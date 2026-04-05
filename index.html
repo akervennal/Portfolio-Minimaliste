@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ============================================================
+         TITRE DU SITE
+         C'est ce qui apparaît dans l'onglet du navigateur.
+         Change "Armel — Photographe" par ce que tu veux.
+    ============================================================ -->
+    <title>Armel — Photographe</title>
+
+    <!-- ============================================================
+         POLICE DE CARACTÈRES
+         On utilise Google Fonts pour charger "Space Mono", une typo
+         monospace élégante qui donne le côté éditorial/minimal.
+         
+         Pour changer la police :
+         1. Va sur https://fonts.google.com
+         2. Choisis une police qui te plaît
+         3. Remplace le lien ci-dessous
+         4. Change le nom dans le CSS plus bas (font-family)
+         
+         Autres polices mono cool : "IBM Plex Mono", "JetBrains Mono",
+         "Courier Prime", "DM Mono"
+    ============================================================ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================
+           VARIABLES CSS — C'EST ICI QUE TU CUSTOMISES TOUT
+           Change ces valeurs pour modifier l'apparence globale du site.
+           ========================================================== */
+        :root {
+            /* -- Couleurs -- */
+            --bg: #ffffff;              /* Fond du site (blanc) */
+            --text: #1a1a1a;            /* Couleur du texte principal (quasi-noir) */
+            --text-light: #666666;      /* Texte secondaire (gris) */
+            --accent: #000000;          /* Couleur d'accent pour les liens survolés */
+            --border: #e0e0e0;          /* Couleur des bordures/séparateurs */
+        }
+
+        /* Mode sombre — appliqué via JS sur <html> */
+        :root.dark {
+            --bg: #1e1e1e;
+            --text: #d6d6d6;
+            --text-light: #787878;
+            --accent: #d6d6d6;
+            --border: #333333;
+        }
+
+        :root {
+
+            /* -- Typographie -- */
+            --font-main: 'Space Mono', monospace;  /* Police principale */
+            --font-size-base: 11px;     /* Taille du texte de base */
+            --font-size-title: 18px;    /* Taille du nom/titre */
+            --font-size-subtitle: 11px; /* Taille du sous-titre */
+            --font-size-nav: 11px;      /* Taille des liens de navigation */
+            --font-size-bio: 13px;      /* Taille du texte de la bio */
+
+            /* -- Layout (dimensions) -- */
+            --sidebar-width: 260px;     /* Largeur de la colonne de gauche */
+            --page-padding: 40px;       /* Marge intérieure générale */
+            --content-max-width: 700px; /* Largeur max de l'image principale */
+        }
+
+
+        /* ==========================================================
+           RESET — Remet tous les éléments à zéro pour éviter
+           les styles par défaut du navigateur
+           ========================================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        /* ==========================================================
+           BODY — Le style global de la page
+           ========================================================== */
+        body {
+            font-family: var(--font-main);
+            font-size: var(--font-size-base);
+            color: var(--text);
+            background-color: var(--bg);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;  /* Texte plus lisse sur Mac */
+        }
+
+
+        /* ==========================================================
+           LAYOUT PRINCIPAL — Structure en 2 colonnes
+           La sidebar est fixe à gauche, le contenu scrolle à droite.
+           C'est un display:flex tout simple.
+           ========================================================== */
+        .layout {
+            display: flex;
+            min-height: 100vh;   /* Prend au minimum toute la hauteur de l'écran */
+        }
+
+
+        /* ==========================================================
+           SIDEBAR — La colonne de gauche
+           Elle reste fixe quand tu scrolles (position: fixed).
+           Contient : ton nom, nav, et la liste des projets/clients.
+           ========================================================== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;              /* Toute la hauteur de l'écran */
+            padding: var(--page-padding);
+            overflow-y: auto;           /* Scroll si la liste est trop longue */
+            border-right: 1px solid var(--border);
+        }
+
+        /* Masquer la scrollbar de la sidebar (plus propre visuellement) */
+        .sidebar::-webkit-scrollbar {
+            width: 0;
+        }
+
+
+        /* ==========================================================
+           HEADER — Ton nom + sous-titre en haut de la sidebar
+           ========================================================== */
+        .site-title {
+            font-size: var(--font-size-title);
+            font-weight: 700;
+            letter-spacing: -0.5px;     /* Resserre légèrement les lettres */
+            text-transform: lowercase;  /* Tout en minuscules comme le ref */
+        }
+
+        .site-subtitle {
+            font-size: var(--font-size-subtitle);
+            color: var(--text-light);
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+
+        /* ==========================================================
+           NAVIGATION PRINCIPALE — Les liens "à propos", "contact" etc.
+           ========================================================== */
+        .nav-main {
+            margin-top: 28px;
+        }
+
+        .nav-main a {
+            display: block;             /* Chaque lien prend toute la largeur */
+            font-size: var(--font-size-nav);
+            color: var(--text);
+            text-decoration: none;      /* Pas de soulignement */
+            padding: 2px 0;
+            transition: color 0.2s;     /* Animation douce au survol */
+        }
+
+        .nav-main a:hover {
+            color: var(--text-light);   /* Gris au survol */
+        }
+
+
+        /* ==========================================================
+           SECTION "WORK" — La liste de tes projets/clients
+           C'est la partie la plus impactante visuellement.
+           Chaque entrée est un lien cliquable.
+           ========================================================== */
+        .nav-work-label {
+            margin-top: 24px;
+            font-size: var(--font-size-nav);
+            font-weight: 700;
+            padding-bottom: 6px;
+        }
+
+        .nav-work a {
+            display: block;
+            font-size: var(--font-size-nav);
+            color: var(--text);
+            text-decoration: none;
+            padding: 1.5px 0;
+            transition: color 0.2s;
+        }
+
+        .nav-work a:hover {
+            color: var(--text-light);
+        }
+
+        /* Projet actuellement sélectionné/actif */
+        .nav-work a.active {
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+
+        /* ==========================================================
+           CONTENU PRINCIPAL — La zone à droite de la sidebar
+           C'est ici que s'affichent tes photos et ta bio.
+           ========================================================== */
+        .main-content {
+            margin-left: var(--sidebar-width);  /* Décalé de la largeur de la sidebar */
+            flex: 1;
+            padding: var(--page-padding);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;    /* Aligne le contenu à gauche */
+        }
+
+
+        /* ==========================================================
+           IMAGE PRINCIPALE — La grande photo de la page d'accueil
+           ========================================================== */
+        .hero-image {
+            width: 100%;
+            max-width: var(--content-max-width);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            /* -- Filtre optionnel pour donner un look à tes photos --
+               Décommente la ligne ci-dessous pour un léger grain :
+               filter: contrast(1.05) saturate(0.9);
+            */
+        }
+
+
+        /* ==========================================================
+           BIO / À PROPOS — Le texte sous la photo
+           ========================================================== */
+        .bio {
+            margin-top: 40px;
+            max-width: var(--content-max-width);
+        }
+
+        .bio-label {
+            font-size: var(--font-size-bio);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .bio p {
+            font-size: var(--font-size-bio);
+            line-height: 1.7;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .bio em {
+            font-style: italic;         /* Italique pour les mots-clés */
+        }
+
+        .bio a {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .bio a:hover {
+            color: var(--text-light);
+        }
+
+
+        /* ==========================================================
+           GALERIE — Grille de photos pour les pages projet
+           Utilise CSS Grid pour un layout flexible.
+           ========================================================== */
+        .gallery {
+            display: grid;
+            grid-template-columns: 1fr;   /* 1 colonne par défaut */
+            gap: 16px;                     /* Espace entre les photos */
+            width: 100%;
+            max-width: var(--content-max-width);
+            margin-top: 20px;
+        }
+
+        /* 2 colonnes pour certaines photos (ajoute class="wide" à la div) */
+        .gallery.two-col {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .gallery img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+
+        /* ==========================================================
+           LAZY LOADING — Les images apparaissent en fondu
+           quand elles entrent dans le viewport au scroll.
+           ========================================================== */
+        img {
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        img.lazy-loaded {
+            opacity: 1;
+        }
+
+        /* Si le navigateur ne supporte pas IntersectionObserver */
+        img.lazy-fallback {
+            opacity: 1;
+        }
+
+        .gallery .full-width {
+            grid-column: 1 / -1;        /* Prend toute la largeur */
+        }
+
+
+        /* ==========================================================
+           TARIFS — Page des formules de service
+           ========================================================== */
+        .tarifs-label {
+            font-size: var(--font-size-bio);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 28px;
+        }
+
+        .tarifs-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            max-width: var(--content-max-width);
+            background-color: var(--border);
+            border: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+
+        .tarif-card {
+            background-color: var(--bg);
+            padding: 24px 20px;
+        }
+
+
+        .tarif-name {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: lowercase;
+            margin-bottom: 4px;
+        }
+
+        .tarif-photos {
+            font-size: 10px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .tarif-price {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            letter-spacing: -1px;
+        }
+
+        .tarif-price-note {
+            font-size: 10px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .tarif-details {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tarif-details li {
+            font-size: 11px;
+            color: var(--text);
+            padding: 4px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .tarif-details li:last-child {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tarif-note {
+            font-size: 11px;
+            color: var(--text-light);
+            max-width: var(--content-max-width);
+            line-height: 1.7;
+            margin-top: 8px;
+        }
+
+        .tarif-note a {
+            color: var(--text);
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .tarifs-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        /* ==========================================================
+           FOOTER — Bas de page
+           ========================================================== */
+        .footer {
+            margin-top: 60px;
+            padding: 20px 0;
+            font-size: 10px;
+            color: var(--text-light);
+            max-width: var(--content-max-width);
+        }
+
+
+        /* ==========================================================
+           PAGE PROJET — Quand on clique sur un projet dans la sidebar
+           ========================================================== */
+        .project-page {
+            display: none;              /* Caché par défaut */
+            width: 100%;
+        }
+
+        .project-page.active {
+            display: block;             /* Affiché quand actif */
+        }
+
+        .project-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: lowercase;
+            margin-bottom: 8px;
+        }
+
+        .project-meta {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 24px;
+        }
+
+
+        /* Bouton hamburger — caché par défaut (desktop) */
+        .mobile-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mobile-toggle span {
+            display: block;
+            width: 16px;
+            height: 1px;
+            background-color: var(--text);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .mobile-toggle.open span:nth-child(1) {
+            transform: translateY(5px) rotate(45deg);
+        }
+
+        .mobile-toggle.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-toggle.open span:nth-child(3) {
+            transform: translateY(-5px) rotate(-45deg);
+        }
+
+        /* ==========================================================
+           RESPONSIVE — Adaptation mobile (écrans < 768px)
+           Sur mobile, la sidebar passe au-dessus du contenu.
+           ========================================================== */
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;  /* Empile au lieu de côte à côte */
+            }
+
+            .sidebar {
+                position: relative;      /* Plus fixe, elle scrolle avec */
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 24px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 24px;
+            }
+
+            /* Affiche le hamburger sur mobile */
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .nav-work-label {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .nav-work {
+                overflow: hidden;
+                max-height: 0;
+                transition: max-height 0.3s ease;
+            }
+
+            .nav-work.open {
+                max-height: 400px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .nav-work {
+                max-height: none !important;
+            }
+        }
+
+        /* -- Toggle mode sombre (style Apple) -- */
+        .dark-toggle {
+            position: absolute;
+            bottom: var(--page-padding);
+            left: var(--page-padding);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .dark-toggle-track {
+            width: 32px;
+            height: 18px;
+            border-radius: 9px;
+            background-color: var(--border);
+            border: 1px solid var(--border);
+            position: relative;
+            transition: background-color 0.25s;
+            flex-shrink: 0;
+        }
+
+        .dark-toggle-thumb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--text-light);
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.25s, background-color 0.25s;
+        }
+
+        :root.dark .dark-toggle-track {
+            background-color: var(--text-light);
+        }
+
+        :root.dark .dark-toggle-thumb {
+            transform: translateX(14px);
+            background-color: var(--bg);
+        }
+
+        .dark-toggle-label {
+            font-family: var(--font-main);
+            font-size: 10px;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+
+        .dark-toggle:hover .dark-toggle-label {
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .dark-toggle {
+                position: static;
+                margin-top: 20px;
+            }
+        }
+
+
+        /* ==========================================================
+           ANIMATIONS — Entrée douce des éléments au chargement
+           ========================================================== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-content {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Animation douce sur les liens de la sidebar */
+        .sidebar a {
+            transition: opacity 0.15s ease, color 0.2s ease;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="layout">
+
+        <!-- ============================================================
+             SIDEBAR — Colonne de gauche
+             
+             POUR CUSTOMISER :
+             • Change ton nom dans <div class="site-title">
+             • Change le sous-titre dans <div class="site-subtitle">
+             • Ajoute/supprime des liens dans nav-main
+             • Ajoute/supprime des projets dans nav-work
+             
+             POUR AJOUTER UN PROJET :
+             1. Ajoute un <a> dans la liste nav-work
+             2. Crée une section project-page correspondante plus bas
+             3. Le data-project doit être identique dans les deux
+        ============================================================ -->
+        <aside class="sidebar">
+
+            <!-- Ton nom -->
+            <div class="site-title">armel</div>
+            <div class="site-subtitle">photographe — nantes</div>
+
+            <!-- Navigation principale -->
+            <nav class="nav-main">
+                <a href="#" data-page="home">à propos</a>
+                <a href="#" data-page="tarifs">tarifs</a>
+                <a href="#" data-page="contact">contact</a>
+            </nav>
+
+            <!-- Liste des projets / clients -->
+            <div class="nav-work-label">
+                work
+                <button class="mobile-toggle" id="mobile-toggle" aria-label="Ouvrir la liste des projets">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <nav class="nav-work" id="nav-work">
+                <!-- ================================================
+                     LISTE DE TES PROJETS
+                     Chaque <a> correspond à un projet.
+                     data-project="nom" doit correspondre à l'id
+                     de la section plus bas.
+                     
+                     Remplace ces exemples par tes vrais projets !
+                ================================================ -->
+                <a href="#" data-project="portraits-urbains">portraits urbains</a>
+                <a href="#" data-project="nantes-la-nuit">nantes la nuit</a>
+                <a href="#" data-project="bretagne-sauvage">bretagne sauvage</a>
+                <a href="#" data-project="reportage-marche">reportage marché</a>
+                <a href="#" data-project="serie-portraits">série portraits</a>
+                <a href="#" data-project="architecture">architecture</a>
+                <a href="#" data-project="projet-perso">projet perso</a>
+                <!-- Ajoute tes projets ici -->
+            </nav>
+
+            <!-- Toggle mode sombre -->
+            <button class="dark-toggle" id="dark-toggle" aria-label="Basculer le mode sombre">
+                <span class="dark-toggle-track"><span class="dark-toggle-thumb"></span></span>
+                <span class="dark-toggle-label" id="dark-toggle-label">clair</span>
+            </button>
+
+        </aside>
+
+
+        <!-- ============================================================
+             CONTENU PRINCIPAL — Zone droite
+        ============================================================ -->
+        <main class="main-content">
+
+            <!-- ========================================================
+                 PAGE D'ACCUEIL — Visible par défaut
+                 
+                 POUR CHANGER L'IMAGE :
+                 1. Place ta photo dans le dossier "images/"
+                 2. Remplace "images/hero.jpg" par le chemin de ta photo
+                 3. Change le alt="" pour décrire ta photo (SEO)
+            ======================================================== -->
+            <section class="home-page active" id="page-home">
+
+                <!-- Image principale -->
+                <div class="hero-image">
+                    <!-- REMPLACE CE PLACEHOLDER PAR TA PHOTO -->
+                    <!-- Exemple : <img src="images/hero.jpg" alt="Description" loading="lazy"> -->
+                    <div style="width:100%; height:500px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; color:#999; font-family:var(--font-main); font-size:12px;">
+                        ta photo ici<br>
+                        remplace ce bloc par une balise &lt;img&gt;
+                    </div>
+                </div>
+
+                <!-- Bio / À propos -->
+                <div class="bio">
+                    <p class="bio-label">perhaps today!</p>
+                    <p>
+                        hello, I'm Armel — a documentary photographer based out of <em>Nantes, France</em>.
+                    </p>
+                    <p>
+                        I shoot portraits, street, and long-form documentary projects.
+                    </p>
+                    <p>
+                        have a question? need a quote? <a href="mailto:ton@email.com">send me a message</a>
+                    </p>
+                </div>
+            </section>
+
+
+            <!-- ========================================================
+                 PAGE TARIFS
+            ======================================================== -->
+            <section class="project-page" id="page-tarifs">
+                <div class="bio">
+                    <p class="tarifs-label">tarifs</p>
+
+                    <div class="tarifs-grid">
+
+                        <!-- ============================================
+                             FORMULE 1 — ESSENTIEL
+                             Modifie le nom, le nombre de photos,
+                             le prix et la liste des détails.
+                        ============================================ -->
+                        <div class="tarif-card">
+                            <div class="tarif-name">essentiel</div>
+                            <!-- Nombre de photos livré -->
+                            <div class="tarif-photos">10 photos retouchées</div>
+                            <!-- Prix -->
+                            <div class="tarif-price">150€</div>
+                            <div class="tarif-price-note">tarif de base</div>
+                            <!-- Détails inclus -->
+                            <ul class="tarif-details">
+                                <li>1h de séance</li>
+                                <li>1 lieu au choix</li>
+                                <li>retouche légère</li>
+                                <li>galerie privée en ligne</li>
+                                <li>livraison sous 7 jours</li>
+                            </ul>
+                        </div>
+
+                        <!-- ============================================
+                             FORMULE 2 — STANDARD (mise en avant)
+                        ============================================ -->
+                        <div class="tarif-card">
+                            <div class="tarif-name">standard</div>
+                            <div class="tarif-photos">20 photos retouchées</div>
+                            <div class="tarif-price">250€</div>
+                            <div class="tarif-price-note">le plus populaire</div>
+                            <ul class="tarif-details">
+                                <li>2h de séance</li>
+                                <li>2 lieux au choix</li>
+                                <li>retouche soignée</li>
+                                <li>galerie privée en ligne</li>
+                                <li>1 tirage offert (A4)</li>
+                                <li>livraison sous 7 jours</li>
+                            </ul>
+                        </div>
+
+                        <!-- ============================================
+                             FORMULE 3 — PREMIUM
+                        ============================================ -->
+                        <div class="tarif-card">
+                            <div class="tarif-name">premium</div>
+                            <div class="tarif-photos">30 photos retouchées</div>
+                            <div class="tarif-price">380€</div>
+                            <div class="tarif-price-note">séance complète</div>
+                            <ul class="tarif-details">
+                                <li>demi-journée (4h)</li>
+                                <li>lieux illimités</li>
+                                <li>retouche avancée</li>
+                                <li>galerie privée en ligne</li>
+                                <li>2 tirages offerts (A4)</li>
+                                <li>fichiers haute résolution</li>
+                                <li>livraison sous 5 jours</li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                    <!-- Note de bas de page / sur mesure -->
+                    <p class="tarif-note">
+                        formules sur mesure disponibles pour les professionnels, reportages et événements. <a href="mailto:ton@email.com">contacte-moi</a> pour un devis.
+                    </p>
+                </div>
+            </section>
+
+
+            <!-- ========================================================
+                 PAGE CONTACT
+            ======================================================== -->
+            <section class="project-page" id="page-contact">
+                <div class="bio">
+                    <p class="bio-label">contact</p>
+                    <p>
+                        email — <a href="mailto:ton@email.com">ton@email.com</a>
+                    </p>
+                    <p>
+                        instagram — <a href="https://instagram.com/toncompte" target="_blank">@toncompte</a>
+                    </p>
+                    <p>
+                        basé à Nantes, disponible partout en France.
+                    </p>
+                </div>
+            </section>
+
+
+            <!-- ========================================================
+                 PAGES PROJET — Une section par projet
+                 
+                 POUR AJOUTER DES PHOTOS À UN PROJET :
+                 1. Crée un dossier images/nom-du-projet/
+                 2. Mets tes photos dedans
+                 3. Ajoute des <img> dans la galerie ci-dessous
+                 
+                 CLASSES UTILES POUR LA GALERIE :
+                 • gallery          → 1 photo par ligne
+                 • gallery two-col  → 2 photos par ligne
+                 • class="full-width" sur une img → prend toute la largeur
+            ======================================================== -->
+
+            <!-- Projet 1 : Portraits Urbains -->
+            <section class="project-page" id="project-portraits-urbains">
+                <div class="project-title">portraits urbains</div>
+                <div class="project-meta">nantes, 2025 — série documentaire</div>
+                <div class="gallery">
+                    <!-- Remplace ces placeholders par tes vraies photos -->
+                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        images/portraits-urbains/photo-01.jpg
+                    </div>
+                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        images/portraits-urbains/photo-02.jpg
+                    </div>
+                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        images/portraits-urbains/photo-03.jpg
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projet 2 : Nantes la Nuit -->
+            <section class="project-page" id="project-nantes-la-nuit">
+                <div class="project-title">nantes la nuit</div>
+                <div class="project-meta">nantes, 2025 — exploration nocturne</div>
+                <div class="gallery two-col">
+                    <div style="width:100%;height:300px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        photo-01.jpg
+                    </div>
+                    <div style="width:100%;height:300px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        photo-02.jpg
+                    </div>
+                    <div style="width:100%;height:300px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        photo-03.jpg
+                    </div>
+                    <div style="width:100%;height:300px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        photo-04.jpg
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projet 3 : Bretagne Sauvage -->
+            <section class="project-page" id="project-bretagne-sauvage">
+                <div class="project-title">bretagne sauvage</div>
+                <div class="project-meta">côtes-d'armor, 2024</div>
+                <div class="gallery">
+                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        photo-01.jpg
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projet 4 : Reportage Marché -->
+            <section class="project-page" id="project-reportage-marche">
+                <div class="project-title">reportage marché</div>
+                <div class="project-meta">nantes — talensac, 2025</div>
+                <div class="gallery">
+                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        photo-01.jpg
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projet 5 : Série Portraits -->
+            <section class="project-page" id="project-serie-portraits">
+                <div class="project-title">série portraits</div>
+                <div class="project-meta">studio & extérieur, 2024-2025</div>
+                <div class="gallery two-col">
+                    <div style="width:100%;height:350px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        photo-01.jpg
+                    </div>
+                    <div style="width:100%;height:350px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        photo-02.jpg
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projet 6 : Architecture -->
+            <section class="project-page" id="project-architecture">
+                <div class="project-title">architecture</div>
+                <div class="project-meta">france, 2024-2025</div>
+                <div class="gallery">
+                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        photo-01.jpg
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projet 7 : Projet Perso -->
+            <section class="project-page" id="project-projet-perso">
+                <div class="project-title">projet perso</div>
+                <div class="project-meta">en cours</div>
+                <div class="gallery">
+                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
+                        photo-01.jpg
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ========================================================
+                 FOOTER
+            ======================================================== -->
+            <footer class="footer">
+                © 2025 armel — tous droits réservés
+            </footer>
+
+        </main>
+    </div>
+
+
+    <!-- ============================================================
+         JAVASCRIPT — Gestion de la navigation
+         
+         Ce script gère :
+         • Le clic sur les liens de la sidebar
+         • L'affichage/masquage des pages projet
+         • La classe "active" sur le lien sélectionné
+         
+         Tu n'as PAS BESOIN de toucher à ce code sauf si tu veux
+         ajouter des fonctionnalités (lightbox, lazy loading, etc.)
+    ============================================================ -->
+    <script>
+        // -- Mode sombre --
+        const toggle = document.getElementById('dark-toggle');
+        const root = document.documentElement;
+
+        const toggleLabel = document.getElementById('dark-toggle-label');
+
+        // Restaure la préférence sauvegardée
+        if (localStorage.getItem('theme') === 'dark') {
+            root.classList.add('dark');
+            toggleLabel.textContent = 'sombre';
+        }
+
+        toggle.addEventListener('click', () => {
+            const isDark = root.classList.toggle('dark');
+            toggleLabel.textContent = isDark ? 'sombre' : 'clair';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // -- Lazy loading des images --
+        // Utilise IntersectionObserver pour déclencher le fondu
+        // quand une image entre dans le viewport.
+        if ('IntersectionObserver' in window) {
+            const imgObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('lazy-loaded');
+                        imgObserver.unobserve(entry.target); // on arrête d'observer une fois chargée
+                    }
+                });
+            }, { rootMargin: '100px' }); // commence à charger 100px avant que l'image soit visible
+
+            // Observer toutes les images existantes et futures
+            function observeImages() {
+                document.querySelectorAll('img:not(.lazy-loaded)').forEach(img => {
+                    imgObserver.observe(img);
+                });
+            }
+
+            observeImages();
+
+            // Re-observer quand on change de page (navigation SPA)
+            document.addEventListener('pageChanged', observeImages);
+        } else {
+            // Fallback : affiche tout directement si IntersectionObserver non supporté
+            document.querySelectorAll('img').forEach(img => img.classList.add('lazy-fallback'));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // -- Hamburger menu mobile --
+            const mobileToggle = document.getElementById('mobile-toggle');
+            const navWork = document.getElementById('nav-work');
+
+            if (mobileToggle && navWork) {
+                mobileToggle.addEventListener('click', () => {
+                    navWork.classList.toggle('open');
+                    mobileToggle.classList.toggle('open');
+                });
+            }
+
+            // -- Récupère tous les éléments nécessaires --
+            const workLinks = document.querySelectorAll('.nav-work a');
+            const pageLinks = document.querySelectorAll('.nav-main a');
+            const homePage = document.getElementById('page-home');
+            const contactPage = document.getElementById('page-contact');
+            const tarifsPage = document.getElementById('page-tarifs');
+            const allProjects = document.querySelectorAll('.project-page');
+
+            // -- Fonction : tout cacher --
+            function hideAll() {
+                homePage.classList.remove('active');
+                homePage.style.display = 'none';
+                allProjects.forEach(p => {
+                    p.classList.remove('active');
+                    p.style.display = 'none';
+                });
+                workLinks.forEach(l => l.classList.remove('active'));
+            }
+
+            // -- Clic sur un projet dans la sidebar --
+            workLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    hideAll();
+
+                    const projectId = link.dataset.project;
+                    const projectEl = document.getElementById(`project-${projectId}`);
+
+                    if (projectEl) {
+                        projectEl.style.display = 'block';
+                        projectEl.classList.add('active');
+                        link.classList.add('active');
+
+                        // Scroll en haut de la page
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                        // Ferme le menu mobile après sélection
+                        if (navWork) navWork.classList.remove('open');
+                        if (mobileToggle) mobileToggle.classList.remove('open');
+
+                        // Notifie le lazy loader qu'il y a de nouvelles images
+                        document.dispatchEvent(new Event('pageChanged'));
+                    }
+                });
+            });
+
+            // -- Clic sur "à propos" ou "contact" --
+            pageLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    hideAll();
+
+                    const page = link.dataset.page;
+                    if (page === 'home') {
+                        homePage.style.display = 'block';
+                        homePage.classList.add('active');
+                    } else if (page === 'contact') {
+                        contactPage.style.display = 'block';
+                        contactPage.classList.add('active');
+                    } else if (page === 'tarifs') {
+                        tarifsPage.style.display = 'block';
+                        tarifsPage.classList.add('active');
+                    }
+
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
