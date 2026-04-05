@@ -9,7 +9,8 @@
          C'est ce qui apparaît dans l'onglet du navigateur.
          Change "Armel — Photographe" par ce que tu veux.
     ============================================================ -->
-    <title>Armel — Photographe</title>
+    <title>Armel Kervennal — Photographe</title>
+    <meta name="description" content="Portfolio d'Armel Kervennal, photographe basé à Nantes. Photo de voiture, paysage et documentaire.">
 
     <!-- ============================================================
          POLICE DE CARACTÈRES
@@ -118,6 +119,8 @@
             padding: var(--page-padding);
             overflow-y: auto;           /* Scroll si la liste est trop longue */
             border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
         }
 
         /* Masquer la scrollbar de la sidebar (plus propre visuellement) */
@@ -177,6 +180,19 @@
             padding-bottom: 6px;
         }
 
+        .nav-year {
+            font-size: var(--font-size-nav);
+            color: var(--text-light);
+            font-weight: 700;
+            margin-top: 14px;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .nav-year:first-child {
+            margin-top: 4px;
+        }
+
         .nav-work a {
             display: block;
             font-size: var(--font-size-nav);
@@ -215,19 +231,26 @@
         /* ==========================================================
            IMAGE PRINCIPALE — La grande photo de la page d'accueil
            ========================================================== */
-        .hero-image {
+        .about-layout {
+            display: flex;
+            gap: 60px;
+            align-items: flex-start;
             width: 100%;
-            max-width: var(--content-max-width);
         }
 
-        .hero-image img {
+        .about-layout .bio {
+            flex: 1;
+            margin-top: 0;
+        }
+
+        .about-photo {
+            flex: 1;
+        }
+
+        .about-photo img {
             width: 100%;
             height: auto;
             display: block;
-            /* -- Filtre optionnel pour donner un look à tes photos --
-               Décommente la ligne ci-dessous pour un léger grain :
-               filter: contrast(1.05) saturate(0.9);
-            */
         }
 
 
@@ -277,16 +300,29 @@
            ========================================================== */
         .gallery {
             display: grid;
-            grid-template-columns: 1fr;   /* 1 colonne par défaut */
-            gap: 16px;                     /* Espace entre les photos */
+            grid-template-columns: 1fr;
+            gap: 16px;
             width: 100%;
-            max-width: var(--content-max-width);
             margin-top: 20px;
         }
 
-        /* 2 colonnes pour certaines photos (ajoute class="wide" à la div) */
         .gallery.two-col {
             grid-template-columns: 1fr 1fr;
+        }
+
+        .gallery.alternating {
+            columns: 2;
+            column-gap: 12px;
+            display: block;
+            max-width: 100%;
+        }
+
+        .gallery.alternating img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 12px;
+            break-inside: avoid;
         }
 
         .gallery img {
@@ -297,21 +333,77 @@
 
 
         /* ==========================================================
+           LIGHTBOX
+           ========================================================== */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+        }
+
+        .lightbox.open {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 92vw;
+            max-height: 92vh;
+            width: auto;
+            height: auto;
+            opacity: 1;
+            object-fit: contain;
+            cursor: default;
+        }
+
+        .lightbox-prev,
+        .lightbox-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 32px;
+            cursor: pointer;
+            padding: 16px;
+            line-height: 1;
+            transition: color 0.2s;
+            user-select: none;
+        }
+
+        .lightbox-prev { left: 8px; }
+        .lightbox-next { right: 8px; }
+
+        .lightbox-prev:hover,
+        .lightbox-next:hover { color: #fff; }
+
+        .gallery img { cursor: zoom-in; }
+
+        /* ==========================================================
            LAZY LOADING — Les images apparaissent en fondu
            quand elles entrent dans le viewport au scroll.
            ========================================================== */
         img {
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transform: translateY(28px);
+            transition: opacity 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         img.lazy-loaded {
             opacity: 1;
+            transform: translateY(0);
         }
 
         /* Si le navigateur ne supporte pas IntersectionObserver */
         img.lazy-fallback {
             opacity: 1;
+            transform: translateY(0);
         }
 
         .gallery .full-width {
@@ -428,12 +520,18 @@
            PAGE PROJET — Quand on clique sur un projet dans la sidebar
            ========================================================== */
         .project-page {
-            display: none;              /* Caché par défaut */
+            display: none;
             width: 100%;
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
         .project-page.active {
-            display: block;             /* Affiché quand actif */
+            display: block;
+        }
+
+        .project-page.visible {
+            opacity: 1;
         }
 
         .project-title {
@@ -487,24 +585,50 @@
            ========================================================== */
         @media (max-width: 768px) {
             .layout {
-                flex-direction: column;  /* Empile au lieu de côte à côte */
+                flex-direction: column;
             }
 
             .sidebar {
-                position: relative;      /* Plus fixe, elle scrolle avec */
+                position: relative;
                 width: 100%;
                 height: auto;
                 border-right: none;
                 border-bottom: 1px solid var(--border);
-                padding: 24px;
+                padding: 12px 16px;
+            }
+
+            .site-title {
+                font-size: 14px;
+            }
+
+            .site-subtitle,
+            .dark-toggle {
+                display: none;
+            }
+
+            .nav-main {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0;
+                margin-top: 6px;
+            }
+
+            .nav-main a {
+                display: inline;
+                padding: 0 12px 0 0;
+            }
+
+            .nav-main a + a {
+                padding: 0 12px;
+                border-left: 1px solid var(--border);
             }
 
             .main-content {
                 margin-left: 0;
-                padding: 24px;
+                padding: 16px;
             }
 
-            /* Affiche le hamburger sur mobile */
             .mobile-toggle {
                 display: flex;
             }
@@ -512,7 +636,8 @@
             .nav-work-label {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
+                gap: 8px;
+                margin-top: 8px;
             }
 
             .nav-work {
@@ -522,7 +647,16 @@
             }
 
             .nav-work.open {
-                max-height: 400px;
+                max-height: 1000px;
+            }
+
+            .gallery.alternating {
+                columns: 1;
+            }
+
+            .about-layout {
+                flex-direction: column;
+                gap: 24px;
             }
         }
 
@@ -534,9 +668,6 @@
 
         /* -- Toggle mode sombre (style Apple) -- */
         .dark-toggle {
-            position: absolute;
-            bottom: var(--page-padding);
-            left: var(--page-padding);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -594,6 +725,21 @@
                 position: static;
                 margin-top: 20px;
             }
+
+            .hero-name {
+                font-size: 18px;
+                margin-bottom: 8px;
+            }
+
+            .hero-desc {
+                font-size: 11px;
+                max-width: 240px;
+            }
+
+            .hero-overlay {
+                top: 16px;
+                left: 16px;
+            }
         }
 
 
@@ -637,42 +783,14 @@
         <aside class="sidebar">
 
             <!-- Ton nom -->
-            <div class="site-title">armel</div>
+            <div class="site-title" id="site-title" style="cursor:pointer;">armel</div>
             <div class="site-subtitle">photographe — nantes</div>
 
             <!-- Navigation principale -->
             <nav class="nav-main">
                 <a href="#" data-page="home">à propos</a>
-                <a href="#" data-page="tarifs">tarifs</a>
+                <!-- <a href="#" data-page="tarifs">tarifs</a> -->
                 <a href="#" data-page="contact">contact</a>
-            </nav>
-
-            <!-- Liste des projets / clients -->
-            <div class="nav-work-label">
-                work
-                <button class="mobile-toggle" id="mobile-toggle" aria-label="Ouvrir la liste des projets">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-            <nav class="nav-work" id="nav-work">
-                <!-- ================================================
-                     LISTE DE TES PROJETS
-                     Chaque <a> correspond à un projet.
-                     data-project="nom" doit correspondre à l'id
-                     de la section plus bas.
-                     
-                     Remplace ces exemples par tes vrais projets !
-                ================================================ -->
-                <a href="#" data-project="portraits-urbains">portraits urbains</a>
-                <a href="#" data-project="nantes-la-nuit">nantes la nuit</a>
-                <a href="#" data-project="bretagne-sauvage">bretagne sauvage</a>
-                <a href="#" data-project="reportage-marche">reportage marché</a>
-                <a href="#" data-project="serie-portraits">série portraits</a>
-                <a href="#" data-project="architecture">architecture</a>
-                <a href="#" data-project="projet-perso">projet perso</a>
-                <!-- Ajoute tes projets ici -->
             </nav>
 
             <!-- Toggle mode sombre -->
@@ -680,6 +798,46 @@
                 <span class="dark-toggle-track"><span class="dark-toggle-thumb"></span></span>
                 <span class="dark-toggle-label" id="dark-toggle-label">clair</span>
             </button>
+
+            <!-- Liste des projets / clients -->
+            <div class="nav-work-label" id="nav-work-label" style="cursor:pointer;">
+                photos
+                <button class="mobile-toggle" id="mobile-toggle" aria-label="Ouvrir la liste des projets">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <nav class="nav-work" id="nav-work">
+                <span class="nav-year">2026</span>
+                <a href="#" data-project="viking-cup-2026">Viking Cup</a>
+                <a href="#" data-project="mezillac-2026">Campagne de Mézillac</a>
+                <a href="#" data-project="nantes-2026">Nantes</a>
+                <a href="#" data-project="saint-nazaire-2026">Saint-Nazaire</a>
+
+                <span class="nav-year">2025</span>
+                <a href="#" data-project="fete-foraine-rennes-2025">Fête Foraine de Rennes</a>
+                <a href="#" data-project="mad-paris-2025">M.A.D. Paris</a>
+                <a href="#" data-project="angleterre-2025">Angleterre</a>
+                <a href="#" data-project="maison-radieuse-2025">Maison Radieuse</a>
+                <a href="#" data-project="pyrenees-2025">Pyrénées</a>
+                <a href="#" data-project="24h-du-mans-2025">24h du Mans</a>
+
+                <span class="nav-year">2024</span>
+                <a href="#" data-project="florence-2024">Florence</a>
+                <a href="#" data-project="rennes-2024">Rennes</a>
+                <a href="#" data-project="grenoble-2024">Grenoble</a>
+                <a href="#" data-project="nice-2024">Nice</a>
+                <a href="#" data-project="marseille-2024">Marseille</a>
+                <a href="#" data-project="lozere-foret-2024">Lozère, forêt</a>
+                <a href="#" data-project="lozere-village-2024">Lozère, village</a>
+                <a href="#" data-project="aubrac-2024">Aubrac</a>
+                <a href="#" data-project="viaduc-garabit-2024">Viaduc de Garabit</a>
+                <a href="#" data-project="nantes-2024">Nantes</a>
+                <a href="#" data-project="thabor-rennes-2024">Thabor — Rennes</a>
+                <a href="#" data-project="port-nantes-2024">Port de Nantes</a>
+            </nav>
+
 
         </aside>
 
@@ -697,33 +855,36 @@
                  2. Remplace "images/hero.jpg" par le chemin de ta photo
                  3. Change le alt="" pour décrire ta photo (SEO)
             ======================================================== -->
-            <section class="home-page active" id="page-home">
-
-                <!-- Image principale -->
-                <div class="hero-image">
-                    <img src="images/Photo principale/MEL_2455.jpg" alt="Photo principale" loading="lazy">
+            <!-- ========================================================
+                 HOME — Showcase des meilleures photos
+            ======================================================== -->
+            <section class="home-page active" id="page-showcase">
+                <div class="gallery alternating">
+                    <!-- Mets tes meilleures photos dans images/showcase/ -->
+                    <!-- et ajoute-les ici -->
                 </div>
+            </section>
 
-                <!-- Bio / À propos -->
-                <div class="bio">
-                    <p class="bio-label">Armel Kervennal</p>
-                    <p>
-                        Salut, je suis un photographe basé sur <em>Nantes.
-                    </p>
-                    <p>
-                        Je fais de la photo de voiture, de paysage, et je débute dans la photo documentaraliste
-                    </p>
-                    <p>
-                        Une question? <a href="mailto:akervennal@gmail.com">envoie moi un mail</a>
-                    </p>
+            <!-- ========================================================
+                 PAGE À PROPOS
+            ======================================================== -->
+            <section class="project-page" id="page-home">
+                <div class="about-layout">
+                    <div class="bio">
+                        <p class="bio-label">Armel Kervennal</p>
+                        <p>Photographe basé à Nantes, je travaille principalement autour de la photographie automobile, de paysage et de rue.</p>
+                    </div>
+                    <div class="about-photo">
+                        <img src="images/Photo principale/MEL_2455.jpg" alt="Photo principale" loading="lazy" decoding="async">
+                    </div>
                 </div>
             </section>
 
 
             <!-- ========================================================
-                 PAGE TARIFS
+                 PAGE TARIFS (désactivée)
             ======================================================== -->
-            <section class="project-page" id="page-tarifs">
+            <section class="project-page" id="page-tarifs" style="display:none !important">
                 <div class="bio">
                     <p class="tarifs-label">tarifs</p>
 
@@ -740,7 +901,6 @@
                             <div class="tarif-photos">10 photos retouchées</div>
                             <!-- Prix -->
                             <div class="tarif-price">150€</div>
-                            <div class="tarif-price-note">tarif de base</div>
                             <!-- Détails inclus -->
                             <ul class="tarif-details">
                                 <li>1h de séance</li>
@@ -758,7 +918,6 @@
                             <div class="tarif-name">standard</div>
                             <div class="tarif-photos">20 photos retouchées</div>
                             <div class="tarif-price">250€</div>
-                            <div class="tarif-price-note">le plus populaire</div>
                             <ul class="tarif-details">
                                 <li>2h de séance</li>
                                 <li>2 lieux au choix</li>
@@ -776,7 +935,6 @@
                             <div class="tarif-name">premium</div>
                             <div class="tarif-photos">30 photos retouchées</div>
                             <div class="tarif-price">380€</div>
-                            <div class="tarif-price-note">séance complète</div>
                             <ul class="tarif-details">
                                 <li>demi-journée (4h)</li>
                                 <li>lieux illimités</li>
@@ -792,7 +950,7 @@
 
                     <!-- Note de bas de page / sur mesure -->
                     <p class="tarif-note">
-                        formules sur mesure disponibles pour les professionnels, reportages et événements. <a href="mailto:ton@email.com">contacte-moi</a> pour un devis.
+                        formules sur mesure disponibles, reportages et événements. <a href="mailto:ton@email.com">contacte-moi</a> pour un devis.
                     </p>
                 </div>
             </section>
@@ -805,13 +963,13 @@
                 <div class="bio">
                     <p class="bio-label">contact</p>
                     <p>
-                        email — <a href="mailto:ton@email.com">ton@email.com</a>
+                        email — <a href="mailto:akervennal@gmail.com">akervennal@gmail.com</a>
                     </p>
                     <p>
-                        instagram — <a href="https://instagram.com/toncompte" target="_blank">@toncompte</a>
+                        instagram — <a href="https://instagram.com/armel_kervennal" target="_blank">@armel_kervennal</a>
                     </p>
                     <p>
-                        basé à Nantes, disponible partout en France.
+                        basé à Nantes, disponible dans le Grand Ouest — Nantes, Rennes, Laval, Vannes et alentours.
                     </p>
                 </div>
             </section>
@@ -831,99 +989,307 @@
                  • class="full-width" sur une img → prend toute la largeur
             ======================================================== -->
 
-            <!-- Projet 1 : Portraits Urbains -->
-            <section class="project-page" id="project-portraits-urbains">
-                <div class="project-title">portraits urbains</div>
-                <div class="project-meta">nantes, 2025 — série documentaire</div>
-                <div class="gallery">
-                    <!-- Remplace ces placeholders par tes vraies photos -->
-                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        images/portraits-urbains/photo-01.jpg
-                    </div>
-                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        images/portraits-urbains/photo-02.jpg
-                    </div>
-                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        images/portraits-urbains/photo-03.jpg
-                    </div>
+            <section class="project-page" id="project-viking-cup-2026">
+                <div class="project-title">Viking Cup</div>
+                <div class="project-meta">Mars 2026</div>
+                <div class="gallery alternating">
+                    <img src="images/viking-cup-2026/MEL_8998.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9003.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9092.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9127.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9148.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9328.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9336.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9453.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9528.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/1-MEL_9738.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9768.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9797.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9811.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
+                    <img src="images/viking-cup-2026/MEL_9816.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
                 </div>
             </section>
 
-            <!-- Projet 2 : Nantes la Nuit -->
-            <section class="project-page" id="project-nantes-la-nuit">
-                <div class="project-title">nantes la nuit</div>
-                <div class="project-meta">nantes, 2025 — exploration nocturne</div>
-                <div class="gallery two-col">
-                    <div style="width:100%;height:300px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        photo-01.jpg
-                    </div>
-                    <div style="width:100%;height:300px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        photo-02.jpg
-                    </div>
-                    <div style="width:100%;height:300px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        photo-03.jpg
-                    </div>
-                    <div style="width:100%;height:300px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        photo-04.jpg
-                    </div>
+            <section class="project-page" id="project-mezillac-2026">
+                <div class="project-title">Campagne de Mézillac</div>
+                <div class="project-meta">Mars 2026</div>
+                <div class="gallery alternating">
+                    <img src="images/mezillac-2026/4-MEL_8715.jpg" alt="Campagne de Mézillac 2026" loading="lazy" decoding="async">
+                    <img src="images/mezillac-2026/3-MEL_8717.jpg" alt="Campagne de Mézillac 2026" loading="lazy" decoding="async">
+                    <img src="images/mezillac-2026/2-MEL_8835.jpg" alt="Campagne de Mézillac 2026" loading="lazy" decoding="async">
                 </div>
             </section>
 
-            <!-- Projet 3 : Bretagne Sauvage -->
-            <section class="project-page" id="project-bretagne-sauvage">
-                <div class="project-title">bretagne sauvage</div>
-                <div class="project-meta">côtes-d'armor, 2024</div>
-                <div class="gallery">
-                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        photo-01.jpg
-                    </div>
+            <section class="project-page" id="project-nantes-2026">
+                <div class="project-title">Nantes</div>
+                <div class="project-meta">Février 2026</div>
+                <div class="gallery alternating">
+                    <img src="images/nantes-2026/7-MEL_8433.jpg" alt="Nantes 2026" loading="lazy" decoding="async">
+                    <img src="images/nantes-2026/6-MEL_8446.jpg" alt="Nantes 2026" loading="lazy" decoding="async">
+                    <img src="images/nantes-2026/5-MEL_8460.jpg" alt="Nantes 2026" loading="lazy" decoding="async">
                 </div>
             </section>
 
-            <!-- Projet 4 : Reportage Marché -->
-            <section class="project-page" id="project-reportage-marche">
-                <div class="project-title">reportage marché</div>
-                <div class="project-meta">nantes — talensac, 2025</div>
-                <div class="gallery">
-                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        photo-01.jpg
-                    </div>
+            <section class="project-page" id="project-saint-nazaire-2026">
+                <div class="project-title">Saint-Nazaire</div>
+                <div class="project-meta">Février 2026</div>
+                <div class="gallery alternating">
+                    <img src="images/saint-nazaire-2026/10-MEL_7964.jpg" alt="Saint-Nazaire 2026" loading="lazy" decoding="async">
+                    <img src="images/saint-nazaire-2026/9-MEL_7970.jpg" alt="Saint-Nazaire 2026" loading="lazy" decoding="async">
+                    <img src="images/saint-nazaire-2026/8-MEL_7998.jpg" alt="Saint-Nazaire 2026" loading="lazy" decoding="async">
                 </div>
             </section>
 
-            <!-- Projet 5 : Série Portraits -->
-            <section class="project-page" id="project-serie-portraits">
-                <div class="project-title">série portraits</div>
-                <div class="project-meta">studio & extérieur, 2024-2025</div>
-                <div class="gallery two-col">
-                    <div style="width:100%;height:350px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        photo-01.jpg
-                    </div>
-                    <div style="width:100%;height:350px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        photo-02.jpg
-                    </div>
+            <section class="project-page" id="project-fete-foraine-rennes-2025">
+                <div class="project-title">Fête Foraine de Rennes</div>
+                <div class="project-meta">Décembre 2025</div>
+                <div class="gallery alternating">
+                    <img src="images/fete-foraine-rennes-2025/1-MEL_7779.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
+                    <img src="images/fete-foraine-rennes-2025/2-MEL_7748.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
+                    <img src="images/fete-foraine-rennes-2025/3-MEL_7745.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
+                    <img src="images/fete-foraine-rennes-2025/4-MEL_7722.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
+                    <img src="images/fete-foraine-rennes-2025/5-MEL_7699.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
+                    <img src="images/fete-foraine-rennes-2025/6-MEL_7681.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
                 </div>
             </section>
 
-            <!-- Projet 6 : Architecture -->
-            <section class="project-page" id="project-architecture">
-                <div class="project-title">architecture</div>
-                <div class="project-meta">france, 2024-2025</div>
-                <div class="gallery">
-                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        photo-01.jpg
-                    </div>
+            <section class="project-page" id="project-mad-paris-2025">
+                <div class="project-title">M.A.D. Paris</div>
+                <div class="project-meta">Décembre 2025</div>
+                <div class="gallery alternating">
+                    <img src="images/mad-paris-2025/MEL_7126.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
+                    <img src="images/mad-paris-2025/MEL_7130.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
+                    <img src="images/mad-paris-2025/MEL_7135.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
+                    <img src="images/mad-paris-2025/MEL_7141.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
+                    <img src="images/mad-paris-2025/MEL_7146.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
+                    <img src="images/mad-paris-2025/MEL_7149.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
                 </div>
             </section>
 
-            <!-- Projet 7 : Projet Perso -->
-            <section class="project-page" id="project-projet-perso">
-                <div class="project-title">projet perso</div>
-                <div class="project-meta">en cours</div>
-                <div class="gallery">
-                    <div style="width:100%;height:400px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;font-family:var(--font-main)">
-                        photo-01.jpg
-                    </div>
+            <section class="project-page" id="project-angleterre-2025">
+                <div class="project-title">Angleterre</div>
+                <div class="project-meta">Décembre 2025</div>
+                <div class="gallery alternating">
+                    <img src="images/angleterre-2025/1-MEL_6436.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
+                    <img src="images/angleterre-2025/2-MEL_6214.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
+                    <img src="images/angleterre-2025/3-MEL_6210.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
+                    <img src="images/angleterre-2025/4-MEL_6207.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
+                    <img src="images/angleterre-2025/5-MEL_6198.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
+                    <img src="images/angleterre-2025/6-MEL_6186.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
+                    <img src="images/angleterre-2025/7-MEL_6184.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
+                    <img src="images/angleterre-2025/8-MEL_6182.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
+                    <img src="images/angleterre-2025/IMG_4776_TIF.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-maison-radieuse-2025">
+                <div class="project-title">Maison Radieuse</div>
+                <div class="project-meta">Décembre 2025</div>
+                <div class="gallery alternating">
+                    <img src="images/maison-radieuse-2025/1-MEL_5634.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
+                    <img src="images/maison-radieuse-2025/2-MEL_5597.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
+                    <img src="images/maison-radieuse-2025/3-MEL_5594.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
+                    <img src="images/maison-radieuse-2025/4-IMG_4736_TIF.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
+                    <img src="images/maison-radieuse-2025/5-IMG_4734_TIF.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
+                    <img src="images/maison-radieuse-2025/6-MEL_5554.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-pyrenees-2025">
+                <div class="project-title">Pyrénées</div>
+                <div class="project-meta">Août 2025</div>
+                <div class="gallery alternating">
+                    <img src="images/pyrenees-2025/10-MEL_2233.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/9-MEL_2240.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/8-MEL_2421.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/7-MEL_2521.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/6-MEL_2545.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/5-MEL_2729.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/4-MEL_3033.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/3-MEL_3066.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/2-MEL_3069.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/1-MEL_3166.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/14-MEL_3530.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/13-MEL_3579.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/12-MEL_3605.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/11-MEL_3611.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/10-MEL_3624.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/9-MEL_3695.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/8-MEL_3748.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/7-MEL_3816.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/6-MEL_3951.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/5-MEL_3958.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/4-MEL_3966.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/3-MEL_3983.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/2-MEL_3986.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                    <img src="images/pyrenees-2025/1-MEL_3991.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-24h-du-mans-2025">
+                <div class="project-title">24h du Mans</div>
+                <div class="project-meta">Juin 2025</div>
+                <div class="gallery alternating">
+                    <img src="images/24h-du-mans-2025/1-MEL_1455.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
+                    <img src="images/24h-du-mans-2025/2-MEL_1452.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
+                    <img src="images/24h-du-mans-2025/3-MEL_1451.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
+                    <img src="images/24h-du-mans-2025/4-MEL_1429.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
+                    <img src="images/24h-du-mans-2025/5-MEL_1111.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
+                    <img src="images/24h-du-mans-2025/6-MEL_1101.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
+                    <img src="images/24h-du-mans-2025/7-MEL_1095.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-florence-2024">
+                <div class="project-title">Florence</div>
+                <div class="project-meta">Avril 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/florence-2024/MEL_0388.jpg" alt="Florence 2024" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-rennes-2024">
+                <div class="project-title">Rennes</div>
+                <div class="project-meta">Avril 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/rennes-2024/MEL_0078.jpg" alt="Rennes 2024" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-grenoble-2024">
+                <div class="project-title">Grenoble</div>
+                <div class="project-meta">Mars 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/grenoble-2024/1-MEL_9885.jpg" alt="Grenoble 2024" loading="lazy" decoding="async">
+                    <img src="images/grenoble-2024/2-MEL_9883.jpg" alt="Grenoble 2024" loading="lazy" decoding="async">
+                    <img src="images/grenoble-2024/3-MEL_9879.jpg" alt="Grenoble 2024" loading="lazy" decoding="async">
+                    <img src="images/grenoble-2024/4-MEL_9866.jpg" alt="Grenoble 2024" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-nice-2024">
+                <div class="project-title">Nice</div>
+                <div class="project-meta">Février 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/nice-2024/5-MEL_9420.jpg" alt="Nice 2024" loading="lazy" decoding="async">
+                    <img src="images/nice-2024/4-MEL_9422.jpg" alt="Nice 2024" loading="lazy" decoding="async">
+                    <img src="images/nice-2024/3-MEL_9426.jpg" alt="Nice 2024" loading="lazy" decoding="async">
+                    <img src="images/nice-2024/2-MEL_9432.jpg" alt="Nice 2024" loading="lazy" decoding="async">
+                    <img src="images/nice-2024/1-MEL_9439.jpg" alt="Nice 2024" loading="lazy" decoding="async">
+                    <img src="images/nice-2024/3-MEL_9563.jpg" alt="Nice 2024" loading="lazy" decoding="async">
+                    <img src="images/nice-2024/2-MEL_9575.jpg" alt="Nice 2024" loading="lazy" decoding="async">
+                    <img src="images/nice-2024/1-MEL_9606.jpg" alt="Nice 2024" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-marseille-2024">
+                <div class="project-title">Marseille</div>
+                <div class="project-meta">Février 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/marseille-2024/1-MEL_9414.jpg" alt="Marseille 2024" loading="lazy" decoding="async">
+                    <img src="images/marseille-2024/2-MEL_9402.jpg" alt="Marseille 2024" loading="lazy" decoding="async">
+                    <img src="images/marseille-2024/3-MEL_9395.jpg" alt="Marseille 2024" loading="lazy" decoding="async">
+                    <img src="images/marseille-2024/4-MEL_9344.jpg" alt="Marseille 2024" loading="lazy" decoding="async">
+                    <img src="images/marseille-2024/5-MEL_9340.jpg" alt="Marseille 2024" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-lozere-foret-2024">
+                <div class="project-title">Lozère, forêt</div>
+                <div class="project-meta">Février 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/lozere-foret-2024/1-MEL_9217.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-foret-2024/2-MEL_9206.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-foret-2024/3-MEL_9180.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-foret-2024/4-MEL_9166.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-foret-2024/5-MEL_9163.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-foret-2024/6-MEL_9135.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-foret-2024/7-MEL_9122.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-foret-2024/8-MEL_9119.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-foret-2024/9-MEL_9112.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-foret-2024/10-MEL_9110.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-lozere-village-2024">
+                <div class="project-title">Lozère, village</div>
+                <div class="project-meta">Février 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/lozere-village-2024/3-MEL_8837.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-village-2024/2-MEL_8841.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-village-2024/1-MEL_8843.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-village-2024/3-MEL_8915.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-village-2024/2-MEL_8930.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
+                    <img src="images/lozere-village-2024/1-MEL_9013.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-aubrac-2024">
+                <div class="project-title">Aubrac</div>
+                <div class="project-meta">Janvier 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/aubrac-2024/1-MEL_8728.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
+                    <img src="images/aubrac-2024/2-MEL_8725.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
+                    <img src="images/aubrac-2024/3-MEL_8724.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
+                    <img src="images/aubrac-2024/4-MEL_8720.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
+                    <img src="images/aubrac-2024/5-MEL_8702.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
+                    <img src="images/aubrac-2024/6-MEL_8697.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-viaduc-garabit-2024">
+                <div class="project-title">Viaduc de Garabit</div>
+                <div class="project-meta">Janvier 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/viaduc-garabit-2024/1-MEL_8475.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
+                    <img src="images/viaduc-garabit-2024/2-MEL_8467.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
+                    <img src="images/viaduc-garabit-2024/3-MEL_8454.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
+                    <img src="images/viaduc-garabit-2024/4-MEL_8449.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
+                    <img src="images/viaduc-garabit-2024/5-MEL_8446.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
+                    <img src="images/viaduc-garabit-2024/6-MEL_8431.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-nantes-2024">
+                <div class="project-title">Nantes</div>
+                <div class="project-meta">Janvier 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/nantes-2024/1-MEL_8349.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/nantes-2024/2-MEL_8345.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/nantes-2024/3-MEL_8312.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/nantes-2024/4-MEL_8307.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/nantes-2024/5-MEL_8306.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/nantes-2024/6-MEL_8230.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/nantes-2024/7-MEL_8228.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/nantes-2024/8-MEL_8227.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-thabor-rennes-2024">
+                <div class="project-title">Thabor — Rennes</div>
+                <div class="project-meta">Janvier 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/thabor-rennes-2024/1-MEL_8176.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
+                    <img src="images/thabor-rennes-2024/2-MEL_8159.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
+                    <img src="images/thabor-rennes-2024/3-MEL_8150.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
+                    <img src="images/thabor-rennes-2024/4-MEL_8103.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
+                    <img src="images/thabor-rennes-2024/5-MEL_8097.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
+                    <img src="images/thabor-rennes-2024/6-MEL_8082.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
+                </div>
+            </section>
+
+            <section class="project-page" id="project-port-nantes-2024">
+                <div class="project-title">Port de Nantes</div>
+                <div class="project-meta">Janvier 2024</div>
+                <div class="gallery alternating">
+                    <img src="images/port-nantes-2024/1-MEL_7745.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/port-nantes-2024/2-MEL_7702.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/port-nantes-2024/3-MEL_7692.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/port-nantes-2024/4-MEL_7683.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/port-nantes-2024/5-MEL_7681.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/port-nantes-2024/6-MEL_7655.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/port-nantes-2024/7-MEL_7650.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
+                    <img src="images/port-nantes-2024/8-MEL_7649.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
                 </div>
             </section>
 
@@ -932,10 +1298,17 @@
                  FOOTER
             ======================================================== -->
             <footer class="footer">
-                © 2025 armel — tous droits réservés
+                © 2026 armel — tous droits réservés
             </footer>
 
         </main>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-prev" id="lightbox-prev">&#8592;</button>
+        <img id="lightbox-img" src="" alt="">
+        <button class="lightbox-next" id="lightbox-next">&#8594;</button>
     </div>
 
 
@@ -973,30 +1346,106 @@
         // Utilise IntersectionObserver pour déclencher le fondu
         // quand une image entre dans le viewport.
         if ('IntersectionObserver' in window) {
-            const imgObserver = new IntersectionObserver((entries) => {
+            // Observer 1 : précharge les images 200px avant (pas d'animation)
+            const preloadObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('lazy-preloaded');
+                        preloadObserver.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '200px' });
+
+            // Observer 2 : déclenche l'animation quand l'image est vraiment visible
+            const animObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('lazy-loaded');
-                        imgObserver.unobserve(entry.target); // on arrête d'observer une fois chargée
+                        animObserver.unobserve(entry.target);
                     }
                 });
-            }, { rootMargin: '100px' }); // commence à charger 100px avant que l'image soit visible
+            }, { rootMargin: '-40px' });
 
-            // Observer toutes les images existantes et futures
             function observeImages() {
                 document.querySelectorAll('img:not(.lazy-loaded)').forEach(img => {
-                    imgObserver.observe(img);
+                    preloadObserver.observe(img);
+                    animObserver.observe(img);
                 });
             }
 
             observeImages();
-
-            // Re-observer quand on change de page (navigation SPA)
             document.addEventListener('pageChanged', observeImages);
         } else {
-            // Fallback : affiche tout directement si IntersectionObserver non supporté
             document.querySelectorAll('img').forEach(img => img.classList.add('lazy-fallback'));
         }
+
+        // Détecte le format naturel des photos et applique la classe portrait
+        function detectOrientations() {
+            document.querySelectorAll('.gallery.alternating img').forEach(img => {
+                function apply() {
+                    if (img.naturalHeight > img.naturalWidth) {
+                        img.classList.add('portrait');
+                    } else {
+                        img.classList.remove('portrait');
+                    }
+                }
+                if (img.complete && img.naturalWidth) {
+                    apply();
+                } else {
+                    img.addEventListener('load', apply);
+                }
+            });
+        }
+
+        detectOrientations();
+        document.addEventListener('pageChanged', detectOrientations);
+
+        // -- Lightbox --
+        (function() {
+            const lightbox  = document.getElementById('lightbox');
+            const lbImg     = document.getElementById('lightbox-img');
+            const lbPrev    = document.getElementById('lightbox-prev');
+            const lbNext    = document.getElementById('lightbox-next');
+            let imgs = [], current = 0;
+
+            function open(list, index) {
+                imgs = list;
+                current = index;
+                lbImg.src = imgs[current].src;
+                lbImg.alt = imgs[current].alt;
+                lightbox.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function close() {
+                lightbox.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            function prev() { current = (current - 1 + imgs.length) % imgs.length; lbImg.src = imgs[current].src; }
+            function next() { current = (current + 1) % imgs.length; lbImg.src = imgs[current].src; }
+
+            document.addEventListener('click', e => {
+                const img = e.target.closest('.gallery img');
+                if (!img) return;
+                const gallery = img.closest('.gallery');
+                const list = Array.from(gallery.querySelectorAll('img'));
+                open(list, list.indexOf(img));
+            });
+
+            lightbox.addEventListener('click', e => {
+                if (e.target === lightbox || e.target === lbImg) close();
+            });
+            lbPrev.addEventListener('click', e => { e.stopPropagation(); prev(); });
+            lbNext.addEventListener('click', e => { e.stopPropagation(); next(); });
+
+            document.addEventListener('keydown', e => {
+                if (!lightbox.classList.contains('open')) return;
+                if (e.key === 'Escape') close();
+                if (e.key === 'ArrowLeft') prev();
+                if (e.key === 'ArrowRight') next();
+            });
+        })();
 
         document.addEventListener('DOMContentLoaded', () => {
 
@@ -1004,16 +1453,20 @@
             const mobileToggle = document.getElementById('mobile-toggle');
             const navWork = document.getElementById('nav-work');
 
+            function toggleNav() {
+                navWork.classList.toggle('open');
+                mobileToggle.classList.toggle('open');
+            }
+
             if (mobileToggle && navWork) {
-                mobileToggle.addEventListener('click', () => {
-                    navWork.classList.toggle('open');
-                    mobileToggle.classList.toggle('open');
-                });
+                mobileToggle.addEventListener('click', e => { e.stopPropagation(); toggleNav(); });
+                document.getElementById('nav-work-label').addEventListener('click', toggleNav);
             }
 
             // -- Récupère tous les éléments nécessaires --
             const workLinks = document.querySelectorAll('.nav-work a');
             const pageLinks = document.querySelectorAll('.nav-main a');
+            const showcasePage = document.getElementById('page-showcase');
             const homePage = document.getElementById('page-home');
             const contactPage = document.getElementById('page-contact');
             const tarifsPage = document.getElementById('page-tarifs');
@@ -1021,13 +1474,28 @@
 
             // -- Fonction : tout cacher --
             function hideAll() {
-                homePage.classList.remove('active');
-                homePage.style.display = 'none';
+                showcasePage.classList.remove('active', 'visible');
+                showcasePage.style.display = 'none';
                 allProjects.forEach(p => {
-                    p.classList.remove('active');
+                    p.classList.remove('active', 'visible');
                     p.style.display = 'none';
                 });
                 workLinks.forEach(l => l.classList.remove('active'));
+            }
+
+            // -- Clic sur le prénom → showcase --
+            document.getElementById('site-title').addEventListener('click', () => {
+                hideAll();
+                if (navWork) navWork.classList.remove('open');
+                if (mobileToggle) mobileToggle.classList.remove('open');
+                showEl(showcasePage);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            function showEl(el) {
+                el.style.display = 'block';
+                el.classList.add('active');
+                requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
             }
 
             // -- Clic sur un projet dans la sidebar --
@@ -1040,18 +1508,11 @@
                     const projectEl = document.getElementById(`project-${projectId}`);
 
                     if (projectEl) {
-                        projectEl.style.display = 'block';
-                        projectEl.classList.add('active');
+                        showEl(projectEl);
                         link.classList.add('active');
-
-                        // Scroll en haut de la page
                         window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                        // Ferme le menu mobile après sélection
                         if (navWork) navWork.classList.remove('open');
                         if (mobileToggle) mobileToggle.classList.remove('open');
-
-                        // Notifie le lazy loader qu'il y a de nouvelles images
                         document.dispatchEvent(new Event('pageChanged'));
                     }
                 });
@@ -1063,16 +1524,16 @@
                     e.preventDefault();
                     hideAll();
 
+                    if (navWork) navWork.classList.remove('open');
+                    if (mobileToggle) mobileToggle.classList.remove('open');
+
                     const page = link.dataset.page;
                     if (page === 'home') {
-                        homePage.style.display = 'block';
-                        homePage.classList.add('active');
+                        showEl(homePage);
                     } else if (page === 'contact') {
-                        contactPage.style.display = 'block';
-                        contactPage.classList.add('active');
+                        showEl(contactPage);
                     } else if (page === 'tarifs') {
-                        tarifsPage.style.display = 'block';
-                        tarifsPage.classList.add('active');
+                        showEl(tarifsPage);
                     }
 
                     window.scrollTo({ top: 0, behavior: 'smooth' });
