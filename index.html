@@ -3,683 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- ============================================================
-         TITRE DU SITE
-         C'est ce qui apparaît dans l'onglet du navigateur.
-         Change "Armel — Photographe" par ce que tu veux.
-    ============================================================ -->
     <title>Armel Kervennal — Photographe</title>
     <meta name="description" content="Portfolio d'Armel Kervennal, photographe basé à Nantes. Photo de voiture, paysage et documentaire.">
 
-    <!-- ============================================================
-         POLICE DE CARACTÈRES
-         On utilise Google Fonts pour charger "Space Mono", une typo
-         monospace élégante qui donne le côté éditorial/minimal.
-         
-         Pour changer la police :
-         1. Va sur https://fonts.google.com
-         2. Choisis une police qui te plaît
-         3. Remplace le lien ci-dessous
-         4. Change le nom dans le CSS plus bas (font-family)
-         
-         Autres polices mono cool : "IBM Plex Mono", "JetBrains Mono",
-         "Courier Prime", "DM Mono"
-    ============================================================ -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
     <style>
-        /* ==========================================================
-           VARIABLES CSS — C'EST ICI QUE TU CUSTOMISES TOUT
-           Change ces valeurs pour modifier l'apparence globale du site.
-           ========================================================== */
         :root {
-            /* -- Couleurs -- */
-            --bg: #ffffff;              /* Fond du site (blanc) */
-            --text: #1a1a1a;            /* Couleur du texte principal (quasi-noir) */
-            --text-light: #666666;      /* Texte secondaire (gris) */
-            --accent: #000000;          /* Couleur d'accent pour les liens survolés */
-            --border: #e0e0e0;          /* Couleur des bordures/séparateurs */
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --text-light: #666666;
+            --border: #e0e0e0;
+            --font-main: 'Space Mono', monospace;
+            --nav-height: 52px;
+            --sidebar-width: 200px;
         }
 
-        /* Mode sombre — appliqué via JS sur <html> */
         :root.dark {
             --bg: #1e1e1e;
             --text: #d6d6d6;
             --text-light: #787878;
-            --accent: #d6d6d6;
             --border: #333333;
         }
 
-        :root {
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-            /* -- Typographie -- */
-            --font-main: 'Space Mono', monospace;  /* Police principale */
-            --font-size-base: 11px;     /* Taille du texte de base */
-            --font-size-title: 18px;    /* Taille du nom/titre */
-            --font-size-subtitle: 11px; /* Taille du sous-titre */
-            --font-size-nav: 11px;      /* Taille des liens de navigation */
-            --font-size-bio: 13px;      /* Taille du texte de la bio */
-
-            /* -- Layout (dimensions) -- */
-            --sidebar-width: 260px;     /* Largeur de la colonne de gauche */
-            --page-padding: 40px;       /* Marge intérieure générale */
-            --content-max-width: 700px; /* Largeur max de l'image principale */
-        }
-
-
-        /* ==========================================================
-           RESET — Remet tous les éléments à zéro pour éviter
-           les styles par défaut du navigateur
-           ========================================================== */
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-
-        /* ==========================================================
-           BODY — Le style global de la page
-           ========================================================== */
         body {
             font-family: var(--font-main);
-            font-size: var(--font-size-base);
+            font-size: 11px;
             color: var(--text);
             background-color: var(--bg);
             line-height: 1.6;
-            -webkit-font-smoothing: antialiased;  /* Texte plus lisse sur Mac */
+            -webkit-font-smoothing: antialiased;
         }
 
-
-        /* ==========================================================
-           LAYOUT PRINCIPAL — Structure en 2 colonnes
-           La sidebar est fixe à gauche, le contenu scrolle à droite.
-           C'est un display:flex tout simple.
-           ========================================================== */
-        .layout {
-            display: flex;
-            min-height: 100vh;   /* Prend au minimum toute la hauteur de l'écran */
-        }
-
-
-        /* ==========================================================
-           SIDEBAR — La colonne de gauche
-           Elle reste fixe quand tu scrolles (position: fixed).
-           Contient : ton nom, nav, et la liste des projets/clients.
-           ========================================================== */
-        .sidebar {
+        /* =====================================================
+           NAV HORIZONTALE — fixe en haut
+        ===================================================== */
+        .site-nav {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: var(--sidebar-width);
-            height: 100vh;              /* Toute la hauteur de l'écran */
-            padding: var(--page-padding);
-            overflow-y: auto;           /* Scroll si la liste est trop longue */
-            border-right: 1px solid var(--border);
+            top: 0; left: 0; right: 0;
+            height: var(--nav-height);
             display: flex;
-            flex-direction: column;
-        }
-
-        /* Masquer la scrollbar de la sidebar (plus propre visuellement) */
-        .sidebar::-webkit-scrollbar {
-            width: 0;
-        }
-
-
-        /* ==========================================================
-           HEADER — Ton nom + sous-titre en haut de la sidebar
-           ========================================================== */
-        .site-title {
-            font-size: var(--font-size-title);
-            font-weight: 700;
-            letter-spacing: -0.5px;     /* Resserre légèrement les lettres */
-            text-transform: lowercase;  /* Tout en minuscules comme le ref */
-        }
-
-        .site-subtitle {
-            font-size: var(--font-size-subtitle);
-            color: var(--text-light);
-            margin-top: 2px;
-            font-weight: 400;
-        }
-
-
-        /* ==========================================================
-           NAVIGATION PRINCIPALE — Les liens "à propos", "contact" etc.
-           ========================================================== */
-        .nav-main {
-            margin-top: 28px;
-        }
-
-        .nav-main a {
-            display: block;             /* Chaque lien prend toute la largeur */
-            font-size: var(--font-size-nav);
-            color: var(--text);
-            text-decoration: none;      /* Pas de soulignement */
-            padding: 2px 0;
-            transition: color 0.2s;     /* Animation douce au survol */
-        }
-
-        .nav-main a:hover {
-            color: var(--text-light);   /* Gris au survol */
-        }
-
-
-        /* ==========================================================
-           SECTION "WORK" — La liste de tes projets/clients
-           C'est la partie la plus impactante visuellement.
-           Chaque entrée est un lien cliquable.
-           ========================================================== */
-        .nav-work-label {
-            margin-top: 24px;
-            font-size: var(--font-size-nav);
-            font-weight: 700;
-            padding-bottom: 6px;
-        }
-
-        .nav-year {
-            font-size: var(--font-size-nav);
-            color: var(--text-light);
-            font-weight: 700;
-            margin-top: 14px;
-            margin-bottom: 2px;
-            display: block;
-        }
-
-        .nav-year:first-child {
-            margin-top: 4px;
-        }
-
-        .nav-work a {
-            display: block;
-            font-size: var(--font-size-nav);
-            color: var(--text);
-            text-decoration: none;
-            padding: 1.5px 0;
-            transition: color 0.2s;
-        }
-
-        .nav-work a:hover {
-            color: var(--text-light);
-        }
-
-        /* Projet actuellement sélectionné/actif */
-        .nav-work a.active {
-            font-weight: 700;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-
-
-        /* ==========================================================
-           CONTENU PRINCIPAL — La zone à droite de la sidebar
-           C'est ici que s'affichent tes photos et ta bio.
-           ========================================================== */
-        .main-content {
-            margin-left: var(--sidebar-width);  /* Décalé de la largeur de la sidebar */
-            flex: 1;
-            padding: var(--page-padding);
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;    /* Aligne le contenu à gauche */
-        }
-
-
-        /* ==========================================================
-           IMAGE PRINCIPALE — La grande photo de la page d'accueil
-           ========================================================== */
-        .about-layout {
-            display: flex;
-            gap: 60px;
-            align-items: flex-start;
-            width: 100%;
-        }
-
-        .about-layout .bio {
-            flex: 1;
-            margin-top: 0;
-        }
-
-        .about-photo {
-            flex: 1;
-        }
-
-        .about-photo img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-
-        /* ==========================================================
-           BIO / À PROPOS — Le texte sous la photo
-           ========================================================== */
-        .bio {
-            margin-top: 40px;
-            max-width: var(--content-max-width);
-        }
-
-        .bio-label {
-            font-size: var(--font-size-bio);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-        }
-
-        .bio p {
-            font-size: var(--font-size-bio);
-            line-height: 1.7;
-            color: var(--text);
-            margin-bottom: 8px;
-        }
-
-        .bio em {
-            font-style: italic;         /* Italique pour les mots-clés */
-        }
-
-        .bio a {
-            color: var(--text);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            font-weight: 700;
-            transition: color 0.2s;
-        }
-
-        .bio a:hover {
-            color: var(--text-light);
-        }
-
-
-        /* ==========================================================
-           GALERIE — Grille de photos pour les pages projet
-           Utilise CSS Grid pour un layout flexible.
-           ========================================================== */
-        .gallery {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .gallery.two-col {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .gallery.alternating {
-            columns: 2;
-            column-gap: 12px;
-            display: block;
-            max-width: 100%;
-        }
-
-        .gallery.alternating img {
-            width: 100%;
-            height: auto;
-            display: block;
-            margin-bottom: 12px;
-            break-inside: avoid;
-        }
-
-        .gallery img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-
-        /* ==========================================================
-           LIGHTBOX
-           ========================================================== */
-        .lightbox {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.92);
-            z-index: 1000;
             align-items: center;
-            justify-content: center;
-            cursor: zoom-out;
+            justify-content: space-between;
+            padding: 0 32px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+            z-index: 200;
         }
 
-        .lightbox.open {
-            display: flex;
-        }
-
-        .lightbox img {
-            max-width: 92vw;
-            max-height: 92vh;
-            width: auto;
-            height: auto;
-            opacity: 1;
-            object-fit: contain;
-            cursor: default;
-        }
-
-        .lightbox-prev,
-        .lightbox-next {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.6);
-            font-size: 32px;
-            cursor: pointer;
-            padding: 16px;
-            line-height: 1;
-            transition: color 0.2s;
-            user-select: none;
-        }
-
-        .lightbox-prev { left: 8px; }
-        .lightbox-next { right: 8px; }
-
-        .lightbox-prev:hover,
-        .lightbox-next:hover { color: #fff; }
-
-        .gallery img { cursor: zoom-in; }
-
-        /* ==========================================================
-           LAZY LOADING — Les images apparaissent en fondu
-           quand elles entrent dans le viewport au scroll.
-           ========================================================== */
-        img {
-            opacity: 0;
-            transform: translateY(28px);
-            transition: opacity 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                        transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        img.lazy-loaded {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Si le navigateur ne supporte pas IntersectionObserver */
-        img.lazy-fallback {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .gallery .full-width {
-            grid-column: 1 / -1;        /* Prend toute la largeur */
-        }
-
-
-        /* ==========================================================
-           TARIFS — Page des formules de service
-           ========================================================== */
-        .tarifs-label {
-            font-size: var(--font-size-bio);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 28px;
-        }
-
-        .tarifs-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            max-width: var(--content-max-width);
-            background-color: var(--border);
-            border: 1px solid var(--border);
-            margin-bottom: 32px;
-        }
-
-        .tarif-card {
-            background-color: var(--bg);
-            padding: 24px 20px;
-        }
-
-
-        .tarif-name {
+        .site-name {
             font-size: 13px;
             font-weight: 700;
+            letter-spacing: -0.5px;
             text-transform: lowercase;
-            margin-bottom: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text);
+            transition: color 0.2s;
+        }
+        .site-name:hover { color: var(--text-light); }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
         }
 
-        .tarif-photos {
-            font-size: 10px;
-            color: var(--text-light);
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
-        }
-
-        .tarif-price {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 2px;
-            letter-spacing: -1px;
-        }
-
-        .tarif-price-note {
-            font-size: 10px;
-            color: var(--text-light);
-            margin-bottom: 20px;
-        }
-
-        .tarif-details {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .tarif-details li {
+        .nav-links a {
             font-size: 11px;
             color: var(--text);
-            padding: 4px 0;
-            border-top: 1px solid var(--border);
+            text-decoration: none;
+            text-transform: lowercase;
+            transition: color 0.2s;
         }
-
-        .tarif-details li:last-child {
-            border-bottom: 1px solid var(--border);
-        }
-
-        .tarif-note {
-            font-size: 11px;
-            color: var(--text-light);
-            max-width: var(--content-max-width);
-            line-height: 1.7;
-            margin-top: 8px;
-        }
-
-        .tarif-note a {
-            color: var(--text);
-            font-weight: 700;
+        .nav-links a:hover { color: var(--text-light); }
+        .nav-links a.active {
             text-decoration: underline;
             text-underline-offset: 3px;
         }
 
-        @media (max-width: 768px) {
-            .tarifs-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-
-        /* ==========================================================
-           FOOTER — Bas de page
-           ========================================================== */
-        .footer {
-            margin-top: 60px;
-            padding: 20px 0;
-            font-size: 10px;
-            color: var(--text-light);
-            max-width: var(--content-max-width);
-        }
-
-
-        /* ==========================================================
-           PAGE PROJET — Quand on clique sur un projet dans la sidebar
-           ========================================================== */
-        .project-page {
-            display: none;
-            width: 100%;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .project-page.active {
-            display: block;
-        }
-
-        .project-page.visible {
-            opacity: 1;
-        }
-
-        .project-title {
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: lowercase;
-            margin-bottom: 8px;
-        }
-
-        .project-meta {
-            font-size: 11px;
-            color: var(--text-light);
-            margin-bottom: 24px;
-        }
-
-
-        /* Bouton hamburger — caché par défaut (desktop) */
-        .mobile-toggle {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 2px;
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .mobile-toggle span {
-            display: block;
-            width: 16px;
-            height: 1px;
-            background-color: var(--text);
-            transition: transform 0.2s, opacity 0.2s;
-        }
-
-        .mobile-toggle.open span:nth-child(1) {
-            transform: translateY(5px) rotate(45deg);
-        }
-
-        .mobile-toggle.open span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .mobile-toggle.open span:nth-child(3) {
-            transform: translateY(-5px) rotate(-45deg);
-        }
-
-        /* ==========================================================
-           RESPONSIVE — Adaptation mobile (écrans < 768px)
-           Sur mobile, la sidebar passe au-dessus du contenu.
-           ========================================================== */
-        @media (max-width: 768px) {
-            .layout {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                position: relative;
-                width: 100%;
-                height: auto;
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-                padding: 12px 16px;
-            }
-
-            .site-title {
-                font-size: 14px;
-            }
-
-            .site-subtitle,
-            .dark-toggle {
-                display: none;
-            }
-
-            .nav-main {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 0;
-                margin-top: 6px;
-            }
-
-            .nav-main a {
-                display: inline;
-                padding: 0 12px 0 0;
-            }
-
-            .nav-main a + a {
-                padding: 0 12px;
-                border-left: 1px solid var(--border);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 16px;
-            }
-
-            .mobile-toggle {
-                display: flex;
-            }
-
-            .nav-work-label {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                margin-top: 8px;
-            }
-
-            .nav-work {
-                overflow: hidden;
-                max-height: 0;
-                transition: max-height 0.3s ease;
-            }
-
-            .nav-work.open {
-                max-height: 1000px;
-            }
-
-            .gallery.alternating {
-                columns: 1;
-            }
-
-            .about-layout {
-                flex-direction: column;
-                gap: 24px;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .nav-work {
-                max-height: none !important;
-            }
-        }
-
-        /* -- Toggle mode sombre (style Apple) -- */
+        /* Dark toggle */
         .dark-toggle {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
             background: none;
             border: none;
             cursor: pointer;
             padding: 0;
         }
-
         .dark-toggle-track {
-            width: 32px;
-            height: 18px;
+            width: 30px; height: 17px;
             border-radius: 9px;
             background-color: var(--border);
             border: 1px solid var(--border);
@@ -687,622 +105,469 @@
             transition: background-color 0.25s;
             flex-shrink: 0;
         }
-
         .dark-toggle-thumb {
-            width: 12px;
-            height: 12px;
+            width: 11px; height: 11px;
             border-radius: 50%;
             background-color: var(--text-light);
             position: absolute;
-            top: 2px;
-            left: 2px;
+            top: 2px; left: 2px;
             transition: transform 0.25s, background-color 0.25s;
         }
-
-        :root.dark .dark-toggle-track {
-            background-color: var(--text-light);
-        }
-
-        :root.dark .dark-toggle-thumb {
-            transform: translateX(14px);
-            background-color: var(--bg);
-        }
-
+        :root.dark .dark-toggle-track { background-color: var(--text-light); }
+        :root.dark .dark-toggle-thumb { transform: translateX(13px); background-color: var(--bg); }
         .dark-toggle-label {
             font-family: var(--font-main);
             font-size: 10px;
             color: var(--text-light);
             letter-spacing: 0.5px;
+        }
+
+        /* =====================================================
+           CONTENU — sous la nav fixe
+        ===================================================== */
+        .main-content {
+            padding-top: var(--nav-height);
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .page.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =====================================================
+           PAGE SHOWCASE — Homepage "armel"
+           3 colonnes, photos en proportion naturelle, pas cliquables
+        ===================================================== */
+        .page-showcase {
+            padding: 32px;
+        }
+
+        .showcase-grid {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .showcase-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .showcase-col img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* =====================================================
+           PAGE GALERIE — sidebar + contenu
+        ===================================================== */
+        .page-gallery {
+            display: none; /* overridden by .active */
+        }
+        .page-gallery.active {
+            display: flex;
+            min-height: calc(100vh - var(--nav-height));
+        }
+
+        /* Sidebar gauche : liste des sorties */
+        .gallery-sidebar {
+            position: sticky;
+            top: var(--nav-height);
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--nav-height));
+            flex-shrink: 0;
+            padding: 28px 24px;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+        }
+        .gallery-sidebar::-webkit-scrollbar { width: 0; }
+
+        .nav-year {
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 700;
+            margin-top: 16px;
+            margin-bottom: 2px;
+            display: block;
+        }
+        .nav-year:first-child { margin-top: 0; }
+
+        .sortie-links a {
+            display: block;
+            font-size: 11px;
+            color: var(--text);
+            text-decoration: none;
+            padding: 2px 0;
             transition: color 0.2s;
         }
+        .sortie-links a:hover { color: var(--text-light); }
+        .sortie-links a.active {
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
 
-        .dark-toggle:hover .dark-toggle-label {
+        /* Contenu principal de la galerie */
+        .gallery-main {
+            flex: 1;
+            padding: 32px;
+            min-width: 0;
+        }
+
+        /* État vide — aucun projet sélectionné */
+        .gallery-empty {
+            color: var(--text-light);
+            font-size: 11px;
+        }
+
+        /* Titre du projet affiché */
+        .project-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: lowercase;
+            margin-bottom: 4px;
+        }
+        .project-meta {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 24px;
+        }
+
+        /* Galerie masonry dans la vue projet */
+        .masonry {
+            columns: 2;
+            column-gap: 10px;
+        }
+        .masonry img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 10px;
+            break-inside: avoid;
+            cursor: zoom-in;
+        }
+
+        /* =====================================================
+           PAGE À PROPOS
+        ===================================================== */
+        .page-about {
+            padding: 52px 32px 60px;
+        }
+        .about-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 40px;
+            align-items: flex-start;
+        }
+        .about-bio { flex: 0 0 220px; }
+        .bio-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .about-bio p {
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 8px;
+        }
+        .about-bio a {
             color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            font-weight: 700;
+        }
+        .about-photo { flex: 1; }
+        .about-photo img { width: 100%; height: auto; display: block; }
+
+        /* =====================================================
+           PAGE CONTACT
+        ===================================================== */
+        .page-contact {
+            padding: 52px 32px 60px;
+        }
+        .contact-label {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+        .page-contact p {
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 6px;
+        }
+        .page-contact a {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            font-weight: 700;
         }
 
-        @media (max-width: 768px) {
-            .dark-toggle {
-                position: static;
-                margin-top: 20px;
-            }
+        /* =====================================================
+           LAZY LOADING
+        ===================================================== */
+        img {
+            opacity: 0;
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        img.lazy-loaded  { opacity: 1; }
+        img.lazy-fallback { opacity: 1; }
 
-            .hero-name {
-                font-size: 18px;
-                margin-bottom: 8px;
-            }
+        /* Les images masonry ont aussi un translateY */
+        .masonry img {
+            transform: translateY(20px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .masonry img.lazy-loaded { opacity: 1; transform: translateY(0); }
 
-            .hero-desc {
+        /* =====================================================
+           LIGHTBOX
+        ===================================================== */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+        }
+        .lightbox.open { display: flex; }
+        .lightbox img {
+            max-width: 92vw; max-height: 92vh;
+            width: auto; height: auto;
+            object-fit: contain;
+            cursor: default;
+            opacity: 1; transform: none;
+            transition: none;
+        }
+        .lightbox-prev, .lightbox-next {
+            position: absolute;
+            top: 50%; transform: translateY(-50%);
+            background: none; border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 32px;
+            cursor: pointer; padding: 16px;
+            line-height: 1; user-select: none;
+            transition: color 0.2s;
+        }
+        .lightbox-prev { left: 8px; }
+        .lightbox-next { right: 8px; }
+        .lightbox-prev:hover, .lightbox-next:hover { color: #fff; }
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+        .footer {
+            padding: 20px 32px;
+            font-size: 10px;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+        @media (max-width: 900px) {
+            .showcase-grid { grid-template-columns: repeat(2, 1fr); }
+            .masonry { columns: 1; }
+        }
+
+        @media (max-width: 600px) {
+            .site-nav { padding: 0 16px; }
+            .nav-links { gap: 14px; }
+            .dark-toggle-label { display: none; }
+            .page-showcase { padding: 16px; }
+            .showcase-grid { gap: 4px; }
+            .showcase-col { gap: 4px; }
+            .gallery-sidebar {
+                position: relative;
+                top: auto;
+                width: 100%;
+                height: auto;
+                max-height: 2000px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                transition: max-height 0.35s ease, padding 0.35s ease, border 0.35s ease;
+                overflow: hidden;
+            }
+            .gallery-sidebar.collapsed {
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+            }
+            .page-gallery.active { flex-direction: column; }
+            .gallery-main { padding: 16px; }
+            .mobile-back {
+                display: inline-block;
                 font-size: 11px;
-                max-width: 240px;
+                color: var(--text-light);
+                cursor: pointer;
+                margin-bottom: 20px;
+                transition: color 0.2s;
             }
-
-            .hero-overlay {
-                top: 16px;
-                left: 16px;
-            }
+            .mobile-back:hover { color: var(--text); }
+            .about-layout { flex-direction: column; gap: 24px; }
+            .about-photo { max-width: 100%; }
+            .page-about, .page-contact { padding-left: 16px; padding-right: 16px; }
         }
-
-
-        /* ==========================================================
-           ANIMATIONS — Entrée douce des éléments au chargement
-           ========================================================== */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .main-content {
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        /* Animation douce sur les liens de la sidebar */
-        .sidebar a {
-            transition: opacity 0.15s ease, color 0.2s ease;
-        }
-
     </style>
 </head>
 <body>
 
-    <div class="layout">
+    <!-- ============================================================
+         NAVIGATION HORIZONTALE
+    ============================================================ -->
+    <nav class="site-nav">
+        <a class="site-name" id="site-name" href="#">armel</a>
 
-        <!-- ============================================================
-             SIDEBAR — Colonne de gauche
-             
-             POUR CUSTOMISER :
-             • Change ton nom dans <div class="site-title">
-             • Change le sous-titre dans <div class="site-subtitle">
-             • Ajoute/supprime des liens dans nav-main
-             • Ajoute/supprime des projets dans nav-work
-             
-             POUR AJOUTER UN PROJET :
-             1. Ajoute un <a> dans la liste nav-work
-             2. Crée une section project-page correspondante plus bas
-             3. Le data-project doit être identique dans les deux
-        ============================================================ -->
-        <aside class="sidebar">
+        <div class="nav-links">
+            <a href="#" data-page="about">à propos</a>
+            <a href="#" data-page="gallery">galerie</a>
+            <a href="#" data-page="contact">contact</a>
 
-            <!-- Ton nom -->
-            <div class="site-title" id="site-title" style="cursor:pointer;">armel</div>
-            <div class="site-subtitle">photographe — nantes</div>
-
-            <!-- Navigation principale -->
-            <nav class="nav-main">
-                <a href="#" data-page="home">à propos</a>
-                <!-- <a href="#" data-page="tarifs">tarifs</a> -->
-                <a href="#" data-page="contact">contact</a>
-            </nav>
-
-            <!-- Toggle mode sombre -->
             <button class="dark-toggle" id="dark-toggle" aria-label="Basculer le mode sombre">
                 <span class="dark-toggle-track"><span class="dark-toggle-thumb"></span></span>
                 <span class="dark-toggle-label" id="dark-toggle-label">clair</span>
             </button>
-
-            <!-- Liste des projets / clients -->
-            <div class="nav-work-label" id="nav-work-label" style="cursor:pointer;">
-                photos
-                <button class="mobile-toggle" id="mobile-toggle" aria-label="Ouvrir la liste des projets">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-            <nav class="nav-work" id="nav-work">
-                <span class="nav-year">2026</span>
-                <a href="#" data-project="viking-cup-2026">Viking Cup</a>
-                <a href="#" data-project="mezillac-2026">Campagne de Mézillac</a>
-                <a href="#" data-project="nantes-2026">Nantes</a>
-                <a href="#" data-project="saint-nazaire-2026">Saint-Nazaire</a>
-
-                <span class="nav-year">2025</span>
-                <a href="#" data-project="fete-foraine-rennes-2025">Fête Foraine de Rennes</a>
-                <a href="#" data-project="mad-paris-2025">M.A.D. Paris</a>
-                <a href="#" data-project="angleterre-2025">Angleterre</a>
-                <a href="#" data-project="maison-radieuse-2025">Maison Radieuse</a>
-                <a href="#" data-project="pyrenees-2025">Pyrénées</a>
-                <a href="#" data-project="24h-du-mans-2025">24h du Mans</a>
-
-                <span class="nav-year">2024</span>
-                <a href="#" data-project="florence-2024">Florence</a>
-                <a href="#" data-project="rennes-2024">Rennes</a>
-                <a href="#" data-project="grenoble-2024">Grenoble</a>
-                <a href="#" data-project="nice-2024">Nice</a>
-                <a href="#" data-project="marseille-2024">Marseille</a>
-                <a href="#" data-project="lozere-foret-2024">Lozère, forêt</a>
-                <a href="#" data-project="lozere-village-2024">Lozère, village</a>
-                <a href="#" data-project="aubrac-2024">Aubrac</a>
-                <a href="#" data-project="viaduc-garabit-2024">Viaduc de Garabit</a>
-                <a href="#" data-project="nantes-2024">Nantes</a>
-                <a href="#" data-project="thabor-rennes-2024">Thabor — Rennes</a>
-                <a href="#" data-project="port-nantes-2024">Port de Nantes</a>
-            </nav>
+        </div>
+    </nav>
 
 
-        </aside>
+    <div class="main-content">
 
-
-        <!-- ============================================================
-             CONTENU PRINCIPAL — Zone droite
-        ============================================================ -->
-        <main class="main-content">
-
-            <!-- ========================================================
-                 PAGE D'ACCUEIL — Visible par défaut
-                 
-                 POUR CHANGER L'IMAGE :
-                 1. Place ta photo dans le dossier "images/"
-                 2. Remplace "images/hero.jpg" par le chemin de ta photo
-                 3. Change le alt="" pour décrire ta photo (SEO)
-            ======================================================== -->
-            <!-- ========================================================
-                 HOME — Showcase des meilleures photos
-            ======================================================== -->
-            <section class="home-page active" id="page-showcase">
-                <div class="gallery alternating">
-                    <!-- Mets tes meilleures photos dans images/showcase/ -->
-                    <!-- et ajoute-les ici -->
+        <!-- ========================================================
+             HOMEPAGE — Showcase (clic sur "armel")
+             Ajoute tes meilleures photos ici dans la grille.
+             3 colonnes, proportions naturelles, pas cliquables.
+        ======================================================== -->
+        <div class="page page-showcase active" id="page-showcase">
+            <div class="showcase-grid">
+                <div class="showcase-col">
+                    <img src="images/showcase/MEL_9528.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/2-MEL_8835.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/9-MEL_3695.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/3-MEL_9879.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/5-MEL_7681.jpg" alt="" loading="lazy" decoding="async">
                 </div>
-            </section>
+                <div class="showcase-col">
+                    <img src="images/showcase/MEL_9003.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/7-MEL_8433.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/13-MEL_3579.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/10-MEL_9110.jpg" alt="" loading="lazy" decoding="async">
+                </div>
+                <div class="showcase-col">
+                    <img src="images/showcase/MEL_9768.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/IMG_4776_TIF.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/1-MEL_3166.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/8-MEL_8227.jpg" alt="" loading="lazy" decoding="async">
+                </div>
+            </div>
+            <footer class="footer">© 2026 armel — tous droits réservés</footer>
+        </div>
 
-            <!-- ========================================================
-                 PAGE À PROPOS
-            ======================================================== -->
-            <section class="project-page" id="page-home">
+
+        <!-- ========================================================
+             GALERIE — Sidebar avec liste des sorties + photos à droite
+        ======================================================== -->
+        <div class="page page-gallery" id="page-gallery">
+
+            <!-- Sidebar : liste des sorties uniquement -->
+            <aside class="gallery-sidebar" id="gallery-sidebar">
+                <nav class="sortie-links" id="sortie-links">
+
+                    <span class="nav-year">2026</span>
+                    <a href="#" data-project="viking-cup-2026">Viking Cup</a>
+                    <a href="#" data-project="mezillac-2026">Campagne de Mézillac</a>
+                    <a href="#" data-project="nantes-2026">Nantes</a>
+                    <a href="#" data-project="saint-nazaire-2026">Saint-Nazaire</a>
+
+                    <span class="nav-year">2025</span>
+                    <a href="#" data-project="fete-foraine-rennes-2025">Fête Foraine de Rennes</a>
+                    <a href="#" data-project="mad-paris-2025">M.A.D. Paris</a>
+                    <a href="#" data-project="angleterre-2025">Angleterre</a>
+                    <a href="#" data-project="maison-radieuse-2025">Maison Radieuse</a>
+                    <a href="#" data-project="pyrenees-2025">Pyrénées</a>
+                    <a href="#" data-project="24h-du-mans-2025">24h du Mans</a>
+
+                    <span class="nav-year">2024</span>
+                    <a href="#" data-project="florence-2024">Florence</a>
+                    <a href="#" data-project="rennes-2024">Rennes</a>
+                    <a href="#" data-project="grenoble-2024">Grenoble</a>
+                    <a href="#" data-project="nice-2024">Nice</a>
+                    <a href="#" data-project="marseille-2024">Marseille</a>
+                    <a href="#" data-project="lozere-foret-2024">Lozère, forêt</a>
+                    <a href="#" data-project="lozere-village-2024">Lozère, village</a>
+                    <a href="#" data-project="aubrac-2024">Aubrac</a>
+                    <a href="#" data-project="viaduc-garabit-2024">Viaduc de Garabit</a>
+                    <a href="#" data-project="nantes-2024">Nantes</a>
+                    <a href="#" data-project="thabor-rennes-2024">Thabor — Rennes</a>
+                    <a href="#" data-project="port-nantes-2024">Port de Nantes</a>
+
+                </nav>
+            </aside>
+
+            <!-- Contenu : photos du projet sélectionné -->
+            <div class="gallery-main" id="gallery-main">
+                <div class="gallery-empty" id="gallery-empty">← sélectionne une sortie</div>
+                <div id="project-view" style="display:none;">
+                    <span class="mobile-back" id="mobile-back" style="display:none;">← retour</span>
+                    <div class="project-title" id="project-title"></div>
+                    <div class="project-meta" id="project-meta"></div>
+                    <div class="masonry" id="project-photos"></div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ========================================================
+             PAGE À PROPOS
+        ======================================================== -->
+        <div class="page" id="page-about">
+            <div class="page-about">
                 <div class="about-layout">
-                    <div class="bio">
-                        <p class="bio-label">Armel Kervennal</p>
+                    <div class="about-bio">
+                        <p class="bio-name">Armel Kervennal</p>
                         <p>Photographe basé à Nantes, je travaille principalement autour de la photographie automobile, de paysage et de rue.</p>
                     </div>
                     <div class="about-photo">
                         <img src="images/Photo principale/MEL_2455.jpg" alt="Photo principale" loading="lazy" decoding="async">
                     </div>
                 </div>
-            </section>
+            </div>
+        </div>
 
 
-            <!-- ========================================================
-                 PAGE TARIFS (désactivée)
-            ======================================================== -->
-            <section class="project-page" id="page-tarifs" style="display:none !important">
-                <div class="bio">
-                    <p class="tarifs-label">tarifs</p>
+        <!-- ========================================================
+             PAGE CONTACT
+        ======================================================== -->
+        <div class="page" id="page-contact">
+            <div class="page-contact">
+                <p class="contact-label">contact</p>
+                <p>email — <a href="mailto:akervennal@gmail.com">akervennal@gmail.com</a></p>
+                <p>instagram — <a href="https://instagram.com/armel_kervennal" target="_blank">@armel_kervennal</a></p>
+                <p style="margin-top:10px; color:var(--text-light);">Basé à Nantes, disponible dans le Grand Ouest — Nantes, Rennes, Laval, Vannes et alentours.</p>
+            </div>
+        </div>
 
-                    <div class="tarifs-grid">
-
-                        <!-- ============================================
-                             FORMULE 1 — ESSENTIEL
-                             Modifie le nom, le nombre de photos,
-                             le prix et la liste des détails.
-                        ============================================ -->
-                        <div class="tarif-card">
-                            <div class="tarif-name">essentiel</div>
-                            <!-- Nombre de photos livré -->
-                            <div class="tarif-photos">10 photos retouchées</div>
-                            <!-- Prix -->
-                            <div class="tarif-price">150€</div>
-                            <!-- Détails inclus -->
-                            <ul class="tarif-details">
-                                <li>1h de séance</li>
-                                <li>1 lieu au choix</li>
-                                <li>retouche légère</li>
-                                <li>galerie privée en ligne</li>
-                                <li>livraison sous 7 jours</li>
-                            </ul>
-                        </div>
-
-                        <!-- ============================================
-                             FORMULE 2 — STANDARD (mise en avant)
-                        ============================================ -->
-                        <div class="tarif-card">
-                            <div class="tarif-name">standard</div>
-                            <div class="tarif-photos">20 photos retouchées</div>
-                            <div class="tarif-price">250€</div>
-                            <ul class="tarif-details">
-                                <li>2h de séance</li>
-                                <li>2 lieux au choix</li>
-                                <li>retouche soignée</li>
-                                <li>galerie privée en ligne</li>
-                                <li>1 tirage offert (A4)</li>
-                                <li>livraison sous 7 jours</li>
-                            </ul>
-                        </div>
-
-                        <!-- ============================================
-                             FORMULE 3 — PREMIUM
-                        ============================================ -->
-                        <div class="tarif-card">
-                            <div class="tarif-name">premium</div>
-                            <div class="tarif-photos">30 photos retouchées</div>
-                            <div class="tarif-price">380€</div>
-                            <ul class="tarif-details">
-                                <li>demi-journée (4h)</li>
-                                <li>lieux illimités</li>
-                                <li>retouche avancée</li>
-                                <li>galerie privée en ligne</li>
-                                <li>2 tirages offerts (A4)</li>
-                                <li>fichiers haute résolution</li>
-                                <li>livraison sous 5 jours</li>
-                            </ul>
-                        </div>
-
-                    </div>
-
-                    <!-- Note de bas de page / sur mesure -->
-                    <p class="tarif-note">
-                        formules sur mesure disponibles, reportages et événements. <a href="mailto:ton@email.com">contacte-moi</a> pour un devis.
-                    </p>
-                </div>
-            </section>
-
-
-            <!-- ========================================================
-                 PAGE CONTACT
-            ======================================================== -->
-            <section class="project-page" id="page-contact">
-                <div class="bio">
-                    <p class="bio-label">contact</p>
-                    <p>
-                        email — <a href="mailto:akervennal@gmail.com">akervennal@gmail.com</a>
-                    </p>
-                    <p>
-                        instagram — <a href="https://instagram.com/armel_kervennal" target="_blank">@armel_kervennal</a>
-                    </p>
-                    <p>
-                        basé à Nantes, disponible dans le Grand Ouest — Nantes, Rennes, Laval, Vannes et alentours.
-                    </p>
-                </div>
-            </section>
-
-
-            <!-- ========================================================
-                 PAGES PROJET — Une section par projet
-                 
-                 POUR AJOUTER DES PHOTOS À UN PROJET :
-                 1. Crée un dossier images/nom-du-projet/
-                 2. Mets tes photos dedans
-                 3. Ajoute des <img> dans la galerie ci-dessous
-                 
-                 CLASSES UTILES POUR LA GALERIE :
-                 • gallery          → 1 photo par ligne
-                 • gallery two-col  → 2 photos par ligne
-                 • class="full-width" sur une img → prend toute la largeur
-            ======================================================== -->
-
-            <section class="project-page" id="project-viking-cup-2026">
-                <div class="project-title">Viking Cup</div>
-                <div class="project-meta">Mars 2026</div>
-                <div class="gallery alternating">
-                    <img src="images/viking-cup-2026/MEL_8998.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9003.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9092.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9127.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9148.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9328.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9336.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9453.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9528.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/1-MEL_9738.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9768.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9797.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9811.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                    <img src="images/viking-cup-2026/MEL_9816.jpg" alt="Viking Cup 2026" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-mezillac-2026">
-                <div class="project-title">Campagne de Mézillac</div>
-                <div class="project-meta">Mars 2026</div>
-                <div class="gallery alternating">
-                    <img src="images/mezillac-2026/4-MEL_8715.jpg" alt="Campagne de Mézillac 2026" loading="lazy" decoding="async">
-                    <img src="images/mezillac-2026/3-MEL_8717.jpg" alt="Campagne de Mézillac 2026" loading="lazy" decoding="async">
-                    <img src="images/mezillac-2026/2-MEL_8835.jpg" alt="Campagne de Mézillac 2026" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-nantes-2026">
-                <div class="project-title">Nantes</div>
-                <div class="project-meta">Février 2026</div>
-                <div class="gallery alternating">
-                    <img src="images/nantes-2026/7-MEL_8433.jpg" alt="Nantes 2026" loading="lazy" decoding="async">
-                    <img src="images/nantes-2026/6-MEL_8446.jpg" alt="Nantes 2026" loading="lazy" decoding="async">
-                    <img src="images/nantes-2026/5-MEL_8460.jpg" alt="Nantes 2026" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-saint-nazaire-2026">
-                <div class="project-title">Saint-Nazaire</div>
-                <div class="project-meta">Février 2026</div>
-                <div class="gallery alternating">
-                    <img src="images/saint-nazaire-2026/10-MEL_7964.jpg" alt="Saint-Nazaire 2026" loading="lazy" decoding="async">
-                    <img src="images/saint-nazaire-2026/9-MEL_7970.jpg" alt="Saint-Nazaire 2026" loading="lazy" decoding="async">
-                    <img src="images/saint-nazaire-2026/8-MEL_7998.jpg" alt="Saint-Nazaire 2026" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-fete-foraine-rennes-2025">
-                <div class="project-title">Fête Foraine de Rennes</div>
-                <div class="project-meta">Décembre 2025</div>
-                <div class="gallery alternating">
-                    <img src="images/fete-foraine-rennes-2025/1-MEL_7779.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
-                    <img src="images/fete-foraine-rennes-2025/2-MEL_7748.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
-                    <img src="images/fete-foraine-rennes-2025/3-MEL_7745.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
-                    <img src="images/fete-foraine-rennes-2025/4-MEL_7722.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
-                    <img src="images/fete-foraine-rennes-2025/5-MEL_7699.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
-                    <img src="images/fete-foraine-rennes-2025/6-MEL_7681.jpg" alt="Fête Foraine de Rennes 2025" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-mad-paris-2025">
-                <div class="project-title">M.A.D. Paris</div>
-                <div class="project-meta">Décembre 2025</div>
-                <div class="gallery alternating">
-                    <img src="images/mad-paris-2025/MEL_7126.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
-                    <img src="images/mad-paris-2025/MEL_7130.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
-                    <img src="images/mad-paris-2025/MEL_7135.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
-                    <img src="images/mad-paris-2025/MEL_7141.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
-                    <img src="images/mad-paris-2025/MEL_7146.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
-                    <img src="images/mad-paris-2025/MEL_7149.jpg" alt="M.A.D. Paris 2025" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-angleterre-2025">
-                <div class="project-title">Angleterre</div>
-                <div class="project-meta">Décembre 2025</div>
-                <div class="gallery alternating">
-                    <img src="images/angleterre-2025/1-MEL_6436.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
-                    <img src="images/angleterre-2025/2-MEL_6214.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
-                    <img src="images/angleterre-2025/3-MEL_6210.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
-                    <img src="images/angleterre-2025/4-MEL_6207.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
-                    <img src="images/angleterre-2025/5-MEL_6198.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
-                    <img src="images/angleterre-2025/6-MEL_6186.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
-                    <img src="images/angleterre-2025/7-MEL_6184.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
-                    <img src="images/angleterre-2025/8-MEL_6182.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
-                    <img src="images/angleterre-2025/IMG_4776_TIF.jpg" alt="Angleterre 2025" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-maison-radieuse-2025">
-                <div class="project-title">Maison Radieuse</div>
-                <div class="project-meta">Décembre 2025</div>
-                <div class="gallery alternating">
-                    <img src="images/maison-radieuse-2025/1-MEL_5634.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
-                    <img src="images/maison-radieuse-2025/2-MEL_5597.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
-                    <img src="images/maison-radieuse-2025/3-MEL_5594.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
-                    <img src="images/maison-radieuse-2025/4-IMG_4736_TIF.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
-                    <img src="images/maison-radieuse-2025/5-IMG_4734_TIF.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
-                    <img src="images/maison-radieuse-2025/6-MEL_5554.jpg" alt="Maison Radieuse 2025" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-pyrenees-2025">
-                <div class="project-title">Pyrénées</div>
-                <div class="project-meta">Août 2025</div>
-                <div class="gallery alternating">
-                    <img src="images/pyrenees-2025/10-MEL_2233.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/9-MEL_2240.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/8-MEL_2421.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/7-MEL_2521.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/6-MEL_2545.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/5-MEL_2729.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/4-MEL_3033.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/3-MEL_3066.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/2-MEL_3069.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/1-MEL_3166.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/14-MEL_3530.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/13-MEL_3579.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/12-MEL_3605.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/11-MEL_3611.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/10-MEL_3624.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/9-MEL_3695.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/8-MEL_3748.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/7-MEL_3816.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/6-MEL_3951.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/5-MEL_3958.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/4-MEL_3966.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/3-MEL_3983.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/2-MEL_3986.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                    <img src="images/pyrenees-2025/1-MEL_3991.jpg" alt="Pyrénées 2025" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-24h-du-mans-2025">
-                <div class="project-title">24h du Mans</div>
-                <div class="project-meta">Juin 2025</div>
-                <div class="gallery alternating">
-                    <img src="images/24h-du-mans-2025/1-MEL_1455.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
-                    <img src="images/24h-du-mans-2025/2-MEL_1452.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
-                    <img src="images/24h-du-mans-2025/3-MEL_1451.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
-                    <img src="images/24h-du-mans-2025/4-MEL_1429.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
-                    <img src="images/24h-du-mans-2025/5-MEL_1111.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
-                    <img src="images/24h-du-mans-2025/6-MEL_1101.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
-                    <img src="images/24h-du-mans-2025/7-MEL_1095.jpg" alt="24h du Mans 2025" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-florence-2024">
-                <div class="project-title">Florence</div>
-                <div class="project-meta">Avril 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/florence-2024/MEL_0388.jpg" alt="Florence 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-rennes-2024">
-                <div class="project-title">Rennes</div>
-                <div class="project-meta">Avril 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/rennes-2024/MEL_0078.jpg" alt="Rennes 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-grenoble-2024">
-                <div class="project-title">Grenoble</div>
-                <div class="project-meta">Mars 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/grenoble-2024/1-MEL_9885.jpg" alt="Grenoble 2024" loading="lazy" decoding="async">
-                    <img src="images/grenoble-2024/2-MEL_9883.jpg" alt="Grenoble 2024" loading="lazy" decoding="async">
-                    <img src="images/grenoble-2024/3-MEL_9879.jpg" alt="Grenoble 2024" loading="lazy" decoding="async">
-                    <img src="images/grenoble-2024/4-MEL_9866.jpg" alt="Grenoble 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-nice-2024">
-                <div class="project-title">Nice</div>
-                <div class="project-meta">Février 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/nice-2024/5-MEL_9420.jpg" alt="Nice 2024" loading="lazy" decoding="async">
-                    <img src="images/nice-2024/4-MEL_9422.jpg" alt="Nice 2024" loading="lazy" decoding="async">
-                    <img src="images/nice-2024/3-MEL_9426.jpg" alt="Nice 2024" loading="lazy" decoding="async">
-                    <img src="images/nice-2024/2-MEL_9432.jpg" alt="Nice 2024" loading="lazy" decoding="async">
-                    <img src="images/nice-2024/1-MEL_9439.jpg" alt="Nice 2024" loading="lazy" decoding="async">
-                    <img src="images/nice-2024/3-MEL_9563.jpg" alt="Nice 2024" loading="lazy" decoding="async">
-                    <img src="images/nice-2024/2-MEL_9575.jpg" alt="Nice 2024" loading="lazy" decoding="async">
-                    <img src="images/nice-2024/1-MEL_9606.jpg" alt="Nice 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-marseille-2024">
-                <div class="project-title">Marseille</div>
-                <div class="project-meta">Février 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/marseille-2024/1-MEL_9414.jpg" alt="Marseille 2024" loading="lazy" decoding="async">
-                    <img src="images/marseille-2024/2-MEL_9402.jpg" alt="Marseille 2024" loading="lazy" decoding="async">
-                    <img src="images/marseille-2024/3-MEL_9395.jpg" alt="Marseille 2024" loading="lazy" decoding="async">
-                    <img src="images/marseille-2024/4-MEL_9344.jpg" alt="Marseille 2024" loading="lazy" decoding="async">
-                    <img src="images/marseille-2024/5-MEL_9340.jpg" alt="Marseille 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-lozere-foret-2024">
-                <div class="project-title">Lozère, forêt</div>
-                <div class="project-meta">Février 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/lozere-foret-2024/1-MEL_9217.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-foret-2024/2-MEL_9206.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-foret-2024/3-MEL_9180.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-foret-2024/4-MEL_9166.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-foret-2024/5-MEL_9163.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-foret-2024/6-MEL_9135.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-foret-2024/7-MEL_9122.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-foret-2024/8-MEL_9119.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-foret-2024/9-MEL_9112.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-foret-2024/10-MEL_9110.jpg" alt="Lozère forêt 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-lozere-village-2024">
-                <div class="project-title">Lozère, village</div>
-                <div class="project-meta">Février 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/lozere-village-2024/3-MEL_8837.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-village-2024/2-MEL_8841.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-village-2024/1-MEL_8843.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-village-2024/3-MEL_8915.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-village-2024/2-MEL_8930.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
-                    <img src="images/lozere-village-2024/1-MEL_9013.jpg" alt="Lozère village 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-aubrac-2024">
-                <div class="project-title">Aubrac</div>
-                <div class="project-meta">Janvier 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/aubrac-2024/1-MEL_8728.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
-                    <img src="images/aubrac-2024/2-MEL_8725.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
-                    <img src="images/aubrac-2024/3-MEL_8724.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
-                    <img src="images/aubrac-2024/4-MEL_8720.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
-                    <img src="images/aubrac-2024/5-MEL_8702.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
-                    <img src="images/aubrac-2024/6-MEL_8697.jpg" alt="Aubrac 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-viaduc-garabit-2024">
-                <div class="project-title">Viaduc de Garabit</div>
-                <div class="project-meta">Janvier 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/viaduc-garabit-2024/1-MEL_8475.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
-                    <img src="images/viaduc-garabit-2024/2-MEL_8467.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
-                    <img src="images/viaduc-garabit-2024/3-MEL_8454.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
-                    <img src="images/viaduc-garabit-2024/4-MEL_8449.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
-                    <img src="images/viaduc-garabit-2024/5-MEL_8446.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
-                    <img src="images/viaduc-garabit-2024/6-MEL_8431.jpg" alt="Viaduc de Garabit 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-nantes-2024">
-                <div class="project-title">Nantes</div>
-                <div class="project-meta">Janvier 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/nantes-2024/1-MEL_8349.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/nantes-2024/2-MEL_8345.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/nantes-2024/3-MEL_8312.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/nantes-2024/4-MEL_8307.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/nantes-2024/5-MEL_8306.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/nantes-2024/6-MEL_8230.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/nantes-2024/7-MEL_8228.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/nantes-2024/8-MEL_8227.jpg" alt="Nantes 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-thabor-rennes-2024">
-                <div class="project-title">Thabor — Rennes</div>
-                <div class="project-meta">Janvier 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/thabor-rennes-2024/1-MEL_8176.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
-                    <img src="images/thabor-rennes-2024/2-MEL_8159.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
-                    <img src="images/thabor-rennes-2024/3-MEL_8150.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
-                    <img src="images/thabor-rennes-2024/4-MEL_8103.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
-                    <img src="images/thabor-rennes-2024/5-MEL_8097.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
-                    <img src="images/thabor-rennes-2024/6-MEL_8082.jpg" alt="Thabor Rennes 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-            <section class="project-page" id="project-port-nantes-2024">
-                <div class="project-title">Port de Nantes</div>
-                <div class="project-meta">Janvier 2024</div>
-                <div class="gallery alternating">
-                    <img src="images/port-nantes-2024/1-MEL_7745.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/port-nantes-2024/2-MEL_7702.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/port-nantes-2024/3-MEL_7692.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/port-nantes-2024/4-MEL_7683.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/port-nantes-2024/5-MEL_7681.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/port-nantes-2024/6-MEL_7655.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/port-nantes-2024/7-MEL_7650.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
-                    <img src="images/port-nantes-2024/8-MEL_7649.jpg" alt="Port de Nantes 2024" loading="lazy" decoding="async">
-                </div>
-            </section>
-
-
-            <!-- ========================================================
-                 FOOTER
-            ======================================================== -->
-            <footer class="footer">
-                © 2026 armel — tous droits réservés
-            </footer>
-
-        </main>
     </div>
+
 
     <!-- Lightbox -->
     <div class="lightbox" id="lightbox">
@@ -1312,124 +577,427 @@
     </div>
 
 
-    <!-- ============================================================
-         JAVASCRIPT — Gestion de la navigation
-         
-         Ce script gère :
-         • Le clic sur les liens de la sidebar
-         • L'affichage/masquage des pages projet
-         • La classe "active" sur le lien sélectionné
-         
-         Tu n'as PAS BESOIN de toucher à ce code sauf si tu veux
-         ajouter des fonctionnalités (lightbox, lazy loading, etc.)
-    ============================================================ -->
     <script>
-        // -- Mode sombre --
-        const toggle = document.getElementById('dark-toggle');
-        const root = document.documentElement;
+        // ============================================================
+        // Données des projets
+        // ============================================================
+        const projects = {
+            'viking-cup-2026': {
+                title: 'Viking Cup', date: 'Mars 2026',
+                photos: [
+                    'images/viking-cup-2026/MEL_8998.jpg',
+                    'images/viking-cup-2026/MEL_9003.jpg',
+                    'images/viking-cup-2026/MEL_9092.jpg',
+                    'images/viking-cup-2026/MEL_9127.jpg',
+                    'images/viking-cup-2026/MEL_9148.jpg',
+                    'images/viking-cup-2026/MEL_9328.jpg',
+                    'images/viking-cup-2026/MEL_9336.jpg',
+                    'images/viking-cup-2026/MEL_9453.jpg',
+                    'images/viking-cup-2026/MEL_9528.jpg',
+                    'images/viking-cup-2026/1-MEL_9738.jpg',
+                    'images/viking-cup-2026/MEL_9768.jpg',
+                    'images/viking-cup-2026/MEL_9797.jpg',
+                    'images/viking-cup-2026/MEL_9811.jpg',
+                    'images/viking-cup-2026/MEL_9816.jpg',
+                ]
+            },
+            'mezillac-2026': {
+                title: 'Campagne de Mézillac', date: 'Mars 2026',
+                photos: [
+                    'images/mezillac-2026/4-MEL_8715.jpg',
+                    'images/mezillac-2026/3-MEL_8717.jpg',
+                    'images/mezillac-2026/2-MEL_8835.jpg',
+                ]
+            },
+            'nantes-2026': {
+                title: 'Nantes', date: 'Février 2026',
+                photos: [
+                    'images/nantes-2026/7-MEL_8433.jpg',
+                    'images/nantes-2026/6-MEL_8446.jpg',
+                    'images/nantes-2026/5-MEL_8460.jpg',
+                ]
+            },
+            'saint-nazaire-2026': {
+                title: 'Saint-Nazaire', date: 'Février 2026',
+                photos: [
+                    'images/saint-nazaire-2026/10-MEL_7964.jpg',
+                    'images/saint-nazaire-2026/9-MEL_7970.jpg',
+                    'images/saint-nazaire-2026/8-MEL_7998.jpg',
+                ]
+            },
+            'fete-foraine-rennes-2025': {
+                title: 'Fête Foraine de Rennes', date: 'Décembre 2025',
+                photos: [
+                    'images/fete-foraine-rennes-2025/1-MEL_7779.jpg',
+                    'images/fete-foraine-rennes-2025/2-MEL_7748.jpg',
+                    'images/fete-foraine-rennes-2025/3-MEL_7745.jpg',
+                    'images/fete-foraine-rennes-2025/4-MEL_7722.jpg',
+                    'images/fete-foraine-rennes-2025/5-MEL_7699.jpg',
+                    'images/fete-foraine-rennes-2025/6-MEL_7681.jpg',
+                ]
+            },
+            'mad-paris-2025': {
+                title: 'M.A.D. Paris', date: 'Décembre 2025',
+                photos: [
+                    'images/mad-paris-2025/MEL_7126.jpg',
+                    'images/mad-paris-2025/MEL_7130.jpg',
+                    'images/mad-paris-2025/MEL_7135.jpg',
+                    'images/mad-paris-2025/MEL_7141.jpg',
+                    'images/mad-paris-2025/MEL_7146.jpg',
+                    'images/mad-paris-2025/MEL_7149.jpg',
+                ]
+            },
+            'angleterre-2025': {
+                title: 'Angleterre', date: 'Décembre 2025',
+                photos: [
+                    'images/angleterre-2025/1-MEL_6436.jpg',
+                    'images/angleterre-2025/2-MEL_6214.jpg',
+                    'images/angleterre-2025/3-MEL_6210.jpg',
+                    'images/angleterre-2025/4-MEL_6207.jpg',
+                    'images/angleterre-2025/5-MEL_6198.jpg',
+                    'images/angleterre-2025/6-MEL_6186.jpg',
+                    'images/angleterre-2025/7-MEL_6184.jpg',
+                    'images/angleterre-2025/8-MEL_6182.jpg',
+                    'images/angleterre-2025/IMG_4776_TIF.jpg',
+                ]
+            },
+            'maison-radieuse-2025': {
+                title: 'Maison Radieuse', date: 'Décembre 2025',
+                photos: [
+                    'images/maison-radieuse-2025/1-MEL_5634.jpg',
+                    'images/maison-radieuse-2025/2-MEL_5597.jpg',
+                    'images/maison-radieuse-2025/3-MEL_5594.jpg',
+                    'images/maison-radieuse-2025/4-IMG_4736_TIF.jpg',
+                    'images/maison-radieuse-2025/5-IMG_4734_TIF.jpg',
+                    'images/maison-radieuse-2025/6-MEL_5554.jpg',
+                ]
+            },
+            'pyrenees-2025': {
+                title: 'Pyrénées', date: 'Août 2025',
+                photos: [
+                    'images/pyrenees-2025/10-MEL_2233.jpg',
+                    'images/pyrenees-2025/9-MEL_2240.jpg',
+                    'images/pyrenees-2025/8-MEL_2421.jpg',
+                    'images/pyrenees-2025/7-MEL_2521.jpg',
+                    'images/pyrenees-2025/6-MEL_2545.jpg',
+                    'images/pyrenees-2025/5-MEL_2729.jpg',
+                    'images/pyrenees-2025/4-MEL_3033.jpg',
+                    'images/pyrenees-2025/3-MEL_3066.jpg',
+                    'images/pyrenees-2025/2-MEL_3069.jpg',
+                    'images/pyrenees-2025/1-MEL_3166.jpg',
+                    'images/pyrenees-2025/14-MEL_3530.jpg',
+                    'images/pyrenees-2025/13-MEL_3579.jpg',
+                    'images/pyrenees-2025/12-MEL_3605.jpg',
+                    'images/pyrenees-2025/11-MEL_3611.jpg',
+                    'images/pyrenees-2025/10-MEL_3624.jpg',
+                    'images/pyrenees-2025/9-MEL_3695.jpg',
+                    'images/pyrenees-2025/8-MEL_3748.jpg',
+                    'images/pyrenees-2025/7-MEL_3816.jpg',
+                    'images/pyrenees-2025/6-MEL_3951.jpg',
+                    'images/pyrenees-2025/5-MEL_3958.jpg',
+                    'images/pyrenees-2025/4-MEL_3966.jpg',
+                    'images/pyrenees-2025/3-MEL_3983.jpg',
+                    'images/pyrenees-2025/2-MEL_3986.jpg',
+                    'images/pyrenees-2025/1-MEL_3991.jpg',
+                ]
+            },
+            '24h-du-mans-2025': {
+                title: '24h du Mans', date: 'Juin 2025',
+                photos: [
+                    'images/24h-du-mans-2025/1-MEL_1455.jpg',
+                    'images/24h-du-mans-2025/2-MEL_1452.jpg',
+                    'images/24h-du-mans-2025/3-MEL_1451.jpg',
+                    'images/24h-du-mans-2025/4-MEL_1429.jpg',
+                    'images/24h-du-mans-2025/5-MEL_1111.jpg',
+                    'images/24h-du-mans-2025/6-MEL_1101.jpg',
+                    'images/24h-du-mans-2025/7-MEL_1095.jpg',
+                ]
+            },
+            'florence-2024': {
+                title: 'Florence', date: 'Avril 2024',
+                photos: ['images/florence-2024/MEL_0388.jpg']
+            },
+            'rennes-2024': {
+                title: 'Rennes', date: 'Avril 2024',
+                photos: ['images/rennes-2024/MEL_0078.jpg']
+            },
+            'grenoble-2024': {
+                title: 'Grenoble', date: 'Mars 2024',
+                photos: [
+                    'images/grenoble-2024/1-MEL_9885.jpg',
+                    'images/grenoble-2024/2-MEL_9883.jpg',
+                    'images/grenoble-2024/3-MEL_9879.jpg',
+                    'images/grenoble-2024/4-MEL_9866.jpg',
+                ]
+            },
+            'nice-2024': {
+                title: 'Nice', date: 'Février 2024',
+                photos: [
+                    'images/nice-2024/5-MEL_9420.jpg',
+                    'images/nice-2024/4-MEL_9422.jpg',
+                    'images/nice-2024/3-MEL_9426.jpg',
+                    'images/nice-2024/2-MEL_9432.jpg',
+                    'images/nice-2024/1-MEL_9439.jpg',
+                    'images/nice-2024/3-MEL_9563.jpg',
+                    'images/nice-2024/2-MEL_9575.jpg',
+                    'images/nice-2024/1-MEL_9606.jpg',
+                ]
+            },
+            'marseille-2024': {
+                title: 'Marseille', date: 'Février 2024',
+                photos: [
+                    'images/marseille-2024/1-MEL_9414.jpg',
+                    'images/marseille-2024/2-MEL_9402.jpg',
+                    'images/marseille-2024/3-MEL_9395.jpg',
+                    'images/marseille-2024/4-MEL_9344.jpg',
+                    'images/marseille-2024/5-MEL_9340.jpg',
+                ]
+            },
+            'lozere-foret-2024': {
+                title: 'Lozère, forêt', date: 'Février 2024',
+                photos: [
+                    'images/lozere-foret-2024/1-MEL_9217.jpg',
+                    'images/lozere-foret-2024/2-MEL_9206.jpg',
+                    'images/lozere-foret-2024/3-MEL_9180.jpg',
+                    'images/lozere-foret-2024/4-MEL_9166.jpg',
+                    'images/lozere-foret-2024/5-MEL_9163.jpg',
+                    'images/lozere-foret-2024/6-MEL_9135.jpg',
+                    'images/lozere-foret-2024/7-MEL_9122.jpg',
+                    'images/lozere-foret-2024/8-MEL_9119.jpg',
+                    'images/lozere-foret-2024/9-MEL_9112.jpg',
+                    'images/lozere-foret-2024/10-MEL_9110.jpg',
+                ]
+            },
+            'lozere-village-2024': {
+                title: 'Lozère, village', date: 'Février 2024',
+                photos: [
+                    'images/lozere-village-2024/3-MEL_8837.jpg',
+                    'images/lozere-village-2024/2-MEL_8841.jpg',
+                    'images/lozere-village-2024/1-MEL_8843.jpg',
+                    'images/lozere-village-2024/3-MEL_8915.jpg',
+                    'images/lozere-village-2024/2-MEL_8930.jpg',
+                    'images/lozere-village-2024/1-MEL_9013.jpg',
+                ]
+            },
+            'aubrac-2024': {
+                title: 'Aubrac', date: 'Janvier 2024',
+                photos: [
+                    'images/aubrac-2024/1-MEL_8728.jpg',
+                    'images/aubrac-2024/2-MEL_8725.jpg',
+                    'images/aubrac-2024/3-MEL_8724.jpg',
+                    'images/aubrac-2024/4-MEL_8720.jpg',
+                    'images/aubrac-2024/5-MEL_8702.jpg',
+                    'images/aubrac-2024/6-MEL_8697.jpg',
+                ]
+            },
+            'viaduc-garabit-2024': {
+                title: 'Viaduc de Garabit', date: 'Janvier 2024',
+                photos: [
+                    'images/viaduc-garabit-2024/1-MEL_8475.jpg',
+                    'images/viaduc-garabit-2024/2-MEL_8467.jpg',
+                    'images/viaduc-garabit-2024/3-MEL_8454.jpg',
+                    'images/viaduc-garabit-2024/4-MEL_8449.jpg',
+                    'images/viaduc-garabit-2024/5-MEL_8446.jpg',
+                    'images/viaduc-garabit-2024/6-MEL_8431.jpg',
+                ]
+            },
+            'nantes-2024': {
+                title: 'Nantes', date: 'Janvier 2024',
+                photos: [
+                    'images/nantes-2024/1-MEL_8349.jpg',
+                    'images/nantes-2024/2-MEL_8345.jpg',
+                    'images/nantes-2024/3-MEL_8312.jpg',
+                    'images/nantes-2024/4-MEL_8307.jpg',
+                    'images/nantes-2024/5-MEL_8306.jpg',
+                    'images/nantes-2024/6-MEL_8230.jpg',
+                    'images/nantes-2024/7-MEL_8228.jpg',
+                    'images/nantes-2024/8-MEL_8227.jpg',
+                ]
+            },
+            'thabor-rennes-2024': {
+                title: 'Thabor — Rennes', date: 'Janvier 2024',
+                photos: [
+                    'images/thabor-rennes-2024/1-MEL_8176.jpg',
+                    'images/thabor-rennes-2024/2-MEL_8159.jpg',
+                    'images/thabor-rennes-2024/3-MEL_8150.jpg',
+                    'images/thabor-rennes-2024/4-MEL_8103.jpg',
+                    'images/thabor-rennes-2024/5-MEL_8097.jpg',
+                    'images/thabor-rennes-2024/6-MEL_8082.jpg',
+                ]
+            },
+            'port-nantes-2024': {
+                title: 'Port de Nantes', date: 'Janvier 2024',
+                photos: [
+                    'images/port-nantes-2024/1-MEL_7745.jpg',
+                    'images/port-nantes-2024/2-MEL_7702.jpg',
+                    'images/port-nantes-2024/3-MEL_7692.jpg',
+                    'images/port-nantes-2024/4-MEL_7683.jpg',
+                    'images/port-nantes-2024/5-MEL_7681.jpg',
+                    'images/port-nantes-2024/6-MEL_7655.jpg',
+                    'images/port-nantes-2024/7-MEL_7650.jpg',
+                    'images/port-nantes-2024/8-MEL_7649.jpg',
+                ]
+            },
+        };
 
+        // ============================================================
+        // Mode sombre
+        // ============================================================
+        const toggleBtn = document.getElementById('dark-toggle');
+        const root = document.documentElement;
         const toggleLabel = document.getElementById('dark-toggle-label');
 
-        // Restaure la préférence sauvegardée
         if (localStorage.getItem('theme') === 'dark') {
             root.classList.add('dark');
             toggleLabel.textContent = 'sombre';
         }
-
-        toggle.addEventListener('click', () => {
+        toggleBtn.addEventListener('click', () => {
             const isDark = root.classList.toggle('dark');
             toggleLabel.textContent = isDark ? 'sombre' : 'clair';
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
 
-        // -- Lazy loading des images --
-        // Utilise IntersectionObserver pour déclencher le fondu
-        // quand une image entre dans le viewport.
-        if ('IntersectionObserver' in window) {
-            // Observer 1 : précharge les images 200px avant (pas d'animation)
-            const preloadObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('lazy-preloaded');
-                        preloadObserver.unobserve(entry.target);
-                    }
-                });
-            }, { rootMargin: '200px' });
+        // ============================================================
+        // Navigation entre pages
+        // ============================================================
+        const allPages = {
+            showcase: document.getElementById('page-showcase'),
+            gallery:  document.getElementById('page-gallery'),
+            about:    document.getElementById('page-about'),
+            contact:  document.getElementById('page-contact'),
+        };
 
-            // Observer 2 : déclenche l'animation quand l'image est vraiment visible
-            const animObserver = new IntersectionObserver((entries) => {
+        function showPage(name) {
+            Object.values(allPages).forEach(p => p.classList.remove('active'));
+            allPages[name].classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.querySelectorAll('.nav-links a[data-page]').forEach(a => {
+                a.classList.toggle('active', a.dataset.page === name);
+            });
+            document.dispatchEvent(new Event('pageChanged'));
+        }
+
+        document.querySelectorAll('.nav-links a[data-page]').forEach(a => {
+            a.addEventListener('click', e => { e.preventDefault(); showPage(a.dataset.page); });
+        });
+
+        document.getElementById('site-name').addEventListener('click', e => {
+            e.preventDefault();
+            showPage('showcase');
+        });
+
+        // ============================================================
+        // Galerie : clic sur une sortie dans la sidebar
+        // ============================================================
+        const projectTitleEl  = document.getElementById('project-title');
+        const projectMetaEl   = document.getElementById('project-meta');
+        const projectPhotosEl = document.getElementById('project-photos');
+        const projectView     = document.getElementById('project-view');
+        const galleryEmpty    = document.getElementById('gallery-empty');
+        const gallerySidebar  = document.getElementById('gallery-sidebar');
+        const mobileBackBtn   = document.getElementById('mobile-back');
+
+        function isMobile() { return window.innerWidth <= 600; }
+
+        // Bouton retour mobile — ré-ouvre la sidebar
+        mobileBackBtn.addEventListener('click', () => {
+            gallerySidebar.classList.remove('collapsed');
+            projectView.style.display = 'none';
+            galleryEmpty.style.display = 'block';
+            mobileBackBtn.style.display = 'none';
+            document.querySelectorAll('.sortie-links a').forEach(l => l.classList.remove('active'));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        document.querySelectorAll('.sortie-links a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const id = link.dataset.project;
+                const p = projects[id];
+                if (!p) return;
+
+                // Marque le lien actif
+                document.querySelectorAll('.sortie-links a').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                // Rempli le projet
+                projectTitleEl.textContent = p.title;
+                projectMetaEl.textContent  = p.date;
+                projectPhotosEl.innerHTML = '';
+                p.photos.forEach(src => {
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.alt = p.title;
+                    img.loading = 'lazy';
+                    img.decoding = 'async';
+                    projectPhotosEl.appendChild(img);
+                });
+
+                galleryEmpty.style.display = 'none';
+                projectView.style.display = 'block';
+
+                // Sur mobile : collapse la sidebar, affiche le bouton retour
+                if (isMobile()) {
+                    gallerySidebar.classList.add('collapsed');
+                    mobileBackBtn.style.display = 'inline-block';
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.dispatchEvent(new Event('pageChanged'));
+            });
+        });
+
+        // ============================================================
+        // Lazy loading
+        // ============================================================
+        function observeImages() {
+            if (!('IntersectionObserver' in window)) {
+                document.querySelectorAll('img:not(.lazy-loaded)').forEach(img => img.classList.add('lazy-fallback'));
+                return;
+            }
+            const obs = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('lazy-loaded');
-                        animObserver.unobserve(entry.target);
+                        obs.unobserve(entry.target);
                     }
                 });
-            }, { rootMargin: '-40px' });
+            }, { rootMargin: '40px' });
 
-            function observeImages() {
-                document.querySelectorAll('img:not(.lazy-loaded)').forEach(img => {
-                    preloadObserver.observe(img);
-                    animObserver.observe(img);
-                });
-            }
-
-            observeImages();
-            document.addEventListener('pageChanged', observeImages);
-        } else {
-            document.querySelectorAll('img').forEach(img => img.classList.add('lazy-fallback'));
+            document.querySelectorAll('img:not(.lazy-loaded):not(.lazy-fallback)').forEach(img => obs.observe(img));
         }
 
-        // Détecte le format naturel des photos et applique la classe portrait
-        function detectOrientations() {
-            document.querySelectorAll('.gallery.alternating img').forEach(img => {
-                function apply() {
-                    if (img.naturalHeight > img.naturalWidth) {
-                        img.classList.add('portrait');
-                    } else {
-                        img.classList.remove('portrait');
-                    }
-                }
-                if (img.complete && img.naturalWidth) {
-                    apply();
-                } else {
-                    img.addEventListener('load', apply);
-                }
-            });
-        }
+        observeImages();
+        document.addEventListener('pageChanged', observeImages);
 
-        detectOrientations();
-        document.addEventListener('pageChanged', detectOrientations);
-
-        // -- Lightbox --
+        // ============================================================
+        // Lightbox (photos des projets seulement)
+        // ============================================================
         (function() {
-            const lightbox  = document.getElementById('lightbox');
-            const lbImg     = document.getElementById('lightbox-img');
-            const lbPrev    = document.getElementById('lightbox-prev');
-            const lbNext    = document.getElementById('lightbox-next');
+            const lightbox = document.getElementById('lightbox');
+            const lbImg    = document.getElementById('lightbox-img');
+            const lbPrev   = document.getElementById('lightbox-prev');
+            const lbNext   = document.getElementById('lightbox-next');
             let imgs = [], current = 0;
 
             function open(list, index) {
-                imgs = list;
-                current = index;
+                imgs = list; current = index;
                 lbImg.src = imgs[current].src;
                 lbImg.alt = imgs[current].alt;
                 lightbox.classList.add('open');
                 document.body.style.overflow = 'hidden';
             }
-
             function close() {
                 lightbox.classList.remove('open');
                 document.body.style.overflow = '';
             }
-
             function prev() { current = (current - 1 + imgs.length) % imgs.length; lbImg.src = imgs[current].src; }
             function next() { current = (current + 1) % imgs.length; lbImg.src = imgs[current].src; }
 
             document.addEventListener('click', e => {
-                const img = e.target.closest('.gallery img');
+                const img = e.target.closest('.masonry img');
                 if (!img) return;
-                const gallery = img.closest('.gallery');
-                const list = Array.from(gallery.querySelectorAll('img'));
+                const list = Array.from(document.querySelectorAll('.masonry img'));
                 open(list, list.indexOf(img));
             });
 
@@ -1438,7 +1006,6 @@
             });
             lbPrev.addEventListener('click', e => { e.stopPropagation(); prev(); });
             lbNext.addEventListener('click', e => { e.stopPropagation(); next(); });
-
             document.addEventListener('keydown', e => {
                 if (!lightbox.classList.contains('open')) return;
                 if (e.key === 'Escape') close();
@@ -1446,100 +1013,6 @@
                 if (e.key === 'ArrowRight') next();
             });
         })();
-
-        document.addEventListener('DOMContentLoaded', () => {
-
-            // -- Hamburger menu mobile --
-            const mobileToggle = document.getElementById('mobile-toggle');
-            const navWork = document.getElementById('nav-work');
-
-            function toggleNav() {
-                navWork.classList.toggle('open');
-                mobileToggle.classList.toggle('open');
-            }
-
-            if (mobileToggle && navWork) {
-                mobileToggle.addEventListener('click', e => { e.stopPropagation(); toggleNav(); });
-                document.getElementById('nav-work-label').addEventListener('click', toggleNav);
-            }
-
-            // -- Récupère tous les éléments nécessaires --
-            const workLinks = document.querySelectorAll('.nav-work a');
-            const pageLinks = document.querySelectorAll('.nav-main a');
-            const showcasePage = document.getElementById('page-showcase');
-            const homePage = document.getElementById('page-home');
-            const contactPage = document.getElementById('page-contact');
-            const tarifsPage = document.getElementById('page-tarifs');
-            const allProjects = document.querySelectorAll('.project-page');
-
-            // -- Fonction : tout cacher --
-            function hideAll() {
-                showcasePage.classList.remove('active', 'visible');
-                showcasePage.style.display = 'none';
-                allProjects.forEach(p => {
-                    p.classList.remove('active', 'visible');
-                    p.style.display = 'none';
-                });
-                workLinks.forEach(l => l.classList.remove('active'));
-            }
-
-            // -- Clic sur le prénom → showcase --
-            document.getElementById('site-title').addEventListener('click', () => {
-                hideAll();
-                if (navWork) navWork.classList.remove('open');
-                if (mobileToggle) mobileToggle.classList.remove('open');
-                showEl(showcasePage);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-
-            function showEl(el) {
-                el.style.display = 'block';
-                el.classList.add('active');
-                requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
-            }
-
-            // -- Clic sur un projet dans la sidebar --
-            workLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    hideAll();
-
-                    const projectId = link.dataset.project;
-                    const projectEl = document.getElementById(`project-${projectId}`);
-
-                    if (projectEl) {
-                        showEl(projectEl);
-                        link.classList.add('active');
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                        if (navWork) navWork.classList.remove('open');
-                        if (mobileToggle) mobileToggle.classList.remove('open');
-                        document.dispatchEvent(new Event('pageChanged'));
-                    }
-                });
-            });
-
-            // -- Clic sur "à propos" ou "contact" --
-            pageLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    hideAll();
-
-                    if (navWork) navWork.classList.remove('open');
-                    if (mobileToggle) mobileToggle.classList.remove('open');
-
-                    const page = link.dataset.page;
-                    if (page === 'home') {
-                        showEl(homePage);
-                    } else if (page === 'contact') {
-                        showEl(contactPage);
-                    } else if (page === 'tarifs') {
-                        showEl(tarifsPage);
-                    }
-
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-            });
-        });
     </script>
 
 </body>
