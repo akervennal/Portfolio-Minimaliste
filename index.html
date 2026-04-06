@@ -132,6 +132,7 @@
             width: 100%;
             height: auto;
             display: block;
+            cursor: zoom-in;
         }
 
         /* =====================================================
@@ -209,17 +210,22 @@
             margin-bottom: 24px;
         }
 
-        /* Galerie masonry dans la vue projet */
+        /* Galerie projet — même principe que showcase, 2 colonnes */
         .masonry {
-            columns: 2;
-            column-gap: 10px;
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
         }
-        .masonry img {
+        .masonry-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        .masonry-col img {
             width: 100%;
             height: auto;
             display: block;
-            margin-bottom: 10px;
-            break-inside: avoid;
             cursor: zoom-in;
         }
 
@@ -290,13 +296,12 @@
         img.lazy-loaded  { opacity: 1; }
         img.lazy-fallback { opacity: 1; }
 
-        /* Les images masonry ont aussi un translateY */
-        .masonry img {
+        .masonry-col img {
             transform: translateY(20px);
             transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                         transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .masonry img.lazy-loaded { opacity: 1; transform: translateY(0); }
+        .masonry-col img.lazy-loaded { opacity: 1; transform: translateY(0); }
 
         /* =====================================================
            LIGHTBOX
@@ -350,16 +355,20 @@
         ===================================================== */
         @media (max-width: 900px) {
             .showcase-grid { grid-template-columns: repeat(2, 1fr); }
-            .masonry { columns: 1; }
+        }
+        @media (max-width: 600px) {
+            .masonry { gap: 16px; }
+            .masonry-col { gap: 16px; }
         }
 
         @media (max-width: 600px) {
             .site-nav { padding: 0 16px; }
-            .nav-links { gap: 14px; }
+            .nav-links { gap: 10px; }
+            .nav-links a { font-size: 12px; }
 
             .page-showcase { padding: 16px; }
-            .showcase-grid { gap: 4px; }
-            .showcase-col { gap: 4px; }
+            .showcase-grid { gap: 16px; }
+            .showcase-col { gap: 16px; }
             .gallery-sidebar {
                 position: relative;
                 top: auto;
@@ -379,7 +388,8 @@
             }
             .page-gallery.active { flex-direction: column; }
             .gallery-main { padding: 16px; }
-            .about-layout { flex-direction: column; gap: 24px; }
+            .about-layout { flex-direction: column; gap: 1px; }
+            .about-bio { flex: none; }
             .about-photo { max-width: 100%; }
             .page-about, .page-contact { padding-left: 16px; padding-right: 16px; }
         }
@@ -886,18 +896,24 @@
                 document.querySelectorAll('.sortie-links a').forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
 
-                // Rempli le projet
+                // Rempli le projet en 2 colonnes flex
                 projectTitleEl.textContent = p.title;
                 projectMetaEl.textContent  = p.date;
                 projectPhotosEl.innerHTML = '';
-                p.photos.forEach(src => {
+                const col1 = document.createElement('div');
+                const col2 = document.createElement('div');
+                col1.className = 'masonry-col';
+                col2.className = 'masonry-col';
+                p.photos.forEach((src, i) => {
                     const img = document.createElement('img');
                     img.src = src;
                     img.alt = p.title;
                     img.loading = 'lazy';
                     img.decoding = 'async';
-                    projectPhotosEl.appendChild(img);
+                    (i % 2 === 0 ? col1 : col2).appendChild(img);
                 });
+                projectPhotosEl.appendChild(col1);
+                projectPhotosEl.appendChild(col2);
 
                 galleryEmpty.style.display = 'none';
                 projectView.style.display = 'block';
@@ -961,9 +977,12 @@
             function next() { current = (current + 1) % imgs.length; lbImg.src = imgs[current].src; }
 
             document.addEventListener('click', e => {
-                const img = e.target.closest('.masonry img');
+                const img = e.target.closest('.masonry-col img, .showcase-col img');
                 if (!img) return;
-                const list = Array.from(document.querySelectorAll('.masonry img'));
+                const isMasonry = img.closest('.masonry');
+                const list = isMasonry
+                    ? Array.from(document.querySelectorAll('.masonry-col img'))
+                    : Array.from(document.querySelectorAll('.showcase-col img'));
                 open(list, list.indexOf(img));
             });
 
