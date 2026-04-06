@@ -319,7 +319,7 @@
         ===================================================== */
         img {
             opacity: 0;
-            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: opacity 1.4s ease;
         }
         img.lazy-loaded  { opacity: 1; }
         img.lazy-fallback { opacity: 1; }
@@ -967,21 +967,19 @@
         // ============================================================
         // Lazy loading
         // ============================================================
-        function observeImages() {
-            if (!('IntersectionObserver' in window)) {
-                document.querySelectorAll('img:not(.lazy-loaded)').forEach(img => img.classList.add('lazy-fallback'));
-                return;
-            }
-            const obs = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('lazy-loaded');
-                        obs.unobserve(entry.target);
-                    }
-                });
-            }, { rootMargin: '40px' });
+        function fadeIn(img) {
+            requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('lazy-loaded')));
+        }
 
-            document.querySelectorAll('img:not(.lazy-loaded):not(.lazy-fallback)').forEach(img => obs.observe(img));
+        function observeImages() {
+            document.querySelectorAll('img:not(.lazy-loaded):not(.lazy-fallback)').forEach(img => {
+                if (img.complete && img.naturalWidth) {
+                    fadeIn(img);
+                } else {
+                    img.addEventListener('load', () => fadeIn(img), { once: true });
+                    img.addEventListener('error', () => fadeIn(img), { once: true });
+                }
+            });
         }
 
         observeImages();
