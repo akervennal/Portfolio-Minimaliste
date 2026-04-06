@@ -391,6 +391,7 @@
             .page-gallery.active { flex-direction: column; }
             .gallery-main { padding: 16px; }
             .about-layout { flex-direction: column; gap: 1px; }
+            .gallery-empty { display: none; }
             .about-bio { flex: none; }
             .about-photo { max-width: 100%; }
             .page-about, .page-contact { padding-left: 16px; padding-right: 16px; }
@@ -845,7 +846,7 @@
         function openGalleryList() {
             gallerySidebar.classList.remove('collapsed');
             projectView.style.display = 'none';
-            galleryEmpty.style.display = 'block';
+            if (!isMobile()) galleryEmpty.style.display = 'block';
             document.querySelectorAll('.sortie-links a').forEach(l => l.classList.remove('active'));
             mobileGalleryState = 'list';
             window.scrollTo({ top: 0, behavior: 'smooth' });
