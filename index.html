@@ -233,34 +233,113 @@
         /* =====================================================
            PAGE À PROPOS
         ===================================================== */
-        .page-about {
-            padding: 10px 32px 60px;
-        }
-        .about-layout {
+        .page-about-layout {
             display: flex;
-            flex-direction: row;
+            min-height: calc(100vh - var(--nav-height));
+        }
+        .about-sidebar {
+            position: sticky;
+            top: var(--nav-height);
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--nav-height));
+            flex-shrink: 0;
+            padding: 28px 24px;
+            overflow-y: auto;
+        }
+        .about-sidebar::-webkit-scrollbar { width: 0; }
+        .about-nav a {
+            display: block;
+            font-size: 16px;
+            color: var(--text);
+            text-decoration: none;
+            padding: 2px 0;
+            transition: color 0.2s;
+        }
+        .about-nav a:hover { color: var(--text-light); }
+        .about-nav a.active {
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .about-main {
+            flex: 1;
+            padding: 32px;
+            min-width: 0;
+        }
+        .about-section { display: none; }
+        .about-section.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+        /* Biographie */
+        .bio-layout {
+            display: flex;
             gap: 40px;
             align-items: flex-start;
         }
-        .about-bio { flex: 0 0 220px; }
-        .bio-name {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-        .about-bio p {
+        .bio-text { flex: 0 0 220px; }
+        .bio-text p {
             font-size: 18px;
             line-height: 1.8;
             margin-bottom: 8px;
         }
-        .about-bio a {
-            color: var(--text);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            font-weight: 700;
+        .bio-photo { flex: 1; }
+        .bio-photo img { width: 100%; height: auto; display: block; }
+
+        /* Approche */
+        .approche-text {
+            max-width: 540px;
         }
-        .about-photo { flex: 1; }
-        .about-photo img { width: 100%; height: auto; display: block; }
+        .approche-text p {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        /* Équipement */
+        .gear-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+        }
+        .gear-item {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .gear-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            object-position: bottom;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .gear-item img.rotate-ccw {
+            transform: rotate(90deg);
+            transform-origin: center center;
+        }
+        .gear-caption {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* Influences */
+        .influences-list {
+            list-style: none;
+        }
+        .influences-list li {
+            font-size: 18px;
+            line-height: 1.8;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .influences-list li:last-child { border-bottom: none; }
+        .influences-list span {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-left: 12px;
+        }
 
         /* =====================================================
            PAGE CONTACT
@@ -501,7 +580,7 @@
 
             <!-- Contenu : photos du projet sélectionné -->
             <div class="gallery-main" id="gallery-main">
-                <div class="gallery-empty" id="gallery-empty">← sélectionne une sortie</div>
+                <div class="gallery-empty" id="gallery-empty"></div>
                 <div id="project-view" style="display:none;">
 <div class="project-title" id="project-title"></div>
                     <div class="project-meta" id="project-meta"></div>
@@ -516,14 +595,74 @@
              PAGE À PROPOS
         ======================================================== -->
         <div class="page" id="page-about">
-            <div class="page-about">
-                <div class="about-layout">
-                    <div class="about-bio">
-                        <p>Photographe basé à Nantes, je travaille principalement autour de la photographie automobile, de paysage et de rue.</p>
+            <div class="page-about-layout">
+
+                <aside class="about-sidebar">
+                    <nav class="about-nav">
+                        <a href="#" data-section="biographie">biographie</a>
+                        <a href="#" data-section="approche">approche</a>
+                        <a href="#" data-section="equipement">équipement</a>
+                        <a href="#" data-section="influences">influences</a>
+                    </nav>
+                </aside>
+
+                <div class="about-main">
+
+                    <!-- Biographie -->
+                    <div class="about-section" id="about-biographie">
+                        <div class="bio-layout">
+                            <div class="bio-text">
+                                <p>Photographe basé à Nantes, je travaille principalement autour de la photographie automobile, de paysage et de rue.</p>
+                            </div>
+                            <div class="bio-photo">
+                                <img src="images/Photo principale/MEL_2455.jpg" alt="Photo principale" loading="lazy" decoding="async">
+                            </div>
+                        </div>
                     </div>
-                    <div class="about-photo">
-                        <img src="images/Photo principale/MEL_2455.jpg" alt="Photo principale" loading="lazy" decoding="async">
+
+                    <!-- Approche -->
+                    <div class="about-section" id="about-approche">
+                        <div class="bio-layout">
+                            <div class="bio-text approche-text">
+                                <p>Je développe une approche photographique basée sur l'exploration et la série. Je photographie principalement l'automobile, le paysage et la photographie de rue, souvent liés à des lieux, des voyages ou des événements.</p>
+                                <p>Mon travail s'inscrit dans une démarche documentaire personnelle : observer, me déplacer, et construire au fil du temps un carnet visuel des endroits et des moments que je traverse.</p>
+                                <p>Je privilégie une approche naturelle, avec une attention particulière portée à la lumière, à l'ambiance et au contexte plutôt qu'à la mise en scène.</p>
+                            </div>
+                            <div class="bio-photo">
+                                <img src="images/approche/MEL_9003.jpg" alt="" loading="lazy" decoding="async">
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Équipement -->
+                    <div class="about-section" id="about-equipement">
+                        <div class="gear-row">
+                            <div class="gear-item" id="gear-nikon" style="width: 18%;">
+                                <img src="images/gear/avant_nikon.png" alt="" loading="lazy" decoding="async">
+                                <p class="gear-caption">Nikon — Boitier principal, utilisé pour la grande majorité de mes prises de vue.</p>
+                            </div>
+                            <div class="gear-item" id="gear-nikkor" style="width: 40%;">
+                                <img src="images/gear/AF-S-NIKKOR-50-mm-1-1.4-G-1.png" alt="" loading="lazy" decoding="async" class="rotate-ccw">
+                                <p class="gear-caption">Nikkor 50mm f/1.8 — Focale fixe lumineuse, mon objectif de prédilection.</p>
+                            </div>
+                            <div class="gear-item" id="gear-sigma" style="width: 18%;">
+                                <img src="images/gear/sigma.jpg" alt="" loading="lazy" decoding="async">
+                                <p class="gear-caption">Sigma — Grand-angle polyvalent, privilégié pour le paysage.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Influences -->
+                    <div class="about-section" id="about-influences">
+                        <ul class="influences-list">
+                            <li>Jacques-Henri Lartigue <span>photographie automobile, France</span></li>
+                            <li>Henri Cartier-Bresson <span>photographie de rue, France</span></li>
+                            <li>Saul Leiter <span>couleur et lumière, États-Unis</span></li>
+                            <li>Michael Kenna <span>paysage minimaliste, Royaume-Uni</span></li>
+                            <li>Ernst Haas <span>mouvement et couleur, Autriche</span></li>
+                        </ul>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -866,6 +1005,30 @@
                     // Si déjà sur galerie + liste → rien
                 } else {
                     showPage(a.dataset.page);
+                    if (a.dataset.page === 'gallery' && !isMobile()) {
+                        const firstSortie = document.querySelector('.sortie-links a');
+                        if (firstSortie) firstSortie.click();
+                    }
+                    if (a.dataset.page === 'about') {
+                        const firstSection = document.querySelector('.about-nav a');
+                        if (firstSection) firstSection.click();
+                    }
+                }
+            });
+        });
+
+        // About : navigation entre sections
+        document.querySelectorAll('.about-nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const id = link.dataset.section;
+                document.querySelectorAll('.about-nav a').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                document.querySelectorAll('.about-section').forEach(s => s.classList.remove('active'));
+                const target = document.getElementById('about-' + id);
+                if (target) {
+                    target.classList.add('active');
+                    observeImages();
                 }
             });
         });
