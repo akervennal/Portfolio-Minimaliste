@@ -1008,6 +1008,7 @@
             aboutSidebar.classList.remove('collapsed');
             document.querySelectorAll('.about-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.about-nav a').forEach(l => l.classList.remove('active'));
+            document.getElementById('about-current-title').textContent = '';
             mobileAboutState = 'list';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
