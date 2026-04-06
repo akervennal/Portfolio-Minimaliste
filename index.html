@@ -413,15 +413,6 @@
             }
             .page-gallery.active { flex-direction: column; }
             .gallery-main { padding: 16px; }
-            .mobile-back {
-                display: inline-block;
-                font-size: 11px;
-                color: var(--text-light);
-                cursor: pointer;
-                margin-bottom: 20px;
-                transition: color 0.2s;
-            }
-            .mobile-back:hover { color: var(--text); }
             .about-layout { flex-direction: column; gap: 24px; }
             .about-photo { max-width: 100%; }
             .page-about, .page-contact { padding-left: 16px; padding-right: 16px; }
@@ -537,8 +528,7 @@
             <div class="gallery-main" id="gallery-main">
                 <div class="gallery-empty" id="gallery-empty">← sélectionne une sortie</div>
                 <div id="project-view" style="display:none;">
-                    <span class="mobile-back" id="mobile-back" style="display:none;">← retour</span>
-                    <div class="project-title" id="project-title"></div>
+<div class="project-title" id="project-title"></div>
                     <div class="project-meta" id="project-meta"></div>
                     <div class="masonry" id="project-photos"></div>
                 </div>
@@ -878,6 +868,9 @@
             contact:  document.getElementById('page-contact'),
         };
 
+        // État mobile galerie : 'list' ou 'project'
+        let mobileGalleryState = 'list';
+
         function showPage(name) {
             Object.values(allPages).forEach(p => p.classList.remove('active'));
             allPages[name].classList.add('active');
@@ -888,8 +881,32 @@
             document.dispatchEvent(new Event('pageChanged'));
         }
 
+        function openGalleryList() {
+            gallerySidebar.classList.remove('collapsed');
+            projectView.style.display = 'none';
+            galleryEmpty.style.display = 'block';
+            document.querySelectorAll('.sortie-links a').forEach(l => l.classList.remove('active'));
+            mobileGalleryState = 'list';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         document.querySelectorAll('.nav-links a[data-page]').forEach(a => {
-            a.addEventListener('click', e => { e.preventDefault(); showPage(a.dataset.page); });
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                if (a.dataset.page === 'gallery' && isMobile()) {
+                    // Déjà sur galerie + en vue projet → revenir à la liste
+                    if (allPages.gallery.classList.contains('active') && mobileGalleryState === 'project') {
+                        openGalleryList();
+                    } else if (!allPages.gallery.classList.contains('active')) {
+                        // Pas sur galerie → ouvrir galerie avec la liste
+                        showPage('gallery');
+                        openGalleryList();
+                    }
+                    // Si déjà sur galerie + liste → rien
+                } else {
+                    showPage(a.dataset.page);
+                }
+            });
         });
 
         document.getElementById('site-name').addEventListener('click', e => {
@@ -906,19 +923,8 @@
         const projectView     = document.getElementById('project-view');
         const galleryEmpty    = document.getElementById('gallery-empty');
         const gallerySidebar  = document.getElementById('gallery-sidebar');
-        const mobileBackBtn   = document.getElementById('mobile-back');
 
         function isMobile() { return window.innerWidth <= 600; }
-
-        // Bouton retour mobile — ré-ouvre la sidebar
-        mobileBackBtn.addEventListener('click', () => {
-            gallerySidebar.classList.remove('collapsed');
-            projectView.style.display = 'none';
-            galleryEmpty.style.display = 'block';
-            mobileBackBtn.style.display = 'none';
-            document.querySelectorAll('.sortie-links a').forEach(l => l.classList.remove('active'));
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
 
         document.querySelectorAll('.sortie-links a').forEach(link => {
             link.addEventListener('click', e => {
@@ -947,10 +953,10 @@
                 galleryEmpty.style.display = 'none';
                 projectView.style.display = 'block';
 
-                // Sur mobile : collapse la sidebar, affiche le bouton retour
+                // Sur mobile : collapse la sidebar
                 if (isMobile()) {
                     gallerySidebar.classList.add('collapsed');
-                    mobileBackBtn.style.display = 'inline-block';
+                    mobileGalleryState = 'project';
                 }
 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
