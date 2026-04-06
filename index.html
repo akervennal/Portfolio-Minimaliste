@@ -60,6 +60,7 @@
             transition: color 0.2s;
         }
         .site-name:hover { color: var(--text-light); }
+        .site-name br { display: none; }
 
         .nav-links {
             display: flex;
@@ -233,7 +234,7 @@
            PAGE À PROPOS
         ===================================================== */
         .page-about {
-            padding: 52px 32px 60px;
+            padding: 10px 32px 60px;
         }
         .about-layout {
             display: flex;
@@ -363,8 +364,9 @@
 
         @media (max-width: 600px) {
             .site-nav { padding: 0 16px; }
-            .nav-links { gap: 10px; }
-            .nav-links a { font-size: 12px; }
+            .site-name br { display: block; }
+            .nav-links { gap: 12px; }
+            .nav-links a { font-size: 20px; }
 
             .page-showcase { padding: 16px; }
             .showcase-grid { gap: 16px; }
@@ -401,7 +403,7 @@
          NAVIGATION HORIZONTALE
     ============================================================ -->
     <nav class="site-nav">
-        <a class="site-name" id="site-name" href="#">Armel Kervennal</a>
+        <a class="site-name" id="site-name" href="#">Armel<br>Kervennal</a>
 
         <div class="nav-links">
             <a href="#" data-page="about">à propos</a>
@@ -420,7 +422,7 @@
              3 colonnes, proportions naturelles, pas cliquables.
         ======================================================== -->
         <div class="page page-showcase active" id="page-showcase">
-            <p class="showcase-intro">"The camera is an instrument that teaches people how to see without a camera." — Dorothea Lange</p>
+            <p class="showcase-intro">"The camera is an instrument that teaches people how to see without a camera."<br>— Dorothea Lange</p>
             <div class="showcase-grid">
                 <div class="showcase-col">
                     <img src="images/showcase/MEL_9768.jpg" alt="" loading="lazy" decoding="async">
