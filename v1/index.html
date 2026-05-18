@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armel Kervennal — Photographe</title>
+    <meta name="description" content="Portfolio d'Armel Kervennal, photographe basé à Nantes. Photo de voiture, paysage et documentaire.">
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --text-light: #666666;
+            --border: #e0e0e0;
+            --font-main: 'Barlow Condensed', sans-serif;
+            --nav-height: 110px;
+            --sidebar-width: 200px;
+        }
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            font-size: 16px;
+            color: var(--text);
+            background-color: var(--bg);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* =====================================================
+           NAV HORIZONTALE — fixe en haut
+        ===================================================== */
+        .site-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 52px;
+            border-bottom: none;
+            line-height: 1;
+            background: var(--bg);
+            z-index: 200;
+        }
+
+        .site-name {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text);
+            transition: color 0.2s;
+        }
+        .site-name:hover { color: var(--text-light); }
+        .site-name br { display: none; }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .nav-links a {
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text-light); }
+        .nav-links a.active {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+
+        /* =====================================================
+           CONTENU — sous la nav fixe
+        ===================================================== */
+        .main-content {
+            padding-top: var(--nav-height);
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+        }
+        .page.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =====================================================
+           PAGE SHOWCASE — Homepage "armel"
+           3 colonnes, photos en proportion naturelle, pas cliquables
+        ===================================================== */
+        .page-showcase {
+            padding: 48px 52px;
+        }
+
+        .showcase-intro {
+            font-size: 22px;
+            font-weight: 300;
+            color: var(--text);
+            margin-bottom: 40px;
+        }
+
+        .showcase-hero {
+            margin: -48px -52px 40px -52px;
+        }
+        .showcase-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .showcase-grid {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .showcase-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .showcase-col img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: zoom-in;
+        }
+
+        /* =====================================================
+           PAGE GALERIE — sidebar + contenu
+        ===================================================== */
+        .page-gallery {
+            display: none; /* overridden by .active */
+        }
+        .page-gallery.active {
+            display: flex;
+            min-height: calc(100vh - var(--nav-height));
+        }
+
+        /* Sidebar gauche : liste des sorties */
+        .gallery-sidebar {
+            position: sticky;
+            top: var(--nav-height);
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--nav-height));
+            flex-shrink: 0;
+            padding: 28px 24px;
+            border-right: none;
+            overflow-y: auto;
+        }
+        .gallery-sidebar::-webkit-scrollbar { width: 0; }
+
+        .nav-year {
+            font-size: 15px;
+            color: var(--text-light);
+            font-weight: 700;
+            margin-top: 16px;
+            margin-bottom: 2px;
+            display: block;
+        }
+        .nav-year:first-child { margin-top: 0; }
+
+        .sortie-links a {
+            display: block;
+            font-size: 16px;
+            color: var(--text);
+            text-decoration: none;
+            padding: 2px 0;
+            transition: color 0.2s;
+        }
+        .sortie-links a:hover { color: var(--text-light); }
+        .sortie-links a.active {
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        /* Contenu principal de la galerie */
+        .gallery-main {
+            flex: 1;
+            padding: 32px;
+            min-width: 0;
+        }
+
+        /* État vide — aucun projet sélectionné */
+        .gallery-empty {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        /* Titre du projet affiché */
+        .project-title {
+            font-size: 22px;
+            font-weight: 700;
+            text-transform: lowercase;
+            margin-bottom: 4px;
+        }
+        .project-meta {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 24px;
+        }
+
+        /* Galerie projet — même principe que showcase, 2 colonnes */
+        .masonry {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+        .masonry-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        .masonry-col img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: zoom-in;
+        }
+
+        /* =====================================================
+           PAGE À PROPOS
+        ===================================================== */
+        .page-about-layout {
+            display: flex;
+            min-height: calc(100vh - var(--nav-height));
+        }
+        .about-sidebar {
+            position: sticky;
+            top: var(--nav-height);
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--nav-height));
+            flex-shrink: 0;
+            padding: 28px 24px;
+            overflow-y: auto;
+        }
+        .about-sidebar::-webkit-scrollbar { width: 0; }
+        .about-nav a {
+            display: block;
+            font-size: 16px;
+            color: var(--text);
+            text-decoration: none;
+            padding: 2px 0;
+            transition: color 0.2s;
+        }
+        .about-nav a:hover { color: var(--text-light); }
+        .about-nav a.active {
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .about-main {
+            flex: 1;
+            padding: 32px;
+            min-width: 0;
+        }
+        .about-section { display: none; }
+        .about-section.active { display: block; animation: fadeIn 0.3s ease-out; }
+        .about-current-title {
+            display: none;
+            font-size: 22px;
+            font-weight: 700;
+            text-transform: lowercase;
+            margin-bottom: 20px;
+        }
+
+        /* Biographie */
+        .bio-layout {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+        .bio-text { flex: 0 0 220px; }
+        .bio-text p {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 8px;
+        }
+        .bio-photo { flex: 1; }
+        .bio-photo img { width: 100%; height: auto; display: block; }
+
+        /* Approche */
+        .approche-text {
+            max-width: 540px;
+        }
+        .approche-text p {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        /* Équipement */
+        .gear-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .gear-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .gear-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            object-position: bottom;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .gear-item img.rotate-ccw {
+            transform: rotate(90deg);
+            transform-origin: center center;
+        }
+        .gear-caption {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* Influences */
+        .influences-list {
+            list-style: none;
+        }
+        .influences-list li {
+            font-size: 18px;
+            line-height: 1.8;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .influences-list li:last-child { border-bottom: none; }
+        .influences-list span {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-left: 12px;
+        }
+
+        /* =====================================================
+           PAGE CONTACT
+        ===================================================== */
+        .page-contact {
+            padding: 52px 32px 60px;
+        }
+        .contact-label {
+            font-size: 22px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+        .page-contact p {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 6px;
+        }
+        .page-contact a {
+            color: var(--text);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            font-weight: 700;
+        }
+
+        /* =====================================================
+           LAZY LOADING
+        ===================================================== */
+        img {
+            opacity: 0;
+            transform: scale(0.94);
+            transition: opacity 1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        img.lazy-loaded {
+            opacity: 1;
+            transform: scale(1);
+        }
+        img.lazy-fallback {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* =====================================================
+           LIGHTBOX
+        ===================================================== */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+        }
+        .lightbox.open { display: flex; }
+        .lightbox img {
+            max-width: 92vw; max-height: 92vh;
+            width: auto; height: auto;
+            object-fit: contain;
+            cursor: default;
+            opacity: 1; transform: none;
+            transition: none;
+        }
+        .lightbox-prev, .lightbox-next {
+            position: absolute;
+            top: 50%; transform: translateY(-50%);
+            background: none; border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 32px;
+            cursor: pointer; padding: 16px;
+            line-height: 1; user-select: none;
+            transition: color 0.2s;
+        }
+        .lightbox-prev { left: 8px; }
+        .lightbox-next { right: 8px; }
+        .lightbox-prev:hover, .lightbox-next:hover { color: #fff; }
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+        .footer {
+            padding: 20px 32px;
+            font-size: 10px;
+            color: var(--text-light);
+            border-top: none;
+            margin-top: 40px;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+        @media (max-width: 900px) {
+            .showcase-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .masonry { gap: 16px; }
+            .masonry-col { gap: 16px; }
+        }
+
+        @media (max-width: 600px) {
+            .site-nav { padding: 0 16px; }
+            .site-name br { display: block; }
+            .nav-links { gap: 12px; }
+            .nav-links a { font-size: 20px; }
+
+            .page-showcase { padding: 16px; }
+            .showcase-hero { margin: -16px -16px 16px -16px; }
+            .showcase-grid { gap: 16px; }
+            .showcase-col { gap: 16px; }
+            .gallery-sidebar {
+                position: relative;
+                top: auto;
+                width: 100%;
+                height: auto;
+                max-height: 2000px;
+                border-right: none;
+                border-bottom: none;
+                transition: max-height 0.35s ease, padding 0.35s ease, border 0.35s ease;
+                overflow: hidden;
+            }
+            .gallery-sidebar.collapsed {
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+            }
+            .page-gallery.active { flex-direction: column; }
+            .gallery-main { padding: 16px; }
+            .about-layout { flex-direction: column; gap: 1px; }
+            .gallery-empty { display: none; }
+            .about-bio { flex: none; }
+            .about-photo { max-width: 100%; }
+            .page-about, .page-contact { padding-left: 16px; padding-right: 16px; }
+
+            .page-about-layout { flex-direction: column; }
+            .about-sidebar {
+                position: relative;
+                top: auto;
+                width: 100%;
+                height: auto;
+                max-height: 2000px;
+                overflow: hidden;
+                transition: max-height 0.35s ease, padding 0.35s ease;
+            }
+            .about-sidebar.collapsed {
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+            .about-main { padding: 16px; }
+            .bio-layout { flex-direction: column; gap: 20px; }
+            .bio-text { flex: none; }
+            .about-current-title { display: block; }
+            .gear-row { flex-direction: column; gap: 32px; }
+            .gear-item { width: 100% !important; }
+            .gear-item img { height: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+         NAVIGATION HORIZONTALE
+    ============================================================ -->
+    <nav class="site-nav">
+        <a class="site-name" id="site-name" href="#">Armel<br> Kervennal</a>
+
+        <div class="nav-links">
+            <a href="#" data-page="about">à propos</a>
+            <a href="#" data-page="gallery">galerie</a>
+            <a href="#" data-page="contact">contact</a>
+
+        </div>
+    </nav>
+
+
+    <div class="main-content">
+
+        <!-- ========================================================
+             HOMEPAGE — Showcase (clic sur "armel")
+             Ajoute tes meilleures photos ici dans la grille.
+             3 colonnes, proportions naturelles, pas cliquables.
+        ======================================================== -->
+        <div class="page page-showcase active" id="page-showcase">
+            <div class="showcase-hero">
+                <img src="images/showcase/hero/MEL_9528.jpg" alt="" fetchpriority="high" decoding="async">
+            </div>
+            <div class="showcase-grid">
+                <div class="showcase-col">
+                    <img src="images/showcase/MEL_9768.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/13-MEL_3579.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/9-MEL_3695.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/1-MEL_3166.jpg" alt="" loading="lazy" decoding="async">
+
+                    <img src="images/showcase/8-MEL_8227.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/1-MEL_5634.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/MEL_6501.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/3-MEL_8724.jpg" alt="" loading="lazy" decoding="async">
+                </div>
+                <div class="showcase-col">
+                    <img src="images/showcase/3-MEL_8150.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/MEL_0388.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/2-MEL_8725.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/6-MEL_7681.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/4-MEL_9344.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/2-MEL_9402.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/MEL_9003.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/5-MEL_7681.jpg" alt="" loading="lazy" decoding="async">
+                </div>
+                <div class="showcase-col">
+                    <img src="images/showcase/7-MEL_8433.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/4-MEL_8103.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/5-IMG_4734_TIF.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/3-MEL_9879.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/IMG_4776_TIF.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/3-MEL_7745.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/2-MEL_8835.jpg" alt="" loading="lazy" decoding="async">
+                    <img src="images/showcase/10-MEL_9110.jpg" alt="" loading="lazy" decoding="async">
+                </div>
+            </div>
+            <footer class="footer">© 2026 armel — tous droits réservés</footer>
+        </div>
+
+
+        <!-- ========================================================
+             GALERIE — Sidebar avec liste des sorties + photos à droite
+        ======================================================== -->
+        <div class="page page-gallery" id="page-gallery">
+
+            <!-- Sidebar : liste des sorties uniquement -->
+            <aside class="gallery-sidebar" id="gallery-sidebar">
+                <nav class="sortie-links" id="sortie-links">
+
+                    <span class="nav-year">2026</span>
+                    <a href="#" data-project="viking-cup-2026">Viking Cup</a>
+                    <a href="#" data-project="mezillac-2026">Campagne de Mézillac</a>
+                    <a href="#" data-project="nantes-2026">Nantes</a>
+                    <a href="#" data-project="saint-nazaire-2026">Saint-Nazaire</a>
+
+                    <span class="nav-year">2025</span>
+                    <a href="#" data-project="fete-foraine-rennes-2025">Fête Foraine de Rennes</a>
+                    <a href="#" data-project="mad-paris-2025">M.A.D. Paris</a>
+                    <a href="#" data-project="angleterre-2025">Angleterre</a>
+                    <a href="#" data-project="maison-radieuse-2025">Maison Radieuse</a>
+                    <a href="#" data-project="pyrenees-2025">Pyrénées</a>
+                    <a href="#" data-project="24h-du-mans-2025">24h du Mans</a>
+
+                    <span class="nav-year">2024</span>
+                    <a href="#" data-project="florence-2024">Florence</a>
+                    <a href="#" data-project="rennes-2024">Rennes</a>
+                    <a href="#" data-project="grenoble-2024">Grenoble</a>
+                    <a href="#" data-project="nice-2024">Nice</a>
+                    <a href="#" data-project="marseille-2024">Marseille</a>
+                    <a href="#" data-project="lozere-foret-2024">Lozère, forêt</a>
+                    <a href="#" data-project="lozere-village-2024">Lozère, village</a>
+                    <a href="#" data-project="aubrac-2024">Aubrac</a>
+                    <a href="#" data-project="viaduc-garabit-2024">Viaduc de Garabit</a>
+                    <a href="#" data-project="nantes-2024">Nantes</a>
+                    <a href="#" data-project="thabor-rennes-2024">Thabor — Rennes</a>
+                    <a href="#" data-project="port-nantes-2024">Port de Nantes</a>
+
+                </nav>
+            </aside>
+
+            <!-- Contenu : photos du projet sélectionné -->
+            <div class="gallery-main" id="gallery-main">
+                <div class="gallery-empty" id="gallery-empty"></div>
+                <div id="project-view" style="display:none;">
+<div class="project-title" id="project-title"></div>
+                    <div class="project-meta" id="project-meta"></div>
+                    <div class="masonry" id="project-photos"></div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ========================================================
+             PAGE À PROPOS
+        ======================================================== -->
+        <div class="page" id="page-about">
+            <div class="page-about-layout">
+
+                <aside class="about-sidebar" id="about-sidebar">
+                    <nav class="about-nav">
+                        <a href="#" data-section="approche">approche</a>
+                        <a href="#" data-section="equipement">équipement</a>
+                    </nav>
+                </aside>
+
+                <div class="about-main">
+                    <div class="about-current-title" id="about-current-title"></div>
+
+                    <!-- Approche -->
+                    <div class="about-section" id="about-approche">
+                        <div class="bio-layout">
+                            <div class="bio-text approche-text">
+                                <p>Je développe une approche photographique basée sur l'exploration et la série. Je fait principalement de la photographie automobile, de paysage et de rue, souvent liés à des lieux, des voyages ou des événements.</p>
+                                <p>Mon travail s'inscrit dans une démarche documentaire personnelle : observer, me déplacer, et construire au fil du temps un carnet visuel des endroits et des moments que je traverse.</p>
+                                <p>Je privilégie une approche naturelle, avec une attention particulière portée à la lumière, à l'ambiance et au contexte plutôt qu'à la mise en scène.</p>
+                            </div>
+                            <div class="bio-photo">
+                                <img src="images/approche/MEL_9003.jpg" alt="" loading="lazy" decoding="async">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Équipement -->
+                    <div class="about-section" id="about-equipement">
+                        <div class="gear-row">
+                            <div class="gear-item" id="gear-nikon">
+                                <img src="images/gear/avant_nikon.png" alt="" loading="lazy" decoding="async">
+                                <p class="gear-caption">Nikon D7500</p>
+                                <p class="gear-caption">C'est mon boîtier principal, un outil robuste et très ergonomique. Il intègre le capteur de 21 mégapixels du Nikon D500, ce qui lui confère une très bonne gestion des ISO pour travailler sereinement dans des conditions de lumière difficiles. Cette définition est amplement suffisante pour des tirages grand format et offre un rendu qui n'a rien à envier au plein format pour la grande majorité des usages.</p>
+                                <p class="gear-caption">Je privilégie le reflex (DSLR) pour son aspect pratique et direct. L'autonomie de la batterie permet de tenir des journées entières sans s'en soucier. Surtout, le viseur optique (OVF) offre une vision de la scène sans latence ni filtre numérique. Cela m'encourage à bien maîtriser mes réglages en amont et à me concentrer uniquement sur l'instant. En photographiant en RAW, j'évite les simulations et les filtres intégrés pour garder une approche neutre à la prise de vue ; l'esthétique et l'étalonnage se gèrent ensuite en post-production.</p>
+                                <p class="gear-caption">Enfin, son moteur autofocus intégré permet d'utiliser de nombreux objectifs argentiques sans adaptateur. Couplé à un autofocus et une rafale efficaces, c'est un boîtier très complet et largement suffisant, à moins de faire de la photographie sportive très spécifique.</p>
+                            </div>
+                            <div class="gear-item" id="gear-nikkor">
+                                <img src="images/gear/AF-S-NIKKOR-50-mm-1-1.4-G-1.png" alt="" loading="lazy" decoding="async" class="rotate-ccw">
+                                <p class="gear-caption">AF-S Nikkor 50mm f/1.4G</p>
+                                <p class="gear-caption">Monté sur un capteur APS-C, ce 50mm équivaut à un 75mm, ce qui en fait une focale particulièrement adaptée pour le portrait. C'est un objectif léger, compact et très agréable à manipuler.</p>
+                                <p class="gear-caption">Ses qualités optiques sont excellentes : le piqué est net dès les grandes ouvertures, le micro-contraste est bien présent et le rendu global est très qualitatif. L'autofocus est rapide et précis. C'est une optique simple mais extrêmement performante, qui offre un rendu très professionnel pour un budget maîtrisé.</p>
+                            </div>
+                            <div class="gear-item" id="gear-sigma">
+                                <img src="images/gear/sigma.jpg" alt="" loading="lazy" decoding="async">
+                                <p class="gear-caption">Sigma 18-35mm f/1.8 DC HSM Art</p>
+                                <p class="gear-caption">C'est l'objectif qui passe le plus de temps sur mon boîtier. Avoir une ouverture constante de f/1.8 sur un zoom est rare et apporte une grande souplesse de travail. Il couvre des focales allant de 27mm (grand angle documentaire) à 52mm (standard), combinant ainsi la luminosité et le flou d'arrière-plan (bokeh) d'une focale fixe avec la flexibilité d'un zoom.</p>
+                                <p class="gear-caption">La qualité de construction est solide et les performances optiques suivent : l'image est nette, très contrastée, avec beaucoup de détails. C'est un objectif particulièrement à l'aise en basse lumière, ce qui permet de s'adapter confortablement à presque toutes les situations sans que le manque d'éclairage ne devienne un frein.</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ========================================================
+             PAGE CONTACT
+        ======================================================== -->
+        <div class="page" id="page-contact">
+            <div class="page-contact">
+                <p class="contact-label">contact</p>
+                <p>email — <a href="mailto:akervennal@gmail.com">akervennal@gmail.com</a></p>
+                <p>instagram — <a href="https://instagram.com/armel_kervennal" target="_blank">@armel_kervennal</a></p>
+                <p style="margin-top:10px; color:var(--text-light);">Basé à Nantes. Toujours partant pour de nouveaux shooting ou projets photo, n'hésitez pas à me contacter!</p>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-prev" id="lightbox-prev">&#8592;</button>
+        <img id="lightbox-img" src="" alt="">
+        <button class="lightbox-next" id="lightbox-next">&#8594;</button>
+    </div>
+
+
+    <script>
+        // ============================================================
+        // Données des projets
+        // ============================================================
+        const projects = {
+            'viking-cup-2026': {
+                title: 'Viking Cup', date: 'Mars 2026',
+                photos: [
+                    'images/viking-cup-2026/MEL_8998.jpg',
+                    'images/viking-cup-2026/MEL_9003.jpg',
+                    'images/viking-cup-2026/MEL_9092.jpg',
+                    'images/viking-cup-2026/MEL_9127.jpg',
+                    'images/viking-cup-2026/MEL_9148.jpg',
+                    'images/viking-cup-2026/MEL_9264.jpg',
+                    'images/viking-cup-2026/MEL_9328.jpg',
+                    'images/viking-cup-2026/MEL_9336.jpg',
+                    'images/viking-cup-2026/MEL_9343.jpg',
+                    'images/viking-cup-2026/MEL_9453.jpg',
+                    'images/viking-cup-2026/MEL_9492.jpg',
+                    'images/viking-cup-2026/MEL_9528.jpg',
+                    'images/viking-cup-2026/MEL_9539.jpg',
+                    'images/viking-cup-2026/1-MEL_9738.jpg',
+                    'images/viking-cup-2026/MEL_9768.jpg',
+                    'images/viking-cup-2026/MEL_9773.jpg',
+                    'images/viking-cup-2026/MEL_9797.jpg',
+                    'images/viking-cup-2026/MEL_9811.jpg',
+                    'images/viking-cup-2026/MEL_9816.jpg',
+                    'images/viking-cup-2026/MEL_9826.jpg',
+                ]
+            },
+            'mezillac-2026': {
+                title: 'Campagne de Mézillac', date: 'Mars 2026',
+                photos: [
+                    'images/mezillac-2026/4-MEL_8715.jpg',
+                    'images/mezillac-2026/3-MEL_8717.jpg',
+                    'images/mezillac-2026/2-MEL_8835.jpg',
+                ]
+            },
+            'nantes-2026': {
+                title: 'Nantes', date: 'Février 2026',
+                photos: [
+                    'images/nantes-2026/7-MEL_8433.jpg',
+                    'images/nantes-2026/6-MEL_8446.jpg',
+                    'images/nantes-2026/5-MEL_8460.jpg',
+                ]
+            },
+            'saint-nazaire-2026': {
+                title: 'Saint-Nazaire', date: 'Février 2026',
+                photos: [
+                    'images/saint-nazaire-2026/10-MEL_7964.jpg',
+                    'images/saint-nazaire-2026/9-MEL_7970.jpg',
+                    'images/saint-nazaire-2026/8-MEL_7998.jpg',
+                ]
+            },
+            'fete-foraine-rennes-2025': {
+                title: 'Fête Foraine de Rennes', date: 'Décembre 2025',
+                photos: [
+                    'images/fete-foraine-rennes-2025/1-MEL_7779.jpg',
+                    'images/fete-foraine-rennes-2025/2-MEL_7748.jpg',
+                    'images/fete-foraine-rennes-2025/3-MEL_7745.jpg',
+                    'images/fete-foraine-rennes-2025/4-MEL_7722.jpg',
+                    'images/fete-foraine-rennes-2025/5-MEL_7699.jpg',
+                    'images/fete-foraine-rennes-2025/6-MEL_7681.jpg',
+                ]
+            },
+            'mad-paris-2025': {
+                title: 'M.A.D. Paris', date: 'Décembre 2025',
+                photos: [
+                    'images/mad-paris-2025/MEL_7126.jpg',
+                    'images/mad-paris-2025/MEL_7130.jpg',
+                    'images/mad-paris-2025/MEL_7135.jpg',
+                    'images/mad-paris-2025/MEL_7141.jpg',
+                    'images/mad-paris-2025/MEL_7146.jpg',
+                    'images/mad-paris-2025/MEL_7149.jpg',
+                ]
+            },
+            'angleterre-2025': {
+                title: 'Angleterre', date: 'Décembre 2025',
+                photos: [
+                    'images/angleterre-2025/1-MEL_6436.jpg',
+                    'images/angleterre-2025/2-MEL_6214.jpg',
+                    'images/angleterre-2025/3-MEL_6210.jpg',
+                    'images/angleterre-2025/4-MEL_6207.jpg',
+                    'images/angleterre-2025/5-MEL_6198.jpg',
+                    'images/angleterre-2025/6-MEL_6186.jpg',
+                    'images/angleterre-2025/7-MEL_6184.jpg',
+                    'images/angleterre-2025/8-MEL_6182.jpg',
+                    'images/angleterre-2025/IMG_4776_TIF.jpg',
+                    'images/angleterre-2025/MEL_6428.jpg',
+                    'images/angleterre-2025/MEL_6432.jpg',
+                    'images/angleterre-2025/MEL_6468.jpg',
+                    'images/angleterre-2025/MEL_6471.jpg',
+                    'images/angleterre-2025/MEL_6501.jpg',
+                ]
+            },
+            'maison-radieuse-2025': {
+                title: 'Maison Radieuse', date: 'Décembre 2025',
+                photos: [
+                    'images/maison-radieuse-2025/1-MEL_5634.jpg',
+                    'images/maison-radieuse-2025/2-MEL_5597.jpg',
+                    'images/maison-radieuse-2025/3-MEL_5594.jpg',
+                    'images/maison-radieuse-2025/4-IMG_4736_TIF.jpg',
+                    'images/maison-radieuse-2025/5-IMG_4734_TIF.jpg',
+                    'images/maison-radieuse-2025/6-MEL_5554.jpg',
+                ]
+            },
+            'pyrenees-2025': {
+                title: 'Pyrénées', date: 'Août 2025',
+                photos: [
+                    'images/pyrenees-2025/10-MEL_2233.jpg',
+                    'images/pyrenees-2025/9-MEL_2240.jpg',
+                    'images/pyrenees-2025/8-MEL_2421.jpg',
+                    'images/pyrenees-2025/7-MEL_2521.jpg',
+                    'images/pyrenees-2025/6-MEL_2545.jpg',
+                    'images/pyrenees-2025/5-MEL_2729.jpg',
+                    'images/pyrenees-2025/4-MEL_3033.jpg',
+                    'images/pyrenees-2025/3-MEL_3066.jpg',
+                    'images/pyrenees-2025/2-MEL_3069.jpg',
+                    'images/pyrenees-2025/1-MEL_3166.jpg',
+                    'images/pyrenees-2025/14-MEL_3530.jpg',
+                    'images/pyrenees-2025/13-MEL_3579.jpg',
+                    'images/pyrenees-2025/12-MEL_3605.jpg',
+                    'images/pyrenees-2025/11-MEL_3611.jpg',
+                    'images/pyrenees-2025/10-MEL_3624.jpg',
+                    'images/pyrenees-2025/9-MEL_3695.jpg',
+                    'images/pyrenees-2025/8-MEL_3748.jpg',
+                    'images/pyrenees-2025/7-MEL_3816.jpg',
+                    'images/pyrenees-2025/6-MEL_3951.jpg',
+                    'images/pyrenees-2025/5-MEL_3958.jpg',
+                    'images/pyrenees-2025/4-MEL_3966.jpg',
+                    'images/pyrenees-2025/3-MEL_3983.jpg',
+                    'images/pyrenees-2025/2-MEL_3986.jpg',
+                    'images/pyrenees-2025/1-MEL_3991.jpg',
+                ]
+            },
+            '24h-du-mans-2025': {
+                title: '24h du Mans', date: 'Juin 2025',
+                photos: [
+                    'images/24h-du-mans-2025/1-MEL_1455.jpg',
+                    'images/24h-du-mans-2025/2-MEL_1452.jpg',
+                    'images/24h-du-mans-2025/3-MEL_1451.jpg',
+                    'images/24h-du-mans-2025/4-MEL_1429.jpg',
+                    'images/24h-du-mans-2025/5-MEL_1111.jpg',
+                    'images/24h-du-mans-2025/6-MEL_1101.jpg',
+                    'images/24h-du-mans-2025/7-MEL_1095.jpg',
+                ]
+            },
+            'florence-2024': {
+                title: 'Florence', date: 'Avril 2024',
+                photos: ['images/florence-2024/MEL_0388.jpg']
+            },
+            'rennes-2024': {
+                title: 'Rennes', date: 'Avril 2024',
+                photos: ['images/rennes-2024/MEL_0078.jpg']
+            },
+            'grenoble-2024': {
+                title: 'Grenoble', date: 'Mars 2024',
+                photos: [
+                    'images/grenoble-2024/1-MEL_9885.jpg',
+                    'images/grenoble-2024/2-MEL_9883.jpg',
+                    'images/grenoble-2024/3-MEL_9879.jpg',
+                    'images/grenoble-2024/4-MEL_9866.jpg',
+                ]
+            },
+            'nice-2024': {
+                title: 'Nice', date: 'Février 2024',
+                photos: [
+                    'images/nice-2024/5-MEL_9420.jpg',
+                    'images/nice-2024/4-MEL_9422.jpg',
+                    'images/nice-2024/3-MEL_9426.jpg',
+                    'images/nice-2024/2-MEL_9432.jpg',
+                    'images/nice-2024/1-MEL_9439.jpg',
+                    'images/nice-2024/3-MEL_9563.jpg',
+                    'images/nice-2024/2-MEL_9575.jpg',
+                    'images/nice-2024/1-MEL_9606.jpg',
+                ]
+            },
+            'marseille-2024': {
+                title: 'Marseille', date: 'Février 2024',
+                photos: [
+                    'images/marseille-2024/1-MEL_9414.jpg',
+                    'images/marseille-2024/2-MEL_9402.jpg',
+                    'images/marseille-2024/3-MEL_9395.jpg',
+                    'images/marseille-2024/4-MEL_9344.jpg',
+                    'images/marseille-2024/5-MEL_9340.jpg',
+                ]
+            },
+            'lozere-foret-2024': {
+                title: 'Lozère, forêt', date: 'Février 2024',
+                photos: [
+                    'images/lozere-foret-2024/1-MEL_9217.jpg',
+                    'images/lozere-foret-2024/2-MEL_9206.jpg',
+                    'images/lozere-foret-2024/3-MEL_9180.jpg',
+                    'images/lozere-foret-2024/4-MEL_9166.jpg',
+                    'images/lozere-foret-2024/5-MEL_9163.jpg',
+                    'images/lozere-foret-2024/6-MEL_9135.jpg',
+                    'images/lozere-foret-2024/7-MEL_9122.jpg',
+                    'images/lozere-foret-2024/8-MEL_9119.jpg',
+                    'images/lozere-foret-2024/9-MEL_9112.jpg',
+                    'images/lozere-foret-2024/10-MEL_9110.jpg',
+                ]
+            },
+            'lozere-village-2024': {
+                title: 'Lozère, village', date: 'Février 2024',
+                photos: [
+                    'images/lozere-village-2024/3-MEL_8837.jpg',
+                    'images/lozere-village-2024/2-MEL_8841.jpg',
+                    'images/lozere-village-2024/1-MEL_8843.jpg',
+                    'images/lozere-village-2024/3-MEL_8915.jpg',
+                    'images/lozere-village-2024/2-MEL_8930.jpg',
+                    'images/lozere-village-2024/1-MEL_9013.jpg',
+                ]
+            },
+            'aubrac-2024': {
+                title: 'Aubrac', date: 'Janvier 2024',
+                photos: [
+                    'images/aubrac-2024/1-MEL_8728.jpg',
+                    'images/aubrac-2024/2-MEL_8725.jpg',
+                    'images/aubrac-2024/3-MEL_8724.jpg',
+                    'images/aubrac-2024/4-MEL_8720.jpg',
+                    'images/aubrac-2024/5-MEL_8702.jpg',
+                    'images/aubrac-2024/6-MEL_8697.jpg',
+                ]
+            },
+            'viaduc-garabit-2024': {
+                title: 'Viaduc de Garabit', date: 'Janvier 2024',
+                photos: [
+                    'images/viaduc-garabit-2024/1-MEL_8475.jpg',
+                    'images/viaduc-garabit-2024/2-MEL_8467.jpg',
+                    'images/viaduc-garabit-2024/3-MEL_8454.jpg',
+                    'images/viaduc-garabit-2024/4-MEL_8449.jpg',
+                    'images/viaduc-garabit-2024/5-MEL_8446.jpg',
+                    'images/viaduc-garabit-2024/6-MEL_8431.jpg',
+                ]
+            },
+            'nantes-2024': {
+                title: 'Nantes', date: 'Janvier 2024',
+                photos: [
+                    'images/nantes-2024/1-MEL_8349.jpg',
+                    'images/nantes-2024/2-MEL_8345.jpg',
+                    'images/nantes-2024/3-MEL_8312.jpg',
+                    'images/nantes-2024/4-MEL_8307.jpg',
+                    'images/nantes-2024/5-MEL_8306.jpg',
+                    'images/nantes-2024/6-MEL_8230.jpg',
+                    'images/nantes-2024/7-MEL_8228.jpg',
+                    'images/nantes-2024/8-MEL_8227.jpg',
+                ]
+            },
+            'thabor-rennes-2024': {
+                title: 'Thabor — Rennes', date: 'Janvier 2024',
+                photos: [
+                    'images/thabor-rennes-2024/1-MEL_8176.jpg',
+                    'images/thabor-rennes-2024/2-MEL_8159.jpg',
+                    'images/thabor-rennes-2024/3-MEL_8150.jpg',
+                    'images/thabor-rennes-2024/4-MEL_8103.jpg',
+                    'images/thabor-rennes-2024/5-MEL_8097.jpg',
+                    'images/thabor-rennes-2024/6-MEL_8082.jpg',
+                ]
+            },
+            'port-nantes-2024': {
+                title: 'Port de Nantes', date: 'Janvier 2024',
+                photos: [
+                    'images/port-nantes-2024/1-MEL_7745.jpg',
+                    'images/port-nantes-2024/2-MEL_7702.jpg',
+                    'images/port-nantes-2024/3-MEL_7692.jpg',
+                    'images/port-nantes-2024/4-MEL_7683.jpg',
+                    'images/port-nantes-2024/5-MEL_7681.jpg',
+                    'images/port-nantes-2024/6-MEL_7655.jpg',
+                    'images/port-nantes-2024/7-MEL_7650.jpg',
+                    'images/port-nantes-2024/8-MEL_7649.jpg',
+                ]
+            },
+        };
+
+        // ============================================================
+        // Mode sombre
+        // ============================================================
+
+        // ============================================================
+        // Navigation entre pages
+        // ============================================================
+        const allPages = {
+            showcase: document.getElementById('page-showcase'),
+            gallery:  document.getElementById('page-gallery'),
+            about:    document.getElementById('page-about'),
+            contact:  document.getElementById('page-contact'),
+        };
+
+        // État mobile galerie : 'list' ou 'project'
+        let mobileGalleryState = 'list';
+        // État mobile about : 'list' ou 'section'
+        let mobileAboutState = 'list';
+        const aboutSidebar = document.getElementById('about-sidebar');
+
+        function showPage(name) {
+            Object.values(allPages).forEach(p => p.classList.remove('active'));
+            allPages[name].classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.querySelectorAll('.nav-links a[data-page]').forEach(a => {
+                a.classList.toggle('active', a.dataset.page === name);
+            });
+            document.dispatchEvent(new Event('pageChanged'));
+        }
+
+        function openAboutList() {
+            aboutSidebar.classList.remove('collapsed');
+            document.querySelectorAll('.about-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.about-nav a').forEach(l => l.classList.remove('active'));
+            document.getElementById('about-current-title').textContent = '';
+            mobileAboutState = 'list';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openGalleryList() {
+            gallerySidebar.classList.remove('collapsed');
+            projectView.style.display = 'none';
+            if (!isMobile()) galleryEmpty.style.display = 'block';
+            document.querySelectorAll('.sortie-links a').forEach(l => l.classList.remove('active'));
+            mobileGalleryState = 'list';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('.nav-links a[data-page]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                if (a.dataset.page === 'gallery' && isMobile()) {
+                    if (allPages.gallery.classList.contains('active') && mobileGalleryState === 'project') {
+                        openGalleryList();
+                    } else if (!allPages.gallery.classList.contains('active')) {
+                        showPage('gallery');
+                        openGalleryList();
+                    }
+                } else if (a.dataset.page === 'about' && isMobile()) {
+                    if (allPages.about.classList.contains('active') && mobileAboutState === 'section') {
+                        openAboutList();
+                    } else if (!allPages.about.classList.contains('active')) {
+                        showPage('about');
+                        openAboutList();
+                    }
+                } else {
+                    showPage(a.dataset.page);
+                    if (a.dataset.page === 'gallery' && !isMobile()) {
+                        const firstSortie = document.querySelector('.sortie-links a');
+                        if (firstSortie) firstSortie.click();
+                    }
+                    if (a.dataset.page === 'about' && !isMobile()) {
+                        const firstSection = document.querySelector('.about-nav a');
+                        if (firstSection) firstSection.click();
+                    }
+                }
+            });
+        });
+
+        // About : navigation entre sections
+        document.querySelectorAll('.about-nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const id = link.dataset.section;
+                document.querySelectorAll('.about-nav a').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                document.querySelectorAll('.about-section').forEach(s => s.classList.remove('active'));
+                const target = document.getElementById('about-' + id);
+                if (target) {
+                    target.classList.add('active');
+                    observeImages();
+                }
+                if (isMobile()) {
+                    aboutSidebar.classList.add('collapsed');
+                    mobileAboutState = 'section';
+                    document.getElementById('about-current-title').textContent = link.textContent;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        });
+
+        document.getElementById('site-name').addEventListener('click', e => {
+            e.preventDefault();
+            showPage('showcase');
+        });
+
+        // ============================================================
+        // Galerie : clic sur une sortie dans la sidebar
+        // ============================================================
+        const projectTitleEl  = document.getElementById('project-title');
+        const projectMetaEl   = document.getElementById('project-meta');
+        const projectPhotosEl = document.getElementById('project-photos');
+        const projectView     = document.getElementById('project-view');
+        const galleryEmpty    = document.getElementById('gallery-empty');
+        const gallerySidebar  = document.getElementById('gallery-sidebar');
+
+        function isMobile() { return window.innerWidth <= 600; }
+
+        document.querySelectorAll('.sortie-links a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const id = link.dataset.project;
+                const p = projects[id];
+                if (!p) return;
+
+                // Marque le lien actif
+                document.querySelectorAll('.sortie-links a').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                // Rempli le projet en 2 colonnes flex
+                projectTitleEl.textContent = p.title;
+                projectMetaEl.textContent  = p.date;
+                projectPhotosEl.innerHTML = '';
+                const col1 = document.createElement('div');
+                const col2 = document.createElement('div');
+                col1.className = 'masonry-col';
+                col2.className = 'masonry-col';
+                p.photos.forEach((src, i) => {
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.alt = p.title;
+                    img.loading = 'lazy';
+                    img.decoding = 'async';
+                    (i % 2 === 0 ? col1 : col2).appendChild(img);
+                });
+                projectPhotosEl.appendChild(col1);
+                projectPhotosEl.appendChild(col2);
+
+                galleryEmpty.style.display = 'none';
+                projectView.style.display = 'block';
+
+                // Sur mobile : collapse la sidebar
+                if (isMobile()) {
+                    gallerySidebar.classList.add('collapsed');
+                    mobileGalleryState = 'project';
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.dispatchEvent(new Event('pageChanged'));
+            });
+        });
+
+        // ============================================================
+        // Lazy loading
+        // ============================================================
+        // Fade-in images via IntersectionObserver
+        // ============================================================
+        const imgObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const img = entry.target;
+                const reveal = () => requestAnimationFrame(() => img.classList.add('lazy-loaded'));
+                if (img.complete) reveal();
+                else {
+                    img.addEventListener('load',  reveal, { once: true });
+                    img.addEventListener('error', reveal, { once: true });
+                }
+                observer.unobserve(img);
+            });
+        }, { rootMargin: '0px 0px 100px 0px' });
+
+        function observeImages() {
+            document.querySelectorAll('img:not(.lazy-loaded):not(.lazy-fallback)').forEach(img => {
+                imgObserver.observe(img);
+            });
+        }
+
+        observeImages();
+        document.addEventListener('pageChanged', observeImages);
+
+        // ============================================================
+        // Lightbox (photos des projets seulement)
+        // ============================================================
+        (function() {
+            const lightbox = document.getElementById('lightbox');
+            const lbImg    = document.getElementById('lightbox-img');
+            const lbPrev   = document.getElementById('lightbox-prev');
+            const lbNext   = document.getElementById('lightbox-next');
+            let imgs = [], current = 0;
+
+            function open(list, index) {
+                imgs = list; current = index;
+                lbImg.src = imgs[current].src;
+                lbImg.alt = imgs[current].alt;
+                lightbox.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+            function close() {
+                lightbox.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+            function prev() { current = (current - 1 + imgs.length) % imgs.length; lbImg.src = imgs[current].src; }
+            function next() { current = (current + 1) % imgs.length; lbImg.src = imgs[current].src; }
+
+            document.addEventListener('click', e => {
+                const img = e.target.closest('.masonry-col img, .showcase-col img');
+                if (!img) return;
+                const isMasonry = img.closest('.masonry');
+                const list = isMasonry
+                    ? Array.from(document.querySelectorAll('.masonry-col img'))
+                    : Array.from(document.querySelectorAll('.showcase-col img'));
+                open(list, list.indexOf(img));
+            });
+
+            lightbox.addEventListener('click', e => {
+                if (e.target === lightbox || e.target === lbImg) close();
+            });
+            lbPrev.addEventListener('click', e => { e.stopPropagation(); prev(); });
+            lbNext.addEventListener('click', e => { e.stopPropagation(); next(); });
+            document.addEventListener('keydown', e => {
+                if (!lightbox.classList.contains('open')) return;
+                if (e.key === 'Escape') close();
+                if (e.key === 'ArrowLeft') prev();
+                if (e.key === 'ArrowRight') next();
+            });
+        })();
+    </script>
+
+</body>
+</html>
