@@ -789,95 +789,90 @@
       }
 
       /* ============================================================
-           LIGHTBOX (PLAY MODE)
+           LIGHTBOX
         ============================================================ */
-      .lightbox {
+      .lb {
         display: none;
         position: fixed;
         inset: 0;
-        background: #000;
         z-index: 1000;
-        align-items: center;
-        justify-content: center;
+      }
+      .lb.open { display: block; }
+
+      .lb-backdrop {
+        position: absolute;
+        inset: 0;
+        background: #000;
         opacity: 0;
-        transition: opacity 0.4s var(--ease);
+        transition: opacity 0.45s ease;
       }
-      .lightbox.open {
-        display: flex;
-        opacity: 1;
-      }
-      .lightbox-img-wrap {
-        position: relative;
-        width: 92vw;
-        height: 86vh;
+      .lb.open .lb-backdrop { opacity: 0.96; }
+
+      .lb-img-wrap {
+        position: absolute;
+        inset: 0;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 60px;
       }
-      .lightbox img {
+      .lb-img {
         max-width: 100%;
         max-height: 100%;
         object-fit: contain;
+        display: block;
         opacity: 0;
-        transition: opacity 0.6s var(--ease);
+        transform: scale(0.96);
+        transition: opacity 0.5s ease, transform 0.55s cubic-bezier(0.17, 0.84, 0.44, 1);
       }
-      .lightbox img.shown {
+      .lb-img.shown {
         opacity: 1;
+        transform: scale(1);
       }
-      .lightbox-controls {
+
+      .lb-counter {
         position: absolute;
         bottom: 32px;
-        left: 0;
-        right: 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 40px;
+        left: 40px;
+        z-index: 2;
         font-family: var(--mono);
         font-size: 10px;
         letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--text-muted);
+        color: rgba(255, 255, 255, 0.25);
+        opacity: 0;
+        transition: opacity 0.4s ease 0.2s;
       }
-      .lightbox-meta {
-        flex: 1;
-      }
-      .lightbox-progress {
-        flex: 1;
-        text-align: center;
-      }
-      .lightbox-keys {
-        flex: 1;
-        text-align: right;
-      }
-      .lightbox-close {
+      .lb.open .lb-counter { opacity: 1; }
+
+      .lb-close {
         position: absolute;
-        top: 32px;
-        right: 40px;
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        transition: color 0.3s;
+        top: 28px;
+        right: 32px;
         z-index: 10;
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.3);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px;
+        opacity: 0;
+        transition: opacity 0.4s ease 0.15s, color 0.2s;
       }
-      .lightbox-close:hover {
-        color: var(--text);
-      }
-      .lightbox-nav {
+      .lb.open .lb-close { opacity: 1; }
+      .lb-close:hover { color: rgba(255, 255, 255, 0.9); }
+
+      .lb-nav {
         position: absolute;
         top: 0;
         bottom: 0;
         width: 50%;
         z-index: 5;
       }
-      .lightbox-nav.prev {
-        left: 0;
-      }
-      .lightbox-nav.next {
-        right: 0;
-      }
+      .lb-nav.prev { left: 0; cursor: w-resize; }
+      .lb-nav.next { right: 0; cursor: e-resize; }
 
       /* ============================================================
            LAZY FADE-IN
@@ -1067,17 +1062,11 @@
           gap: 8px;
           padding: 40px 20px 20px;
         }
-        .lightbox-controls {
-          padding: 0 20px;
-          font-size: 9px;
-        }
-        .lightbox-keys {
-          display: none;
-        }
-        .lightbox-close {
-          right: 20px;
-          top: 20px;
-        }
+        .lb-img-wrap { padding: 48px 16px 200px; }
+        .lb-counter { bottom: auto; top: 20px; left: 20px; }
+        .lb-close { top: 18px; right: 18px; }
+        .lb-nav.prev { cursor: default; }
+        .lb-nav.next { cursor: default; }
       }
     </style>
   </head>
@@ -1280,20 +1269,18 @@
     </main>
 
     <!-- ========================================================
-           LIGHTBOX — MODE PROJECTION
+           LIGHTBOX
       ======================================================== -->
-    <div class="lightbox" id="lightbox">
-      <button class="lightbox-close" id="lightboxClose">fermer · esc</button>
-      <div class="lightbox-nav prev" id="lightboxPrev"></div>
-      <div class="lightbox-nav next" id="lightboxNext"></div>
-      <div class="lightbox-img-wrap">
-        <img id="lightboxImg" src="" alt="" />
+    <div class="lb" id="lightbox">
+      <div class="lb-backdrop"></div>
+      <div class="lb-img-wrap">
+        <img class="lb-img" id="lightboxImg" src="" alt="" />
       </div>
-      <div class="lightbox-controls">
-        <div class="lightbox-meta" id="lightboxMeta"></div>
-        <div class="lightbox-progress" id="lightboxProgress"></div>
-        <div class="lightbox-keys">← → esc</div>
-      </div>
+
+      <div class="lb-counter" id="lbCounter"></div>
+      <button class="lb-close" id="lightboxClose">fermer · esc</button>
+      <div class="lb-nav prev" id="lightboxPrev"></div>
+      <div class="lb-nav next" id="lightboxNext"></div>
     </div>
 
     <script>
@@ -1943,56 +1930,62 @@
       }
 
       // ============================================================
-      // LIGHTBOX / PROJECTION MODE
+      // LIGHTBOX
       // ============================================================
       const lightbox = document.getElementById("lightbox");
-      const lbImg = document.getElementById("lightboxImg");
-      const lbMeta = document.getElementById("lightboxMeta");
-      const lbProgress = document.getElementById("lightboxProgress");
-      const lbClose = document.getElementById("lightboxClose");
-      const lbPrev = document.getElementById("lightboxPrev");
-      const lbNext = document.getElementById("lightboxNext");
+      const lbImg    = document.getElementById("lightboxImg");
+      const lbClose  = document.getElementById("lightboxClose");
+      const lbPrev   = document.getElementById("lightboxPrev");
+      const lbNext   = document.getElementById("lightboxNext");
 
-      let lbPhotos = [];
-      let lbIndex = 0;
+      let lbPhotos  = [];
+      let lbIndex   = 0;
       let lbProject = "";
-      let lbDate = "";
-      let lbAuto = false;
+      let lbDate    = "";
+      let lbAuto    = false;
       let lbInterval = null;
 
       function openLightbox(photos, index, title, date, autoplay) {
-        lbPhotos = photos;
-        lbIndex = index;
+        lbPhotos  = photos;
+        lbIndex   = index;
         lbProject = title;
-        lbDate = date;
-        lbAuto = autoplay;
+        lbDate    = date;
+        lbAuto    = autoplay;
         lightbox.classList.add("open");
         document.body.style.overflow = "hidden";
-        showLightboxPhoto();
+        showLightboxPhoto(true);
         if (autoplay) startAutoplay();
       }
 
-      function showLightboxPhoto() {
+      function showLightboxPhoto(isOpen) {
+        const src = lbPhotos[lbIndex];
+
         lbImg.classList.remove("shown");
-        const newSrc = lbPhotos[lbIndex];
-        const next = new Image();
-        next.onload = () => {
-          lbImg.src = newSrc;
-          requestAnimationFrame(() => lbImg.classList.add("shown"));
+
+        // Counter
+        document.getElementById("lbCounter").textContent =
+          `${String(lbIndex + 1).padStart(2, "0")} / ${String(lbPhotos.length).padStart(2, "0")}`;
+
+        // Load image then reveal
+        const preload = new Image();
+        preload.onload = preload.onerror = () => {
+          lbImg.src = src;
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              lbImg.classList.add("shown");
+            });
+          });
         };
-        next.src = newSrc;
-        const parts = [lbProject, lbDate].filter((p) => p);
-        lbMeta.textContent = parts.join(" · ");
-        lbProgress.textContent = `${String(lbIndex + 1).padStart(2, "0")} / ${String(lbPhotos.length).padStart(2, "0")}`;
+        preload.src = src;
       }
 
       function lbNextPhoto() {
         lbIndex = (lbIndex + 1) % lbPhotos.length;
-        showLightboxPhoto();
+        showLightboxPhoto(false);
       }
       function lbPrevPhoto() {
         lbIndex = (lbIndex - 1 + lbPhotos.length) % lbPhotos.length;
-        showLightboxPhoto();
+        showLightboxPhoto(false);
       }
 
       function startAutoplay() {
@@ -2000,39 +1993,25 @@
         lbInterval = setInterval(lbNextPhoto, 5000);
       }
       function stopAutoplay() {
-        if (lbInterval) {
-          clearInterval(lbInterval);
-          lbInterval = null;
-        }
+        if (lbInterval) { clearInterval(lbInterval); lbInterval = null; }
       }
 
       function closeLightbox() {
         lightbox.classList.remove("open");
+        lbImg.classList.remove("shown");
         document.body.style.overflow = "";
         stopAutoplay();
       }
 
       lbClose.addEventListener("click", closeLightbox);
-      lbPrev.addEventListener("click", () => {
-        lbPrevPhoto();
-        if (lbAuto) startAutoplay();
-      });
-      lbNext.addEventListener("click", () => {
-        lbNextPhoto();
-        if (lbAuto) startAutoplay();
-      });
+      lbPrev.addEventListener("click", () => { lbPrevPhoto(); if (lbAuto) startAutoplay(); });
+      lbNext.addEventListener("click", () => { lbNextPhoto(); if (lbAuto) startAutoplay(); });
 
       document.addEventListener("keydown", (e) => {
         if (!lightbox.classList.contains("open")) return;
         if (e.key === "Escape") closeLightbox();
-        if (e.key === "ArrowLeft") {
-          lbPrevPhoto();
-          if (lbAuto) startAutoplay();
-        }
-        if (e.key === "ArrowRight") {
-          lbNextPhoto();
-          if (lbAuto) startAutoplay();
-        }
+        if (e.key === "ArrowLeft")  { lbPrevPhoto(); if (lbAuto) startAutoplay(); }
+        if (e.key === "ArrowRight") { lbNextPhoto(); if (lbAuto) startAutoplay(); }
       });
 
 
