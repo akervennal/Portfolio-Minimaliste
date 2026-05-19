@@ -1,0 +1,2254 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Armel Kervennal — Photographe</title>
+    <meta
+      name="description"
+      content="Portfolio d'Armel Kervennal, photographe basé à Nantes. Photo automobile, paysage et documentaire."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --bg-elev: #141414;
+        --text: #f0ede4;
+        --text-muted: #8a857c;
+        --text-faint: #4a4842;
+        --line: rgba(240, 237, 228, 0.08);
+        --line-strong: rgba(240, 237, 228, 0.2);
+        --serif: "EB Garamond", Georgia, "Times New Roman", serif;
+        --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        --mono: "JetBrains Mono", "Courier New", monospace;
+        --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--sans);
+        font-size: 15px;
+        font-weight: 300;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button {
+        font-family: inherit;
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+      }
+
+      /* ============================================================
+           CUSTOM CURSOR
+        ============================================================ */
+      body {
+        cursor: none;
+      }
+      a,
+      button,
+      [data-page],
+      [data-project],
+      img {
+        cursor: none;
+      }
+      .cursor {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 8px;
+        height: 8px;
+        background: var(--text);
+        border-radius: 50%;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        transition:
+          width 0.4s var(--ease-out),
+          height 0.4s var(--ease-out),
+          background 0.3s,
+          opacity 0.2s;
+        z-index: 9999;
+        mix-blend-mode: difference;
+      }
+      .cursor.cursor-link {
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        border: 1px solid var(--text);
+      }
+      .cursor.cursor-photo {
+        width: 64px;
+        height: 64px;
+        background: transparent;
+        border: 1px solid var(--text);
+      }
+      .cursor-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .cursor.cursor-photo .cursor-label {
+        opacity: 0.9;
+      }
+
+      /* ============================================================
+           HEADER
+        ============================================================ */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 22px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 100;
+      }
+      .header-blur {
+        position: absolute;
+        top: 0;
+        bottom: -120px;
+        background: rgba(10, 10, 10, 0.12);
+        backdrop-filter: blur(14px) saturate(130%);
+        -webkit-backdrop-filter: blur(14px) saturate(130%);
+        z-index: -1;
+        pointer-events: none;
+      }
+      .header-blur-left {
+        left: 0;
+        width: 340px;
+        -webkit-mask-image:
+          linear-gradient(to right, black 55%, transparent 100%),
+          linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 28%, rgba(0,0,0,0.95) 38%, rgba(0,0,0,0.82) 48%, rgba(0,0,0,0.62) 60%, rgba(0,0,0,0.38) 73%, rgba(0,0,0,0.16) 86%, rgba(0,0,0,0.04) 94%, rgba(0,0,0,0) 100%);
+        -webkit-mask-composite: source-in;
+        mask-image:
+          linear-gradient(to right, black 55%, transparent 100%),
+          linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 28%, rgba(0,0,0,0.95) 38%, rgba(0,0,0,0.82) 48%, rgba(0,0,0,0.62) 60%, rgba(0,0,0,0.38) 73%, rgba(0,0,0,0.16) 86%, rgba(0,0,0,0.04) 94%, rgba(0,0,0,0) 100%);
+        mask-composite: intersect;
+      }
+      .header-blur-right {
+        right: 0;
+        width: 540px;
+        -webkit-mask-image:
+          linear-gradient(to left, black 55%, transparent 100%),
+          linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 28%, rgba(0,0,0,0.95) 38%, rgba(0,0,0,0.82) 48%, rgba(0,0,0,0.62) 60%, rgba(0,0,0,0.38) 73%, rgba(0,0,0,0.16) 86%, rgba(0,0,0,0.04) 94%, rgba(0,0,0,0) 100%);
+        -webkit-mask-composite: source-in;
+        mask-image:
+          linear-gradient(to left, black 55%, transparent 100%),
+          linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 28%, rgba(0,0,0,0.95) 38%, rgba(0,0,0,0.82) 48%, rgba(0,0,0,0.62) 60%, rgba(0,0,0,0.38) 73%, rgba(0,0,0,0.16) 86%, rgba(0,0,0,0.04) 94%, rgba(0,0,0,0) 100%);
+        mask-composite: intersect;
+      }
+      .header::before {
+        display: none;
+      }
+
+      .logo {
+        font-family: var(--serif);
+        font-size: 17px;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        color: #fff;
+        position: relative;
+        z-index: 2;
+        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+      }
+      .logo em {
+        font-style: italic;
+        opacity: 0.7;
+      }
+
+      .nav {
+        display: flex;
+        gap: 36px;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+      }
+
+      .nav a {
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #fff;
+        position: relative;
+        padding: 4px 0;
+        font-family: var(--mono);
+        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+      }
+      .nav a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -2px;
+        height: 1px;
+        background: #fff;
+        transform: scaleX(0);
+        transform-origin: right center;
+        transition: transform 0.5s var(--ease-out);
+      }
+      .nav a:hover::after,
+      .nav a.active::after {
+        transform: scaleX(1);
+        transform-origin: left center;
+      }
+
+      /* ============================================================
+           PAGE SYSTEM
+        ============================================================ */
+      .page {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.5s var(--ease);
+      }
+      .page.active {
+        display: block;
+      }
+      .page.fade-in {
+        opacity: 1;
+      }
+
+      /* ============================================================
+           HOMEPAGE — HERO SLIDESHOW
+        ============================================================ */
+      .hero {
+        position: relative;
+        height: 100vh;
+        width: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+      .hero-slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 2s var(--ease);
+      }
+      .hero-slide.active {
+        opacity: 1;
+      }
+      .hero-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .hero-slide::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.6) 0%,
+          rgba(0, 0, 0, 0.2) 14%,
+          rgba(0, 0, 0, 0) 40%,
+          rgba(0, 0, 0, 0.45) 78%,
+          rgba(0, 0, 0, 0.85) 100%
+        );
+        pointer-events: none;
+      }
+
+      .hero-caption {
+        position: absolute;
+        bottom: 36px;
+        left: 40px;
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        color: #fff;
+        text-transform: uppercase;
+        opacity: 1;
+        z-index: 10;
+        text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6);
+      }
+      .hero-progress {
+        position: absolute;
+        bottom: 40px;
+        right: 40px;
+        display: flex;
+        gap: 6px;
+        z-index: 10;
+      }
+      .hero-progress span {
+        width: 18px;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.3);
+        transition: background 0.5s;
+      }
+      .hero-progress span.active {
+        background: var(--text);
+      }
+
+      .scroll-hint {
+        position: absolute;
+        bottom: 36px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text);
+        opacity: 0.5;
+        z-index: 10;
+        animation: bob 2.5s ease-in-out infinite;
+      }
+      @keyframes bob {
+        0%,
+        100% {
+          transform: translateX(-50%) translateY(0);
+        }
+        50% {
+          transform: translateX(-50%) translateY(4px);
+        }
+      }
+
+      /* ============================================================
+           SHOWCASE — INTRO + GRID
+        ============================================================ */
+      .showcase {
+        padding: 100px 40px 100px;
+      }
+
+      .section-header {
+        max-width: 720px;
+        margin-bottom: 100px;
+      }
+
+      .section-eyebrow {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 24px;
+      }
+      .section-title {
+        font-family: var(--serif);
+        font-size: 44px;
+        font-weight: 400;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        margin-bottom: 28px;
+      }
+      .section-title em {
+        font-style: italic;
+        color: var(--text-muted);
+      }
+      .section-intro {
+        font-size: 15px;
+        color: var(--text-muted);
+        line-height: 1.8;
+        max-width: 540px;
+        font-weight: 300;
+      }
+
+      .grid-3 {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      .grid-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .grid-col img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .see-more {
+        margin-top: 100px;
+        text-align: center;
+      }
+      .see-more a {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 14px 28px;
+        border: 1px solid var(--line-strong);
+        color: var(--text);
+        transition: all 0.4s var(--ease);
+        display: inline-block;
+      }
+      .see-more a:hover {
+        background: var(--text);
+        color: var(--bg);
+        border-color: var(--text);
+      }
+
+      /* ============================================================
+           PROJECTS INDEX
+        ============================================================ */
+      .projects-page {
+        padding: 160px 40px 100px;
+      }
+
+      .year-group {
+        margin-bottom: 80px;
+      }
+      .year-group:last-child {
+        margin-bottom: 0;
+      }
+      .year-num {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        color: var(--text-faint);
+        margin-bottom: 12px;
+      }
+      .year-label {
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 48px;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+      .year-label-count {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.15em;
+        opacity: 0.5;
+        font-style: normal;
+      }
+
+      .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 64px 32px;
+      }
+      .project-card {
+        display: block;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .projects-grid:has(.project-card:hover) .project-card {
+        transform: scale(0.98);
+        filter: brightness(0.75);
+      }
+      .projects-grid:has(.project-card:hover) .project-card:hover {
+        transform: scale(1.01);
+        filter: brightness(1);
+      }
+      .project-cover {
+        aspect-ratio: 4 / 5;
+        background: var(--bg-elev);
+        position: relative;
+        overflow: hidden;
+      }
+      .project-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .project-cover::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 100%);
+        pointer-events: none;
+      }
+      .project-card-name {
+        font-family: var(--serif);
+        font-size: 20px;
+        font-weight: 400;
+        color: #fff;
+        margin-bottom: 4px;
+      }
+      .project-card:hover .project-card-name {
+        transform: translateY(-4px);
+      }
+      .project-card-meta {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: rgba(255,255,255,0.6);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        display: flex;
+        justify-content: space-between;
+        transition: transform 0.9s var(--ease-out), opacity 0.8s var(--ease);
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      .project-card:hover .project-card-meta {
+        opacity: 1;
+        transform: translateY(-4px);
+      }
+      .project-card-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 16px 18px;
+        z-index: 1;
+      }
+
+      /* ============================================================
+           PROJECT VIEW
+        ============================================================ */
+      .project-view {
+        padding: 140px 40px 100px;
+      }
+      .project-back {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        transition: color 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 80px;
+      }
+      .project-back:hover {
+        color: var(--text);
+      }
+      .project-back .arrow {
+        transition: transform 0.4s var(--ease-out);
+        display: inline-block;
+      }
+      .project-back:hover .arrow {
+        transform: translateX(-4px);
+      }
+
+      .project-view-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 60px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+        gap: 24px;
+      }
+      .project-view-title {
+        font-family: var(--serif);
+        font-size: 56px;
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: -0.015em;
+      }
+      .project-view-meta {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-muted);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        text-align: right;
+      }
+      .project-view-meta div + div {
+        margin-top: 8px;
+      }
+
+      .play-button {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 12px 22px;
+        border: 1px solid var(--line-strong);
+        color: var(--text);
+        transition: all 0.4s var(--ease);
+        margin-bottom: 60px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .play-button:hover {
+        background: var(--text);
+        color: var(--bg);
+        border-color: var(--text);
+      }
+      .play-icon {
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 4px 0 4px 6px;
+        border-color: transparent transparent transparent currentColor;
+      }
+
+      .grid-2 {
+        display: flex;
+        gap: 32px;
+        align-items: flex-start;
+      }
+
+      /* ============================================================
+           FLOATING YEAR INDICATOR
+        ============================================================ */
+      .year-indicator {
+        position: fixed;
+        top: 50%;
+        right: 24px;
+        transform: translateY(-50%);
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-muted);
+        letter-spacing: 0.3em;
+        writing-mode: vertical-rl;
+        transition: opacity 0.5s;
+        opacity: 0;
+        z-index: 50;
+        pointer-events: none;
+      }
+      .year-indicator.visible {
+        opacity: 1;
+      }
+
+      /* ============================================================
+           PHOTO CAPTION ON HOVER
+        ============================================================ */
+      .photo-caption {
+        position: fixed;
+        bottom: 36px;
+        left: 40px;
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        color: #fff;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 0.4s var(--ease);
+        pointer-events: none;
+        z-index: 80;
+        background: rgba(0, 0, 0, 0.55);
+        padding: 8px 14px;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border-radius: 2px;
+      }
+      .photo-caption.visible {
+        opacity: 1;
+      }
+
+      /* ============================================================
+           ABOUT
+        ============================================================ */
+      .about-page {
+        padding: 160px 40px 100px;
+        max-width: 1100px;
+      }
+      .about-bio {
+        margin-bottom: 120px;
+      }
+      .about-section {
+        margin-bottom: 100px;
+        padding-top: 60px;
+        border-top: 1px solid var(--line);
+      }
+      .about-section:first-child {
+        padding-top: 0;
+        border-top: none;
+      }
+      .about-section-title {
+        font-family: var(--serif);
+        font-size: 32px;
+        font-weight: 400;
+        font-style: italic;
+        margin-bottom: 40px;
+      }
+      .about-text {
+        max-width: 620px;
+      }
+      .about-text p {
+        font-size: 15px;
+        line-height: 1.9;
+        margin-bottom: 18px;
+        color: var(--text);
+      }
+      .about-text p + p {
+        color: var(--text-muted);
+      }
+      .gear-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .gear-item h3 {
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 400;
+        margin-bottom: 8px;
+      }
+      .gear-item .gear-label {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        margin-bottom: 20px;
+      }
+      .gear-item p {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.8;
+        margin-bottom: 14px;
+      }
+
+      /* ============================================================
+           CONTACT
+        ============================================================ */
+      .contact-page {
+        min-height: 100vh;
+        padding: 160px 40px 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .contact-title {
+        font-family: var(--serif);
+        font-size: 96px;
+        font-weight: 400;
+        line-height: 1;
+        margin-bottom: 80px;
+        letter-spacing: -0.02em;
+      }
+      .contact-title em {
+        font-style: italic;
+        color: var(--text-muted);
+      }
+      .contact-info {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 24px 40px;
+        font-size: 18px;
+      }
+      .contact-info dt {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        padding-top: 8px;
+      }
+      .contact-info dd {
+        font-family: var(--serif);
+        font-size: 22px;
+      }
+      .contact-info dd a {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 2px;
+        transition: border-color 0.3s;
+      }
+      .contact-info dd a:hover {
+        border-color: var(--text);
+      }
+      .contact-note {
+        margin-top: 80px;
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.8;
+        max-width: 500px;
+        font-style: italic;
+        font-family: var(--serif);
+      }
+
+      /* ============================================================
+           LIGHTBOX (PLAY MODE)
+        ============================================================ */
+      .lightbox {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: #000;
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.4s var(--ease);
+      }
+      .lightbox.open {
+        display: flex;
+        opacity: 1;
+      }
+      .lightbox-img-wrap {
+        position: relative;
+        width: 92vw;
+        height: 86vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .lightbox img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        opacity: 0;
+        transition: opacity 0.6s var(--ease);
+      }
+      .lightbox img.shown {
+        opacity: 1;
+      }
+      .lightbox-controls {
+        position: absolute;
+        bottom: 32px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px;
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+      .lightbox-meta {
+        flex: 1;
+      }
+      .lightbox-progress {
+        flex: 1;
+        text-align: center;
+      }
+      .lightbox-keys {
+        flex: 1;
+        text-align: right;
+      }
+      .lightbox-close {
+        position: absolute;
+        top: 32px;
+        right: 40px;
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        transition: color 0.3s;
+        z-index: 10;
+      }
+      .lightbox-close:hover {
+        color: var(--text);
+      }
+      .lightbox-nav {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 50%;
+        z-index: 5;
+      }
+      .lightbox-nav.prev {
+        left: 0;
+      }
+      .lightbox-nav.next {
+        right: 0;
+      }
+
+      /* ============================================================
+           LAZY FADE-IN
+        ============================================================ */
+      .grid-col img,
+      .grid-2 img,
+      .hero-slide img {
+        opacity: 0;
+        transition: opacity 1.2s var(--ease);
+      }
+      .project-cover img {
+        opacity: 0;
+        transition: opacity 1.2s var(--ease);
+      }
+      .grid-col img.loaded,
+      .grid-2 img.loaded,
+      .project-cover img.loaded,
+      .hero-slide.active img.loaded {
+        opacity: 1;
+      }
+      .hero-slide.active img {
+        opacity: 1;
+      }
+
+      /* ============================================================
+           FOOTER
+        ============================================================ */
+      .footer {
+        padding: 60px 40px 30px;
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid var(--line);
+        margin-top: 100px;
+      }
+
+      /* ============================================================
+           RESPONSIVE
+        ============================================================ */
+      @media (max-width: 1100px) {
+        .projects-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .section-title {
+          font-size: 36px;
+        }
+        .project-view-title {
+          font-size: 44px;
+        }
+        .contact-title {
+          font-size: 64px;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .project-card-meta {
+          opacity: 1;
+          transform: none;
+        }
+        .projects-grid:has(.project-card:hover) .project-card {
+          transform: none;
+          filter: none;
+        }
+        body {
+          cursor: auto;
+        }
+        a,
+        button,
+        [data-page],
+        [data-project],
+        img {
+          cursor: auto;
+        }
+        .cursor {
+          display: none;
+        }
+        .header {
+          padding: 20px 20px;
+        }
+        .header-blur {
+          bottom: -40px;
+        }
+        .logo {
+          font-size: 15px;
+        }
+        .nav {
+          gap: 18px;
+        }
+        .nav a {
+          font-size: 10px;
+        }
+        .hero-caption {
+          left: 20px;
+          bottom: 24px;
+          font-size: 9px;
+        }
+        .hero-progress {
+          right: unset;
+          left: 50%;
+          transform: translateX(-50%);
+          bottom: 28px;
+        }
+        .scroll-hint {
+          display: none;
+        }
+        .showcase {
+          padding: 80px 20px 60px;
+        }
+        .section-header {
+          margin-bottom: 60px;
+        }
+        .section-title {
+          font-size: 28px;
+        }
+        .grid-3 {
+          flex-direction: column;
+          gap: 12px;
+        }
+        .grid-col {
+          gap: 12px;
+        }
+        .projects-page {
+          padding: 100px 20px 60px;
+        }
+        .year-group {
+          margin-bottom: 60px;
+        }
+        .projects-grid {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+        .project-view {
+          padding: 100px 20px 60px;
+        }
+        .project-back {
+          margin-bottom: 40px;
+        }
+        .project-view-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .project-view-meta {
+          text-align: left;
+        }
+        .project-view-title {
+          font-size: 32px;
+        }
+        .grid-2 {
+          flex-direction: column;
+          gap: 12px;
+        }
+        .about-page {
+          padding: 100px 20px 60px;
+        }
+        .about-section-title {
+          font-size: 24px;
+        }
+        .gear-list {
+          grid-template-columns: 1fr;
+          gap: 50px;
+        }
+        .contact-page {
+          padding: 100px 20px 60px;
+        }
+        .contact-title {
+          font-size: 44px;
+        }
+        .contact-info {
+          grid-template-columns: 1fr;
+          gap: 8px 0;
+        }
+        .contact-info dt {
+          padding-top: 16px;
+        }
+        .year-indicator {
+          display: none;
+        }
+        .photo-caption {
+          display: none;
+        }
+        .footer {
+          flex-direction: column;
+          gap: 8px;
+          padding: 40px 20px 20px;
+        }
+        .lightbox-controls {
+          padding: 0 20px;
+          font-size: 9px;
+        }
+        .lightbox-keys {
+          display: none;
+        }
+        .lightbox-close {
+          right: 20px;
+          top: 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Custom cursor -->
+    <div class="cursor" id="cursor">
+      <span class="cursor-label" id="cursorLabel"></span>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-blur header-blur-left" aria-hidden="true"></div>
+      <div class="header-blur header-blur-right" aria-hidden="true"></div>
+      <a href="#" class="logo" data-page="home"
+        >Armel <em>Kervennal</em></a
+      >
+      <nav class="nav">
+        <a href="#" data-page="projects">projets</a>
+        <a href="#" data-page="about">à propos</a>
+        <a href="#" data-page="contact">contact</a>
+      </nav>
+    </header>
+
+    <!-- Floating year indicator -->
+    <div class="year-indicator" id="yearIndicator">2026</div>
+
+    <!-- Photo caption on hover -->
+    <div class="photo-caption" id="photoCaption"></div>
+
+    <main>
+      <!-- ========================================================
+             HOMEPAGE
+        ======================================================== -->
+      <div class="page active fade-in" id="page-home">
+        <section class="hero" id="hero">
+          <!-- slides injected by JS -->
+          <div class="hero-caption" id="heroCaption"></div>
+          <div class="hero-progress" id="heroProgress"></div>
+          <div class="scroll-hint">scroll ↓</div>
+        </section>
+
+        <section class="showcase">
+          <div class="grid-3" id="showcaseGrid">
+            <!-- columns injected by JS -->
+          </div>
+
+          <div class="see-more">
+            <a href="#" data-page="projects">voir tous les projets →</a>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <span>Armel Kervennal · 2026</span>
+          <span>Nantes — France</span>
+        </footer>
+      </div>
+
+      <!-- ========================================================
+             PROJECTS INDEX
+        ======================================================== -->
+      <div class="page" id="page-projects">
+        <div class="projects-page">
+          <div id="projectsContainer">
+            <!-- grid injected by JS -->
+          </div>
+        </div>
+
+        <footer class="footer">
+          <span>Armel Kervennal · 2026</span>
+          <span>Nantes — France</span>
+        </footer>
+      </div>
+
+      <!-- ========================================================
+             PROJECT VIEW
+        ======================================================== -->
+      <div class="page" id="page-project">
+        <div class="project-view">
+
+          <div class="project-view-header">
+            <h1 class="project-view-title" id="projectTitle"></h1>
+            <div class="project-view-meta" id="projectMeta"></div>
+          </div>
+
+
+          <div class="grid-2" id="projectPhotos">
+            <!-- columns injected by JS -->
+          </div>
+        </div>
+
+        <footer class="footer">
+          <span>Armel Kervennal · 2026</span>
+          <span>Nantes — France</span>
+        </footer>
+      </div>
+
+      <!-- ========================================================
+             ABOUT
+        ======================================================== -->
+      <div class="page" id="page-about">
+        <div class="about-page">
+          <section class="about-section">
+            <h2 class="about-section-title">Approche</h2>
+            <div class="about-text">
+              <p>
+                Je développe une approche photographique basée sur
+                l'exploration et la série. Principalement photographie
+                automobile, paysage et de rue, souvent liée à des lieux, des
+                voyages ou des événements.
+              </p>
+              <p>
+                Mon travail s'inscrit dans une démarche documentaire
+                personnelle : observer, me déplacer, et construire au fil du
+                temps un carnet visuel des endroits et des moments que je
+                traverse.
+              </p>
+              <p>
+                Je privilégie une approche naturelle, avec une attention
+                particulière portée à la lumière, à l'ambiance et au contexte
+                plutôt qu'à la mise en scène.
+              </p>
+            </div>
+          </section>
+
+          <section class="about-section">
+            <h2 class="about-section-title">Équipement</h2>
+            <div class="gear-list">
+              <div class="gear-item">
+                <div class="gear-label">Boîtier</div>
+                <h3>Nikon D7500</h3>
+                <p>
+                  C'est mon boîtier principal, un outil robuste et très ergonomique. Il intègre le capteur de 21 mégapixels du Nikon D500, ce qui lui confère une très bonne gestion des ISO pour travailler sereinement dans des conditions de lumière difficiles. Cette définition est amplement suffisante pour des tirages grand format et offre un rendu qui n'a rien à envier au plein format pour la grande majorité des usages.
+                </p>
+                <p>
+                  Je privilégie le reflex (DSLR) pour son aspect pratique et direct. L'autonomie de la batterie permet de tenir des journées entières sans s'en soucier. Surtout, le viseur optique (OVF) offre une vision de la scène sans latence ni filtre numérique. Cela m'encourage à bien maîtriser mes réglages en amont et à me concentrer uniquement sur l'instant. En photographiant en RAW, j'évite les simulations et les filtres intégrés pour garder une approche neutre à la prise de vue ; l'esthétique et l'étalonnage se gèrent ensuite en post-production.
+                </p>
+                <p>
+                  Enfin, son moteur autofocus intégré permet d'utiliser de nombreux objectifs argentiques sans adaptateur. Couplé à un autofocus et une rafale efficaces, c'est un boîtier très complet et largement suffisant, à moins de faire de la photographie sportive très spécifique.
+                </p>
+              </div>
+              <div class="gear-item">
+                <div class="gear-label">Objectif standard</div>
+                <h3>AF-S Nikkor 50mm f/1.4G</h3>
+                <p>
+                  Monté sur un capteur APS-C, ce 50mm équivaut à un 75mm, ce qui en fait une focale particulièrement adaptée pour le portrait. C'est un objectif léger, compact et très agréable à manipuler.
+                </p>
+                <p>
+                  Ses qualités optiques sont excellentes : le piqué est net dès les grandes ouvertures, le micro-contraste est bien présent et le rendu global est très qualitatif. L'autofocus est rapide et précis. C'est une optique simple mais extrêmement performante, qui offre un rendu très professionnel pour un budget maîtrisé.
+                </p>
+              </div>
+              <div class="gear-item">
+                <div class="gear-label">Zoom polyvalent</div>
+                <h3>Sigma 18-35mm f/1.8 DC HSM Art</h3>
+                <p>
+                  C'est l'objectif qui passe le plus de temps sur mon boîtier. Avoir une ouverture constante de f/1.8 sur un zoom est rare et apporte une grande souplesse de travail. Il couvre des focales allant de 27mm (grand angle documentaire) à 52mm (standard), combinant ainsi la luminosité et le flou d'arrière-plan (bokeh) d'une focale fixe avec la flexibilité d'un zoom.
+                </p>
+                <p>
+                  La qualité de construction est solide et les performances optiques suivent : l'image est nette, très contrastée, avec beaucoup de détails. C'est un objectif particulièrement à l'aise en basse lumière, ce qui permet de s'adapter confortablement à presque toutes les situations sans que le manque d'éclairage ne devienne un frein.
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <footer class="footer">
+          <span>Armel Kervennal · 2026</span>
+          <span>Nantes — France</span>
+        </footer>
+      </div>
+
+      <!-- ========================================================
+             CONTACT
+        ======================================================== -->
+      <div class="page" id="page-contact">
+        <div class="contact-page">
+          <h1 class="contact-title">
+            Travaillons<br /><em>ensemble.</em>
+          </h1>
+          <dl class="contact-info">
+            <dt>Email</dt>
+            <dd>
+              <a href="mailto:akervennal@gmail.com">akervennal@gmail.com</a>
+            </dd>
+            <dt>Instagram</dt>
+            <dd>
+              <a href="https://instagram.com/armel_kervennal" target="_blank"
+                >@armel_kervennal</a
+              >
+            </dd>
+            <dt>Basé à</dt>
+            <dd>Nantes, France</dd>
+          </dl>
+          <p class="contact-note">
+            Toujours partant pour de nouveaux shootings ou projets photo —
+            n'hésite pas à m'écrire.
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <!-- ========================================================
+           LIGHTBOX — MODE PROJECTION
+      ======================================================== -->
+    <div class="lightbox" id="lightbox">
+      <button class="lightbox-close" id="lightboxClose">fermer · esc</button>
+      <div class="lightbox-nav prev" id="lightboxPrev"></div>
+      <div class="lightbox-nav next" id="lightboxNext"></div>
+      <div class="lightbox-img-wrap">
+        <img id="lightboxImg" src="" alt="" />
+      </div>
+      <div class="lightbox-controls">
+        <div class="lightbox-meta" id="lightboxMeta"></div>
+        <div class="lightbox-progress" id="lightboxProgress"></div>
+        <div class="lightbox-keys">← → esc</div>
+      </div>
+    </div>
+
+    <script>
+      // ============================================================
+      // PROJECT DATA
+      // ============================================================
+      const projects = {
+        "la-bozage-2026": {
+          title: "La Bozage",
+          date: "2026",
+          dateLong: "2026",
+          year: "2026",
+          location: "France",
+          photos: [
+            "../images/La%20Bozage/1-MEL_1536.jpg",
+            "../images/La%20Bozage/2-MEL_1467.jpg",
+            "../images/La%20Bozage/3-MEL_1397.jpg",
+            "../images/La%20Bozage/4-MEL_1385.jpg",
+            "../images/La%20Bozage/5-MEL_1356.jpg",
+            "../images/La%20Bozage/6-MEL_1325.jpg",
+            "../images/La%20Bozage/7-MEL_1320.jpg",
+            "../images/La%20Bozage/8-MEL_1307.jpg",
+            "../images/La%20Bozage/9-MEL_1292.jpg",
+            "../images/La%20Bozage/10-MEL_1282.jpg",
+            "../images/La%20Bozage/11-MEL_1199.jpg",
+            "../images/La%20Bozage/12-MEL_1188.jpg",
+            "../images/La%20Bozage/13-MEL_1163.jpg",
+            "../images/La%20Bozage/14-MEL_1158.jpg",
+            "../images/La%20Bozage/15-MEL_1154.jpg",
+            "../images/La%20Bozage/16-MEL_1141.jpg",
+            "../images/La%20Bozage/17-MEL_1113.jpg",
+            "../images/La%20Bozage/18-MEL_1093.jpg",
+            "../images/La%20Bozage/19-MEL_1073.jpg",
+            "../images/La%20Bozage/20-MEL_1060.jpg",
+            "../images/La%20Bozage/21-MEL_1058.jpg",
+            "../images/La%20Bozage/22-MEL_1031.jpg",
+            "../images/La%20Bozage/23-MEL_1026.jpg",
+          ],
+        },
+        "moelan-sur-mer-2026": {
+          title: "Moëlan-sur-Mer",
+          date: "2026",
+          dateLong: "2026",
+          year: "2026",
+          location: "Bretagne",
+          photos: [
+            "../images/Mo%C3%ABlan-sur-Mer/1-MEL_0903.jpg",
+            "../images/Mo%C3%ABlan-sur-Mer/2-MEL_0899.jpg",
+            "../images/Mo%C3%ABlan-sur-Mer/3-MEL_0851.jpg",
+            "../images/Mo%C3%ABlan-sur-Mer/4-MEL_0835.jpg",
+            "../images/Mo%C3%ABlan-sur-Mer/5-MEL_0829.jpg",
+            "../images/Mo%C3%ABlan-sur-Mer/6-MEL_0794.jpg",
+            "../images/Mo%C3%ABlan-sur-Mer/7-MEL_0792.jpg",
+            "../images/Mo%C3%ABlan-sur-Mer/8-MEL_0788.jpg",
+            "../images/Mo%C3%ABlan-sur-Mer/9-MEL_0764.jpg",
+            "../images/Mo%C3%ABlan-sur-Mer/10-MEL_0749.jpg",
+            "../images/Mo%C3%ABlan-sur-Mer/11-MEL_0734.jpg",
+          ],
+        },
+        "viking-cup-2026": {
+          title: "Viking Cup",
+          date: "Mars 2026",
+          dateLong: "Mars 2026",
+          year: "2026",
+          location: "Normandie",
+          photos: [
+            "../images/viking-cup-2026/MEL_8998.jpg",
+            "../images/viking-cup-2026/MEL_9003.jpg",
+            "../images/viking-cup-2026/MEL_9092.jpg",
+            "../images/viking-cup-2026/MEL_9127.jpg",
+            "../images/viking-cup-2026/MEL_9148.jpg",
+            "../images/viking-cup-2026/MEL_9264.jpg",
+            "../images/viking-cup-2026/MEL_9328.jpg",
+            "../images/viking-cup-2026/MEL_9336.jpg",
+            "../images/viking-cup-2026/MEL_9343.jpg",
+            "../images/viking-cup-2026/MEL_9453.jpg",
+            "../images/viking-cup-2026/MEL_9492.jpg",
+            "../images/viking-cup-2026/MEL_9528.jpg",
+            "../images/viking-cup-2026/MEL_9539.jpg",
+            "../images/viking-cup-2026/1-MEL_9738.jpg",
+            "../images/viking-cup-2026/MEL_9768.jpg",
+            "../images/viking-cup-2026/MEL_9773.jpg",
+            "../images/viking-cup-2026/MEL_9797.jpg",
+            "../images/viking-cup-2026/MEL_9811.jpg",
+            "../images/viking-cup-2026/MEL_9816.jpg",
+            "../images/viking-cup-2026/MEL_9826.jpg",
+          ],
+        },
+        "mezillac-2026": {
+          title: "Campagne de Mézillac",
+          date: "Mars 2026",
+          dateLong: "Mars 2026",
+          year: "2026",
+          location: "Ardèche",
+          photos: [
+            "../images/mezillac-2026/4-MEL_8715.jpg",
+            "../images/mezillac-2026/3-MEL_8717.jpg",
+            "../images/mezillac-2026/2-MEL_8835.jpg",
+          ],
+        },
+        "nantes-2026": {
+          title: "Nantes",
+          date: "Février 2026",
+          dateLong: "Février 2026",
+          year: "2026",
+          location: "Loire-Atlantique",
+          photos: [
+            "../images/nantes-2026/7-MEL_8433.jpg",
+            "../images/nantes-2026/6-MEL_8446.jpg",
+            "../images/nantes-2026/5-MEL_8460.jpg",
+          ],
+        },
+        "saint-nazaire-2026": {
+          title: "Saint-Nazaire",
+          date: "Février 2026",
+          dateLong: "Février 2026",
+          year: "2026",
+          location: "Loire-Atlantique",
+          photos: [
+            "../images/saint-nazaire-2026/10-MEL_7964.jpg",
+            "../images/saint-nazaire-2026/9-MEL_7970.jpg",
+            "../images/saint-nazaire-2026/8-MEL_7998.jpg",
+          ],
+        },
+        "fete-foraine-rennes-2025": {
+          title: "Fête Foraine de Rennes",
+          date: "Décembre 2025",
+          dateLong: "Décembre 2025",
+          year: "2025",
+          location: "Bretagne",
+          photos: [
+            "../images/fete-foraine-rennes-2025/1-MEL_7779.jpg",
+            "../images/fete-foraine-rennes-2025/2-MEL_7748.jpg",
+            "../images/fete-foraine-rennes-2025/3-MEL_7745.jpg",
+            "../images/fete-foraine-rennes-2025/4-MEL_7722.jpg",
+            "../images/fete-foraine-rennes-2025/5-MEL_7699.jpg",
+            "../images/fete-foraine-rennes-2025/6-MEL_7681.jpg",
+          ],
+        },
+        "mad-paris-2025": {
+          title: "M.A.D. Paris",
+          date: "Décembre 2025",
+          dateLong: "Décembre 2025",
+          year: "2025",
+          location: "Paris",
+          photos: [
+            "../images/mad-paris-2025/MEL_7126.jpg",
+            "../images/mad-paris-2025/MEL_7130.jpg",
+            "../images/mad-paris-2025/MEL_7135.jpg",
+            "../images/mad-paris-2025/MEL_7141.jpg",
+            "../images/mad-paris-2025/MEL_7146.jpg",
+            "../images/mad-paris-2025/MEL_7149.jpg",
+          ],
+        },
+        "angleterre-2025": {
+          title: "Angleterre",
+          date: "Décembre 2025",
+          dateLong: "Décembre 2025",
+          year: "2025",
+          location: "Royaume-Uni",
+          photos: [
+            "../images/angleterre-2025/1-MEL_6436.jpg",
+            "../images/angleterre-2025/2-MEL_6214.jpg",
+            "../images/angleterre-2025/3-MEL_6210.jpg",
+            "../images/angleterre-2025/4-MEL_6207.jpg",
+            "../images/angleterre-2025/5-MEL_6198.jpg",
+            "../images/angleterre-2025/6-MEL_6186.jpg",
+            "../images/angleterre-2025/7-MEL_6184.jpg",
+            "../images/angleterre-2025/8-MEL_6182.jpg",
+            "../images/angleterre-2025/IMG_4776_TIF.jpg",
+            "../images/angleterre-2025/MEL_6428.jpg",
+            "../images/angleterre-2025/MEL_6432.jpg",
+            "../images/angleterre-2025/MEL_6468.jpg",
+            "../images/angleterre-2025/MEL_6471.jpg",
+            "../images/angleterre-2025/MEL_6501.jpg",
+          ],
+        },
+        "maison-radieuse-2025": {
+          title: "Maison Radieuse",
+          date: "Décembre 2025",
+          dateLong: "Décembre 2025",
+          year: "2025",
+          location: "Rezé",
+          photos: [
+            "../images/maison-radieuse-2025/1-MEL_5634.jpg",
+            "../images/maison-radieuse-2025/2-MEL_5597.jpg",
+            "../images/maison-radieuse-2025/3-MEL_5594.jpg",
+            "../images/maison-radieuse-2025/4-IMG_4736_TIF.jpg",
+            "../images/maison-radieuse-2025/5-IMG_4734_TIF.jpg",
+            "../images/maison-radieuse-2025/6-MEL_5554.jpg",
+          ],
+        },
+        "pyrenees-2025": {
+          title: "Pyrénées",
+          date: "Août 2025",
+          dateLong: "Août 2025",
+          year: "2025",
+          location: "Pyrénées",
+          photos: [
+            "../images/pyrenees-2025/10-MEL_2233.jpg",
+            "../images/pyrenees-2025/9-MEL_2240.jpg",
+            "../images/pyrenees-2025/8-MEL_2421.jpg",
+            "../images/pyrenees-2025/7-MEL_2521.jpg",
+            "../images/pyrenees-2025/6-MEL_2545.jpg",
+            "../images/pyrenees-2025/5-MEL_2729.jpg",
+            "../images/pyrenees-2025/4-MEL_3033.jpg",
+            "../images/pyrenees-2025/3-MEL_3066.jpg",
+            "../images/pyrenees-2025/2-MEL_3069.jpg",
+            "../images/pyrenees-2025/1-MEL_3166.jpg",
+            "../images/pyrenees-2025/14-MEL_3530.jpg",
+            "../images/pyrenees-2025/13-MEL_3579.jpg",
+            "../images/pyrenees-2025/12-MEL_3605.jpg",
+            "../images/pyrenees-2025/11-MEL_3611.jpg",
+            "../images/pyrenees-2025/10-MEL_3624.jpg",
+            "../images/pyrenees-2025/9-MEL_3695.jpg",
+            "../images/pyrenees-2025/8-MEL_3748.jpg",
+            "../images/pyrenees-2025/7-MEL_3816.jpg",
+            "../images/pyrenees-2025/6-MEL_3951.jpg",
+            "../images/pyrenees-2025/5-MEL_3958.jpg",
+            "../images/pyrenees-2025/4-MEL_3966.jpg",
+            "../images/pyrenees-2025/3-MEL_3983.jpg",
+            "../images/pyrenees-2025/2-MEL_3986.jpg",
+            "../images/pyrenees-2025/1-MEL_3991.jpg",
+          ],
+        },
+        "24h-du-mans-2025": {
+          title: "24h du Mans",
+          date: "Juin 2025",
+          dateLong: "Juin 2025",
+          year: "2025",
+          location: "Sarthe",
+          photos: [
+            "../images/24h-du-mans-2025/1-MEL_1455.jpg",
+            "../images/24h-du-mans-2025/2-MEL_1452.jpg",
+            "../images/24h-du-mans-2025/3-MEL_1451.jpg",
+            "../images/24h-du-mans-2025/4-MEL_1429.jpg",
+            "../images/24h-du-mans-2025/5-MEL_1111.jpg",
+            "../images/24h-du-mans-2025/6-MEL_1101.jpg",
+            "../images/24h-du-mans-2025/7-MEL_1095.jpg",
+          ],
+        },
+        "florence-2024": {
+          title: "Florence",
+          date: "Avril 2024",
+          dateLong: "Avril 2024",
+          year: "2024",
+          location: "Italie",
+          photos: ["../images/florence-2024/MEL_0388.jpg"],
+        },
+        "rennes-2024": {
+          title: "Rennes",
+          date: "Avril 2024",
+          dateLong: "Avril 2024",
+          year: "2024",
+          location: "Bretagne",
+          photos: ["../images/rennes-2024/MEL_0078.jpg"],
+        },
+        "grenoble-2024": {
+          title: "Grenoble",
+          date: "Mars 2024",
+          dateLong: "Mars 2024",
+          year: "2024",
+          location: "Isère",
+          photos: [
+            "../images/grenoble-2024/1-MEL_9885.jpg",
+            "../images/grenoble-2024/2-MEL_9883.jpg",
+            "../images/grenoble-2024/3-MEL_9879.jpg",
+            "../images/grenoble-2024/4-MEL_9866.jpg",
+          ],
+        },
+        "nice-2024": {
+          title: "Nice",
+          date: "Février 2024",
+          dateLong: "Février 2024",
+          year: "2024",
+          location: "Côte d'Azur",
+          photos: [
+            "../images/nice-2024/5-MEL_9420.jpg",
+            "../images/nice-2024/4-MEL_9422.jpg",
+            "../images/nice-2024/3-MEL_9426.jpg",
+            "../images/nice-2024/2-MEL_9432.jpg",
+            "../images/nice-2024/1-MEL_9439.jpg",
+            "../images/nice-2024/3-MEL_9563.jpg",
+            "../images/nice-2024/2-MEL_9575.jpg",
+            "../images/nice-2024/1-MEL_9606.jpg",
+          ],
+        },
+        "marseille-2024": {
+          title: "Marseille",
+          date: "Février 2024",
+          dateLong: "Février 2024",
+          year: "2024",
+          location: "Provence",
+          photos: [
+            "../images/marseille-2024/1-MEL_9414.jpg",
+            "../images/marseille-2024/2-MEL_9402.jpg",
+            "../images/marseille-2024/3-MEL_9395.jpg",
+            "../images/marseille-2024/4-MEL_9344.jpg",
+            "../images/marseille-2024/5-MEL_9340.jpg",
+          ],
+        },
+        "lozere-foret-2024": {
+          title: "Lozère, forêt",
+          date: "Février 2024",
+          dateLong: "Février 2024",
+          year: "2024",
+          location: "Lozère",
+          photos: [
+            "../images/lozere-foret-2024/1-MEL_9217.jpg",
+            "../images/lozere-foret-2024/2-MEL_9206.jpg",
+            "../images/lozere-foret-2024/3-MEL_9180.jpg",
+            "../images/lozere-foret-2024/4-MEL_9166.jpg",
+            "../images/lozere-foret-2024/5-MEL_9163.jpg",
+            "../images/lozere-foret-2024/6-MEL_9135.jpg",
+            "../images/lozere-foret-2024/7-MEL_9122.jpg",
+            "../images/lozere-foret-2024/8-MEL_9119.jpg",
+            "../images/lozere-foret-2024/9-MEL_9112.jpg",
+            "../images/lozere-foret-2024/10-MEL_9110.jpg",
+          ],
+        },
+        "lozere-village-2024": {
+          title: "Lozère, village",
+          date: "Février 2024",
+          dateLong: "Février 2024",
+          year: "2024",
+          location: "Lozère",
+          photos: [
+            "../images/lozere-village-2024/3-MEL_8837.jpg",
+            "../images/lozere-village-2024/2-MEL_8841.jpg",
+            "../images/lozere-village-2024/1-MEL_8843.jpg",
+            "../images/lozere-village-2024/3-MEL_8915.jpg",
+            "../images/lozere-village-2024/2-MEL_8930.jpg",
+            "../images/lozere-village-2024/1-MEL_9013.jpg",
+          ],
+        },
+        "aubrac-2024": {
+          title: "Aubrac",
+          date: "Janvier 2024",
+          dateLong: "Janvier 2024",
+          year: "2024",
+          location: "Aubrac",
+          photos: [
+            "../images/aubrac-2024/1-MEL_8728.jpg",
+            "../images/aubrac-2024/2-MEL_8725.jpg",
+            "../images/aubrac-2024/3-MEL_8724.jpg",
+            "../images/aubrac-2024/4-MEL_8720.jpg",
+            "../images/aubrac-2024/5-MEL_8702.jpg",
+            "../images/aubrac-2024/6-MEL_8697.jpg",
+          ],
+        },
+        "viaduc-garabit-2024": {
+          title: "Viaduc de Garabit",
+          date: "Janvier 2024",
+          dateLong: "Janvier 2024",
+          year: "2024",
+          location: "Cantal",
+          photos: [
+            "../images/viaduc-garabit-2024/1-MEL_8475.jpg",
+            "../images/viaduc-garabit-2024/2-MEL_8467.jpg",
+            "../images/viaduc-garabit-2024/3-MEL_8454.jpg",
+            "../images/viaduc-garabit-2024/4-MEL_8449.jpg",
+            "../images/viaduc-garabit-2024/5-MEL_8446.jpg",
+            "../images/viaduc-garabit-2024/6-MEL_8431.jpg",
+          ],
+        },
+        "nantes-2024": {
+          title: "Nantes",
+          date: "Janvier 2024",
+          dateLong: "Janvier 2024",
+          year: "2024",
+          location: "Loire-Atlantique",
+          photos: [
+            "../images/nantes-2024/1-MEL_8349.jpg",
+            "../images/nantes-2024/2-MEL_8345.jpg",
+            "../images/nantes-2024/3-MEL_8312.jpg",
+            "../images/nantes-2024/4-MEL_8307.jpg",
+            "../images/nantes-2024/5-MEL_8306.jpg",
+            "../images/nantes-2024/6-MEL_8230.jpg",
+            "../images/nantes-2024/7-MEL_8228.jpg",
+            "../images/nantes-2024/8-MEL_8227.jpg",
+          ],
+        },
+        "thabor-rennes-2024": {
+          title: "Thabor — Rennes",
+          date: "Janvier 2024",
+          dateLong: "Janvier 2024",
+          year: "2024",
+          location: "Bretagne",
+          photos: [
+            "../images/thabor-rennes-2024/1-MEL_8176.jpg",
+            "../images/thabor-rennes-2024/2-MEL_8159.jpg",
+            "../images/thabor-rennes-2024/3-MEL_8150.jpg",
+            "../images/thabor-rennes-2024/4-MEL_8103.jpg",
+            "../images/thabor-rennes-2024/5-MEL_8097.jpg",
+            "../images/thabor-rennes-2024/6-MEL_8082.jpg",
+          ],
+        },
+        "port-nantes-2024": {
+          title: "Port de Nantes",
+          date: "Janvier 2024",
+          dateLong: "Janvier 2024",
+          year: "2024",
+          location: "Loire-Atlantique",
+          photos: [
+            "../images/port-nantes-2024/1-MEL_7745.jpg",
+            "../images/port-nantes-2024/2-MEL_7702.jpg",
+            "../images/port-nantes-2024/3-MEL_7692.jpg",
+            "../images/port-nantes-2024/4-MEL_7683.jpg",
+            "../images/port-nantes-2024/5-MEL_7681.jpg",
+            "../images/port-nantes-2024/6-MEL_7655.jpg",
+            "../images/port-nantes-2024/7-MEL_7650.jpg",
+            "../images/port-nantes-2024/8-MEL_7649.jpg",
+          ],
+        },
+      };
+
+      // ============================================================
+      // HERO SLIDESHOW PHOTOS
+      // ============================================================
+      let activeHeroPhotos = [];
+
+      const heroPhotos = [
+        {
+          src: "../images/showcase/hero/MEL_9528.jpg",
+          caption: "Viking Cup — Mars 2026",
+        },
+        {
+          src: "../images/showcase/MEL_9768.jpg",
+          caption: "Viking Cup — Mars 2026",
+        },
+        {
+          
+          src: "../images/showcase/MEL_9003.jpg",
+          caption: "Atelier — 2025",
+        },
+        {
+          src: "../images/showcase/IMG_4776_TIF.jpg",
+          caption: "Angleterre — Décembre 2025",
+        },
+        {
+          src: "../images/showcase/2-MEL_8835.jpg",
+          caption: "Campagne de Mézillac — Mars 2026",
+        },
+        {
+          src: "../images/showcase/3-MEL_7745.jpg",
+          caption: "Fête Foraine de Rennes — Décembre 2025",
+        },
+        {
+          src: "../images/showcase/6-MEL_7681.jpg",
+          caption: "Fête Foraine de Rennes — Décembre 2025",
+        },
+      ];
+
+      // ============================================================
+      // SHOWCASE GRID PHOTOS (homepage)
+      // ============================================================
+      const showcasePhotos = [
+        "../images/showcase/MEL_9768.jpg",
+        "../images/showcase/3-MEL_8150.jpg",
+        "../images/showcase/7-MEL_8433.jpg",
+        "../images/showcase/13-MEL_3579.jpg",
+        "../images/showcase/MEL_0388.jpg",
+        "../images/showcase/4-MEL_8103.jpg",
+        "../images/showcase/9-MEL_3695.jpg",
+        "../images/showcase/2-MEL_8725.jpg",
+        "../images/showcase/5-IMG_4734_TIF.jpg",
+        "../images/showcase/1-MEL_3166.jpg",
+        "../images/showcase/6-MEL_7681.jpg",
+        "../images/showcase/3-MEL_9879.jpg",
+        "../images/showcase/8-MEL_8227.jpg",
+        "../images/showcase/4-MEL_9344.jpg",
+        "../images/showcase/IMG_4776_TIF.jpg",
+        "../images/showcase/1-MEL_5634.jpg",
+        "../images/showcase/2-MEL_9402.jpg",
+        "../images/showcase/3-MEL_7745.jpg",
+        "../images/showcase/MEL_6501.jpg",
+        "../images/showcase/MEL_9003.jpg",
+        "../images/showcase/2-MEL_8835.jpg",
+        "../images/showcase/3-MEL_8724.jpg",
+        "../images/showcase/5-MEL_7681.jpg",
+        "../images/showcase/10-MEL_9110.jpg",
+      ];
+
+      // ============================================================
+      // PAGE NAVIGATION
+      // ============================================================
+      const pages = {
+        home: document.getElementById("page-home"),
+        projects: document.getElementById("page-projects"),
+        project: document.getElementById("page-project"),
+        about: document.getElementById("page-about"),
+        contact: document.getElementById("page-contact"),
+      };
+
+      let currentPage = "home";
+
+      function showPage(name) {
+        if (currentPage === name) return;
+        const current = pages[currentPage];
+        const next = pages[name];
+
+        // fade out current
+        current.classList.remove("fade-in");
+        setTimeout(() => {
+          current.classList.remove("active");
+          next.classList.add("active");
+          window.scrollTo(0, 0);
+          requestAnimationFrame(() => {
+            next.classList.add("fade-in");
+            observeImages();
+          });
+          currentPage = name;
+        }, 400);
+
+        // update nav active state
+        document.querySelectorAll(".nav a").forEach((a) => {
+          a.classList.toggle("active", a.dataset.page === name);
+        });
+      }
+
+      // Bind nav links + any [data-page] element
+      function bindPageLinks() {
+        document.querySelectorAll("[data-page]").forEach((el) => {
+          el.addEventListener("click", (e) => {
+            e.preventDefault();
+            showPage(el.dataset.page);
+          });
+        });
+      }
+
+      // ============================================================
+      // HERO SLIDESHOW
+      // ============================================================
+      function buildHero() {
+        const hero = document.getElementById("hero");
+        const progress = document.getElementById("heroProgress");
+        const caption = document.getElementById("heroCaption");
+
+        const heroPhotosMobile = [
+          { src: "../images/showcase/1-MEL_3166.jpg", caption: "" },
+          { src: "../images/showcase/2-MEL_8725.jpg", caption: "" },
+          { src: "../images/showcase/13-MEL_3579.jpg", caption: "" },
+          { src: "../images/showcase/3-MEL_9879.jpg", caption: "" },
+          { src: "../images/showcase/4-MEL_9344.jpg", caption: "" },
+          { src: "../images/showcase/MEL_0388.jpg", caption: "" },
+        ];
+
+        const isMobile = window.matchMedia("(max-width: 700px)").matches;
+        activeHeroPhotos = isMobile ? heroPhotosMobile : heroPhotos;
+
+        activeHeroPhotos.forEach((p, i) => {
+          const slide = document.createElement("div");
+          slide.className = "hero-slide";
+          if (i === 0) slide.classList.add("active");
+          const img = document.createElement("img");
+          img.src = p.src;
+          img.alt = p.caption;
+          if (i === 0) {
+            img.setAttribute("fetchpriority", "high");
+            img.classList.add("loaded");
+          } else {
+            img.loading = "lazy";
+          }
+          img.decoding = "async";
+          slide.appendChild(img);
+          hero.insertBefore(slide, caption);
+
+          const dot = document.createElement("span");
+          if (i === 0) dot.classList.add("active");
+          progress.appendChild(dot);
+        });
+        caption.textContent = activeHeroPhotos[0].caption;
+      }
+
+      let heroIndex = 0;
+      function cycleHero() {
+        const slides = document.querySelectorAll(".hero-slide");
+        const dots = document.querySelectorAll("#heroProgress span");
+        if (!slides.length) return;
+        slides[heroIndex].classList.remove("active");
+        dots[heroIndex].classList.remove("active");
+        heroIndex = (heroIndex + 1) % slides.length;
+        slides[heroIndex].classList.add("active");
+        dots[heroIndex].classList.add("active");
+        document.getElementById("heroCaption").textContent =
+          activeHeroPhotos[heroIndex].caption;
+      }
+
+      // ============================================================
+      // SHOWCASE GRID (homepage)
+      // ============================================================
+      function buildShowcase() {
+        const grid = document.getElementById("showcaseGrid");
+        const cols = [
+          document.createElement("div"),
+          document.createElement("div"),
+          document.createElement("div"),
+        ];
+        cols.forEach((c) => {
+          c.className = "grid-col";
+          grid.appendChild(c);
+        });
+        showcasePhotos.forEach((src, i) => {
+          const img = document.createElement("img");
+          img.src = src;
+          img.alt = "";
+          img.loading = "lazy";
+          img.decoding = "async";
+          img.dataset.caption = "Sélection";
+          img.addEventListener("click", () => {
+            openLightbox(showcasePhotos, i, "Sélection", "", false);
+          });
+          cols[i % 3].appendChild(img);
+        });
+      }
+
+      // ============================================================
+      // PROJECTS INDEX
+      // ============================================================
+      function buildProjects() {
+        const container = document.getElementById("projectsContainer");
+
+        const allProjects = Object.entries(projects)
+          .map(([id, p]) => ({ id, ...p }))
+          .sort((a, b) => b.year.localeCompare(a.year));
+
+        const grid = document.createElement("div");
+        grid.className = "projects-grid";
+
+        allProjects.forEach((proj) => {
+            const card = document.createElement("a");
+            card.href = "#";
+            card.className = "project-card";
+            card.dataset.project = proj.id;
+
+            const cover = document.createElement("div");
+            cover.className = "project-cover";
+            const img = document.createElement("img");
+            img.src = proj.cover || proj.photos[0];
+            img.alt = proj.title;
+            img.loading = "lazy";
+            img.decoding = "async";
+            cover.appendChild(img);
+
+            const name = document.createElement("div");
+            name.className = "project-card-name";
+            name.textContent = proj.title;
+
+            const meta = document.createElement("div");
+            meta.className = "project-card-meta";
+            meta.innerHTML = `<span>${proj.date}</span><span>${proj.photos.length} photos</span>`;
+
+            const info = document.createElement("div");
+            info.className = "project-card-info";
+            info.appendChild(name);
+            info.appendChild(meta);
+            cover.appendChild(info);
+            card.appendChild(cover);
+            card.addEventListener("click", (e) => {
+              e.preventDefault();
+              openProject(proj.id);
+            });
+            grid.appendChild(card);
+          });
+
+        container.appendChild(grid);
+      }
+
+      // ============================================================
+      // OPEN PROJECT VIEW
+      // ============================================================
+      let currentProject = null;
+
+      function openProject(id) {
+        const p = projects[id];
+        if (!p) return;
+        currentProject = { id, ...p };
+
+        document.getElementById("projectTitle").textContent = p.title;
+        document.getElementById("projectMeta").innerHTML = `
+          <div>${p.dateLong}</div>
+          <div>${p.photos.length} photographies</div>
+        `;
+
+        const photosEl = document.getElementById("projectPhotos");
+        photosEl.innerHTML = "";
+        const col1 = document.createElement("div");
+        const col2 = document.createElement("div");
+        col1.className = "grid-col";
+        col2.className = "grid-col";
+        p.photos.forEach((src, i) => {
+          const img = document.createElement("img");
+          img.src = src;
+          img.alt = p.title;
+          img.loading = "lazy";
+          img.decoding = "async";
+          img.dataset.caption = `${p.title} · ${p.dateLong}`;
+          img.dataset.photoIndex = i;
+          img.addEventListener("click", () => {
+            openLightbox(p.photos, i, p.title, p.dateLong, false);
+          });
+          (i % 2 === 0 ? col1 : col2).appendChild(img);
+        });
+        photosEl.appendChild(col1);
+        photosEl.appendChild(col2);
+
+        showPage("project");
+      }
+
+      // ============================================================
+      // LIGHTBOX / PROJECTION MODE
+      // ============================================================
+      const lightbox = document.getElementById("lightbox");
+      const lbImg = document.getElementById("lightboxImg");
+      const lbMeta = document.getElementById("lightboxMeta");
+      const lbProgress = document.getElementById("lightboxProgress");
+      const lbClose = document.getElementById("lightboxClose");
+      const lbPrev = document.getElementById("lightboxPrev");
+      const lbNext = document.getElementById("lightboxNext");
+
+      let lbPhotos = [];
+      let lbIndex = 0;
+      let lbProject = "";
+      let lbDate = "";
+      let lbAuto = false;
+      let lbInterval = null;
+
+      function openLightbox(photos, index, title, date, autoplay) {
+        lbPhotos = photos;
+        lbIndex = index;
+        lbProject = title;
+        lbDate = date;
+        lbAuto = autoplay;
+        lightbox.classList.add("open");
+        document.body.style.overflow = "hidden";
+        showLightboxPhoto();
+        if (autoplay) startAutoplay();
+      }
+
+      function showLightboxPhoto() {
+        lbImg.classList.remove("shown");
+        const newSrc = lbPhotos[lbIndex];
+        const next = new Image();
+        next.onload = () => {
+          lbImg.src = newSrc;
+          requestAnimationFrame(() => lbImg.classList.add("shown"));
+        };
+        next.src = newSrc;
+        const parts = [lbProject, lbDate].filter((p) => p);
+        lbMeta.textContent = parts.join(" · ");
+        lbProgress.textContent = `${String(lbIndex + 1).padStart(2, "0")} / ${String(lbPhotos.length).padStart(2, "0")}`;
+      }
+
+      function lbNextPhoto() {
+        lbIndex = (lbIndex + 1) % lbPhotos.length;
+        showLightboxPhoto();
+      }
+      function lbPrevPhoto() {
+        lbIndex = (lbIndex - 1 + lbPhotos.length) % lbPhotos.length;
+        showLightboxPhoto();
+      }
+
+      function startAutoplay() {
+        if (lbInterval) clearInterval(lbInterval);
+        lbInterval = setInterval(lbNextPhoto, 5000);
+      }
+      function stopAutoplay() {
+        if (lbInterval) {
+          clearInterval(lbInterval);
+          lbInterval = null;
+        }
+      }
+
+      function closeLightbox() {
+        lightbox.classList.remove("open");
+        document.body.style.overflow = "";
+        stopAutoplay();
+      }
+
+      lbClose.addEventListener("click", closeLightbox);
+      lbPrev.addEventListener("click", () => {
+        lbPrevPhoto();
+        if (lbAuto) startAutoplay();
+      });
+      lbNext.addEventListener("click", () => {
+        lbNextPhoto();
+        if (lbAuto) startAutoplay();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (!lightbox.classList.contains("open")) return;
+        if (e.key === "Escape") closeLightbox();
+        if (e.key === "ArrowLeft") {
+          lbPrevPhoto();
+          if (lbAuto) startAutoplay();
+        }
+        if (e.key === "ArrowRight") {
+          lbNextPhoto();
+          if (lbAuto) startAutoplay();
+        }
+      });
+
+
+      // ============================================================
+      // LAZY FADE-IN
+      // ============================================================
+      const imgObserver = new IntersectionObserver(
+        (entries, obs) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const img = entry.target;
+            const reveal = () =>
+              requestAnimationFrame(() => img.classList.add("loaded"));
+            if (img.complete) reveal();
+            else {
+              img.addEventListener("load", reveal, { once: true });
+              img.addEventListener("error", reveal, { once: true });
+            }
+            obs.unobserve(img);
+          });
+        },
+        { rootMargin: "0px 0px 200px 0px" },
+      );
+
+      function observeImages() {
+        document.querySelectorAll("img:not(.loaded)").forEach((img) => {
+          imgObserver.observe(img);
+        });
+      }
+
+      // ============================================================
+      // CUSTOM CURSOR
+      // ============================================================
+      const cursor = document.getElementById("cursor");
+      const cursorLabel = document.getElementById("cursorLabel");
+      let cursorX = 0;
+      let cursorY = 0;
+      let cursorRX = 0;
+      let cursorRY = 0;
+
+      document.addEventListener("mousemove", (e) => {
+        cursorX = e.clientX;
+        cursorY = e.clientY;
+      });
+
+      function animateCursor() {
+        cursorRX += (cursorX - cursorRX) * 0.25;
+        cursorRY += (cursorY - cursorRY) * 0.25;
+        cursor.style.transform = `translate(${cursorRX}px, ${cursorRY}px) translate(-50%, -50%)`;
+        requestAnimationFrame(animateCursor);
+      }
+      animateCursor();
+
+      // Cursor state based on hover
+      document.addEventListener(
+        "mouseover",
+        (e) => {
+          const t = e.target;
+          if (t.tagName === "IMG" && !t.closest(".lightbox") && !t.closest(".hero-slide")) {
+            cursor.classList.add("cursor-photo");
+            cursorLabel.textContent = "voir";
+            if (t.dataset.caption) {
+              const caption = document.getElementById("photoCaption");
+              caption.textContent = t.dataset.caption;
+              caption.classList.add("visible");
+            }
+          } else if (
+            t.tagName === "A" ||
+            t.tagName === "BUTTON" ||
+            t.closest("[data-page]") ||
+            t.closest("[data-project]")
+          ) {
+            cursor.classList.add("cursor-link");
+            cursorLabel.textContent = "";
+          }
+        },
+        true,
+      );
+
+      document.addEventListener(
+        "mouseout",
+        (e) => {
+          const t = e.target;
+          if (t.tagName === "IMG") {
+            cursor.classList.remove("cursor-photo");
+            cursorLabel.textContent = "";
+            document
+              .getElementById("photoCaption")
+              .classList.remove("visible");
+          } else if (
+            t.tagName === "A" ||
+            t.tagName === "BUTTON" ||
+            t.closest("[data-page]") ||
+            t.closest("[data-project]")
+          ) {
+            cursor.classList.remove("cursor-link");
+          }
+        },
+        true,
+      );
+
+      // ============================================================
+      // FLOATING YEAR INDICATOR
+      // ============================================================
+      const yearIndicator = document.getElementById("yearIndicator");
+      let yearObserver = null;
+
+      function setupYearObserver() {
+        if (yearObserver) yearObserver.disconnect();
+        yearObserver = new IntersectionObserver(
+          (entries) => {
+            // pick entry closest to top of viewport
+            const visible = entries
+              .filter((e) => e.isIntersecting)
+              .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+            if (visible.length > 0) {
+              yearIndicator.textContent = visible[0].target.dataset.year;
+              yearIndicator.classList.add("visible");
+            }
+          },
+          { rootMargin: "-30% 0px -50% 0px" },
+        );
+        document
+          .querySelectorAll(".year-group")
+          .forEach((g) => yearObserver.observe(g));
+      }
+
+      window.addEventListener("scroll", () => {
+        if (currentPage !== "projects") {
+          yearIndicator.classList.remove("visible");
+        }
+
+        if (currentPage === "home") {
+          const scrollY = window.pageYOffset;
+          const vh = window.innerHeight;
+          const progress = Math.min(scrollY / vh, 1);
+          const hero = document.getElementById("hero");
+          hero.style.opacity = 1 - progress * 1.4;
+          document.querySelectorAll(".hero-slide img").forEach((img) => {
+            img.style.transform = `translateY(${scrollY * 0.25}px)`;
+          });
+        }
+      }, { passive: true });
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      buildHero();
+      buildShowcase();
+      buildProjects();
+      bindPageLinks();
+      setupYearObserver();
+      observeImages();
+
+      // Start hero cycle after first frame
+      setInterval(cycleHero, 6500);
+    </script>
+  </body>
+</html>
