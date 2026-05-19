@@ -143,14 +143,33 @@
         justify-content: space-between;
         align-items: center;
         z-index: 100;
+        transition: padding 0.4s ease;
+      }
+      .header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 160px;
+        background: linear-gradient(to bottom, rgba(8, 8, 8, 0.85) 0%, rgba(8, 8, 8, 0.5) 45%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.45s ease;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .header.scrolled {
+        padding-top: 14px;
+        padding-bottom: 14px;
+      }
+      .header.scrolled::before {
+        opacity: 1;
       }
       .header-blur {
         position: absolute;
         top: 0;
         bottom: -120px;
         background: rgba(10, 10, 10, 0.12);
-        backdrop-filter: blur(14px) saturate(130%);
-        -webkit-backdrop-filter: blur(14px) saturate(130%);
         z-index: -1;
         pointer-events: none;
       }
@@ -178,18 +197,14 @@
           linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 28%, rgba(0,0,0,0.95) 38%, rgba(0,0,0,0.82) 48%, rgba(0,0,0,0.62) 60%, rgba(0,0,0,0.38) 73%, rgba(0,0,0,0.16) 86%, rgba(0,0,0,0.04) 94%, rgba(0,0,0,0) 100%);
         mask-composite: intersect;
       }
-      .header::before {
-        display: none;
-      }
-
       .logo {
         font-family: var(--serif);
-        font-size: 17px;
+        font-size: 22px;
         font-weight: 400;
         letter-spacing: 0.04em;
         color: #fff;
         position: relative;
-        z-index: 2;
+        z-index: 1;
         text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
       }
       .logo em {
@@ -240,13 +255,15 @@
       .page {
         display: none;
         opacity: 0;
-        transition: opacity 0.5s var(--ease);
+        transform: translateY(18px);
+        transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
       }
       .page.active {
         display: block;
       }
       .page.fade-in {
         opacity: 1;
+        transform: translateY(0);
       }
 
       /* ============================================================
@@ -640,31 +657,6 @@
         opacity: 1;
       }
 
-      /* ============================================================
-           PHOTO CAPTION ON HOVER
-        ============================================================ */
-      .photo-caption {
-        position: fixed;
-        bottom: 36px;
-        left: 40px;
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.18em;
-        color: #fff;
-        text-transform: uppercase;
-        opacity: 0;
-        transition: opacity 0.4s var(--ease);
-        pointer-events: none;
-        z-index: 80;
-        background: rgba(0, 0, 0, 0.55);
-        padding: 8px 14px;
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        border-radius: 2px;
-      }
-      .photo-caption.visible {
-        opacity: 1;
-      }
 
       /* ============================================================
            ABOUT
@@ -878,7 +870,11 @@
            LAZY FADE-IN
         ============================================================ */
       .grid-col img,
-      .grid-2 img,
+      .grid-2 img {
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 1.2s var(--ease), transform 1s var(--ease);
+      }
       .hero-slide img {
         opacity: 0;
         transition: opacity 1.2s var(--ease);
@@ -888,7 +884,10 @@
         transition: opacity 1.2s var(--ease);
       }
       .grid-col img.loaded,
-      .grid-2 img.loaded,
+      .grid-2 img.loaded {
+        opacity: 1;
+        transform: translateY(0);
+      }
       .project-cover img.loaded,
       .hero-slide.active img.loaded {
         opacity: 1;
@@ -960,7 +959,7 @@
           bottom: -40px;
         }
         .logo {
-          font-size: 15px;
+          font-size: 19px;
         }
         .nav {
           gap: 18px;
@@ -1054,9 +1053,6 @@
         .year-indicator {
           display: none;
         }
-        .photo-caption {
-          display: none;
-        }
         .footer {
           flex-direction: column;
           gap: 8px;
@@ -1095,7 +1091,6 @@
     <div class="year-indicator" id="yearIndicator">2026</div>
 
     <!-- Photo caption on hover -->
-    <div class="photo-caption" id="photoCaption"></div>
 
     <main>
       <!-- ========================================================
@@ -1918,6 +1913,7 @@
           img.decoding = "async";
           img.dataset.caption = `${p.title} · ${p.dateLong}`;
           img.dataset.photoIndex = i;
+          img.style.transitionDelay = `${Math.min(i * 60, 600)}ms`;
           img.addEventListener("click", () => {
             openLightbox(p.photos, i, p.title, p.dateLong, false);
           });
@@ -2014,6 +2010,38 @@
         if (e.key === "ArrowRight") { lbNextPhoto(); if (lbAuto) startAutoplay(); }
       });
 
+      let lbTouchX = 0;
+      lightbox.addEventListener("touchstart", (e) => {
+        lbTouchX = e.touches[0].clientX;
+      }, { passive: true });
+      lightbox.addEventListener("touchend", (e) => {
+        const dx = e.changedTouches[0].clientX - lbTouchX;
+        if (Math.abs(dx) < 50) return;
+        if (dx < 0) lbNextPhoto(); else lbPrevPhoto();
+        if (lbAuto) startAutoplay();
+      }, { passive: true });
+
+      // Swipe between pages on mobile
+      const pageOrder = ["home", "projects", "about", "contact"];
+      let pageTouchX = 0;
+      let pageTouchY = 0;
+      document.addEventListener("touchstart", (e) => {
+        if (lightbox.classList.contains("open")) return;
+        pageTouchX = e.touches[0].clientX;
+        pageTouchY = e.touches[0].clientY;
+      }, { passive: true });
+      document.addEventListener("touchend", (e) => {
+        if (lightbox.classList.contains("open")) return;
+        const dx = e.changedTouches[0].clientX - pageTouchX;
+        const dy = e.changedTouches[0].clientY - pageTouchY;
+        if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+        const base = currentPage === "project" ? "projects" : currentPage;
+        const idx = pageOrder.indexOf(base);
+        if (idx === -1) return;
+        if (dx < 0 && idx < pageOrder.length - 1) showPage(pageOrder[idx + 1]);
+        if (dx > 0 && idx > 0) showPage(pageOrder[idx - 1]);
+      }, { passive: true });
+
 
       // ============================================================
       // LAZY FADE-IN
@@ -2073,11 +2101,6 @@
           if (t.tagName === "IMG" && !t.closest(".lightbox") && !t.closest(".hero-slide")) {
             cursor.classList.add("cursor-photo");
             cursorLabel.textContent = "voir";
-            if (t.dataset.caption) {
-              const caption = document.getElementById("photoCaption");
-              caption.textContent = t.dataset.caption;
-              caption.classList.add("visible");
-            }
           } else if (
             t.tagName === "A" ||
             t.tagName === "BUTTON" ||
@@ -2098,9 +2121,6 @@
           if (t.tagName === "IMG") {
             cursor.classList.remove("cursor-photo");
             cursorLabel.textContent = "";
-            document
-              .getElementById("photoCaption")
-              .classList.remove("visible");
           } else if (
             t.tagName === "A" ||
             t.tagName === "BUTTON" ||
@@ -2139,7 +2159,10 @@
           .forEach((g) => yearObserver.observe(g));
       }
 
+      const header = document.querySelector(".header");
       window.addEventListener("scroll", () => {
+        header.classList.toggle("scrolled", window.pageYOffset > 40);
+
         if (currentPage !== "projects") {
           yearIndicator.classList.remove("visible");
         }
