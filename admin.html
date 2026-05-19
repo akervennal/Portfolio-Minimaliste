@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Manager — Portfolio</title>
+  <style>
+    :root {
+      --bg:     #0a0a0a;
+      --bg2:    #141414;
+      --bg3:    #1e1e1e;
+      --text:   #f0ede4;
+      --muted:  #8a857c;
+      --faint:  #3a3830;
+      --border: rgba(240, 237, 228, 0.1);
+      --accent: #c8b89a;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── OVERLAY ──────────────────────────────────────────── */
+    #overlay {
+      position: fixed; inset: 0; background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 20px; z-index: 200;
+    }
+    #overlay h1 { font-size: 18px; font-weight: 400; letter-spacing: 0.03em; }
+    #overlay p  { color: var(--muted); font-size: 12px; text-align: center; line-height: 1.8; }
+    .open-btn {
+      padding: 12px 36px;
+      border: 1px solid var(--border);
+      background: none; color: var(--text);
+      font-size: 11px; letter-spacing: 0.15em;
+      text-transform: uppercase; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .open-btn:hover { background: var(--text); color: var(--bg); }
+    #errMsg { color: #c47; font-size: 11px; display: none; max-width: 400px; text-align: center; }
+
+    /* ── APP SHELL ────────────────────────────────────────── */
+    #app { display: none; flex-direction: column; height: 100vh; }
+    #app.on { display: flex; }
+
+    /* ── HEADER ──────────────────────────────────────────── */
+    .hdr {
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 20px; height: 48px; flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .hdr-title { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .tabs { display: flex; gap: 2px; }
+    .tab {
+      padding: 6px 18px; font-size: 11px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      cursor: pointer; border: 1px solid transparent;
+      background: none; color: var(--muted);
+      transition: all 0.15s; font-family: inherit;
+    }
+    .tab.on { color: var(--text); border-color: var(--border); background: var(--bg2); }
+    .spacer { flex: 1; }
+    #saveStatus { font-size: 11px; color: var(--accent); min-width: 90px; text-align: right; }
+    #saveBtn {
+      padding: 8px 22px; background: var(--text); color: var(--bg);
+      border: none; font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; cursor: pointer; font-family: inherit;
+    }
+    #saveBtn:hover { opacity: 0.85; }
+
+    /* ── PANELS ──────────────────────────────────────────── */
+    .panel { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+    .panel.on { display: flex; }
+
+    /* ── HOME PANEL ──────────────────────────────────────── */
+    .home-main { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── PROJECT PANEL ───────────────────────────────────── */
+    .proj-bar {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .proj-bar label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+    #projSel {
+      background: var(--bg2); border: 1px solid var(--border);
+      color: var(--text); padding: 6px 10px; font-size: 12px;
+      font-family: inherit; cursor: pointer; flex: 1; max-width: 380px;
+    }
+    .proj-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── SECTION BLOCK ───────────────────────────────────── */
+    .sblock { border: 1px solid var(--border); }
+    .sblock-head {
+      padding: 9px 14px; display: flex; align-items: center; gap: 10px;
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--muted); border-bottom: 1px solid var(--border);
+    }
+    .sblock-count { background: var(--bg3); padding: 2px 7px; font-size: 9px; border-radius: 2px; }
+    .sblock-hint  { font-size: 9px; color: var(--faint); margin-left: auto; letter-spacing: 0.1em; }
+
+    .sblock-body {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 10px; min-height: 78px; transition: background 0.15s;
+    }
+    .sblock-body.over {
+      background: rgba(200, 184, 154, 0.05);
+      outline: 1px dashed rgba(200, 184, 154, 0.4);
+      outline-offset: -4px;
+    }
+
+    /* ── CARD (section) ──────────────────────────────────── */
+    .card {
+      position: relative; width: 90px; flex-shrink: 0;
+      cursor: grab; border: 1px solid transparent; transition: border-color 0.15s;
+      user-select: none;
+    }
+    .card:hover  { border-color: var(--border); }
+    .card.ghost  { opacity: 0.25; }
+    .card.insert-before::before {
+      content: ''; position: absolute; left: -5px; top: 0; bottom: 0;
+      width: 3px; background: var(--accent); z-index: 10; border-radius: 2px;
+    }
+    .card img {
+      width: 90px; height: auto; display: block;
+      background: var(--bg3);
+    }
+    .card-cap {
+      width: 100%; background: var(--bg2); border: none;
+      border-top: 1px solid var(--border); color: var(--muted);
+      font-size: 9px; padding: 4px 6px; font-family: inherit;
+    }
+    .card-cap:focus { outline: none; color: var(--text); background: var(--bg3); }
+    .card-cap::placeholder { color: var(--faint); }
+    .rm {
+      position: absolute; top: 2px; right: 2px;
+      width: 18px; height: 18px; background: rgba(10,10,10,0.85);
+      border: none; color: var(--muted); font-size: 14px; line-height: 1;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.15s; font-family: inherit; border-radius: 1px;
+    }
+    .card:hover .rm { opacity: 1; }
+    .rm:hover { color: var(--text); }
+    .cover-badge {
+      position: absolute; bottom: 2px; left: 2px;
+      background: rgba(200, 184, 154, 0.92); color: #0a0a0a;
+      font-size: 7px; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 2px 5px; pointer-events: none; border-radius: 1px;
+    }
+    .set-cover {
+      position: absolute; bottom: 2px; left: 2px;
+      background: rgba(10,10,10,0.85); border: none;
+      color: var(--muted); font-size: 9px; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 2px 5px; cursor: pointer;
+      opacity: 0; transition: opacity 0.15s; font-family: inherit;
+      border-radius: 1px;
+    }
+    .card:hover .set-cover { opacity: 1; }
+
+    /* ── POOL ────────────────────────────────────────────── */
+    .pool {
+      border-top: 1px solid var(--border); flex-shrink: 0;
+      max-height: 185px; display: flex; flex-direction: column;
+    }
+    .pool-head {
+      padding: 8px 14px; flex-shrink: 0;
+      font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--muted);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pool-count { font-size: 9px; color: var(--faint); }
+    .pool-strip {
+      display: flex; flex-wrap: nowrap; gap: 6px;
+      padding: 4px 10px 10px; overflow-x: auto; flex: 1;
+    }
+    .pool-strip::-webkit-scrollbar { height: 3px; }
+    .pool-strip::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 2px; }
+
+    .pcard {
+      width: 76px; flex-shrink: 0; cursor: grab;
+      opacity: 0.6; transition: opacity 0.15s; user-select: none;
+    }
+    .pcard:hover { opacity: 1; }
+    .pcard img {
+      width: 76px; height: auto; display: block;
+      background: var(--bg3); border: 1px solid transparent; transition: border-color 0.15s;
+    }
+    .pcard:hover img { border-color: var(--border); }
+    .pcard-name {
+      font-size: 8px; color: var(--faint); padding: 3px 1px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 76px;
+    }
+
+    /* ── MISC ────────────────────────────────────────────── */
+    .empty {
+      font-size: 10px; color: var(--faint); letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 16px 8px; align-self: center;
+    }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- ── OVERLAY ─────────────────────────────────────────────────────────── -->
+<div id="overlay">
+  <h1>Photo Manager</h1>
+  <p>Ouvre le dossier racine du portfolio.<br>Fonctionne sur Chrome / Edge uniquement.</p>
+  <button class="open-btn" id="openBtn">Ouvrir le dossier</button>
+  <span id="errMsg"></span>
+</div>
+
+<!-- ── APP ─────────────────────────────────────────────────────────────── -->
+<div id="app">
+  <header class="hdr">
+    <span class="hdr-title">Photo Manager</span>
+    <div class="tabs">
+      <button class="tab on" data-panel="home">Accueil</button>
+      <button class="tab"    data-panel="proj">Projets</button>
+    </div>
+    <span class="spacer"></span>
+    <span id="saveStatus"></span>
+    <button id="saveBtn">Enregistrer</button>
+  </header>
+
+  <!-- Homepage panel -->
+  <div class="panel on" id="panel-home">
+    <div class="home-main" id="homeMain"></div>
+    <div class="pool">
+      <div class="pool-head">
+        Pool — images/showcase
+        <span class="pool-count" id="poolCount"></span>
+      </div>
+      <div class="pool-strip" id="poolStrip"></div>
+    </div>
+  </div>
+
+  <!-- Projects panel -->
+  <div class="panel" id="panel-proj">
+    <div class="proj-bar">
+      <label>Projet</label>
+      <select id="projSel"><option value="">— sélectionner —</option></select>
+    </div>
+    <div class="proj-body" id="projBody">
+      <span class="empty">Sélectionne un projet</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────
+let cfg       = null;
+let root      = null;
+let thumbs    = {};       // { path: objectURL }
+let poolFiles = [];       // all src paths under images/showcase/
+let projFiles = {};       // { id: [srcPath] }
+let drag      = null;     // active drag payload
+
+// ─── FILE SYSTEM ──────────────────────────────────────────────────────────
+async function resolveFile(path) {
+  const parts = path.split('/').filter(Boolean);
+  let h = root;
+  for (let i = 0; i < parts.length - 1; i++) {
+    h = await h.getDirectoryHandle(decodeURIComponent(parts[i])).catch(() => null);
+    if (!h) return null;
+  }
+  return h.getFileHandle(decodeURIComponent(parts[parts.length - 1])).catch(() => null);
+}
+
+async function resolveDir(path) {
+  const parts = path.split('/').filter(Boolean);
+  let h = root;
+  for (const p of parts) {
+    h = await h.getDirectoryHandle(decodeURIComponent(p)).catch(() => null);
+    if (!h) return null;
+  }
+  return h;
+}
+
+async function scanDir(encodedPath) {
+  const dh = await resolveDir(encodedPath);
+  if (!dh) return [];
+  const out = [];
+  for await (const [name, h] of dh.entries()) {
+    if (h.kind === 'file' && /\.(jpg|jpeg|png|webp)$/i.test(name)) {
+      out.push(`${encodedPath}/${name}`);
+    } else if (h.kind === 'directory') {
+      out.push(...await scanDir(`${encodedPath}/${encodeURIComponent(name)}`));
+    }
+  }
+  return out.sort();
+}
+
+async function thumb(src) {
+  if (thumbs[src]) return thumbs[src];
+  const fh = await resolveFile(src);
+  if (!fh) return '';
+  const url = URL.createObjectURL(await fh.getFile());
+  thumbs[src] = url;
+  return url;
+}
+
+async function readCfg() {
+  const fh = await resolveFile('photos-config.js');
+  if (!fh) throw new Error('photos-config.js introuvable dans ce dossier');
+  const text = await (await fh.getFile()).text();
+  const json = text.replace(/^var PORTFOLIO_CONFIG\s*=\s*/, '').replace(/;\s*$/, '');
+  return JSON.parse(json);
+}
+
+async function writeCfg() {
+  const fh = await root.getFileHandle('photos-config.js', { create: false });
+  const w  = await fh.createWritable();
+  await w.write(`var PORTFOLIO_CONFIG = ${JSON.stringify(cfg, null, 2)};\n`);
+  await w.close();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+async function init() {
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('app').classList.add('on');
+
+  cfg = await readCfg();
+
+  // Scan showcase pool
+  poolFiles = await scanDir('images/showcase');
+  document.getElementById('poolCount').textContent = `(${poolFiles.length})`;
+
+  // Scan each project's folder
+  for (const [id, p] of Object.entries(cfg.projects)) {
+    const first = p.photos[0];
+    if (!first) continue;
+    const folder = first.split('/').slice(0, -1).join('/');
+    projFiles[id] = await scanDir(folder);
+  }
+
+  // Build project selector
+  const sel = document.getElementById('projSel');
+  for (const [id, p] of Object.entries(cfg.projects)) {
+    const o = document.createElement('option');
+    o.value = id;
+    o.textContent = `${p.title} · ${p.date}`;
+    sel.appendChild(o);
+  }
+
+  renderHome();
+  renderPool();
+}
+
+// ─── POOL ─────────────────────────────────────────────────────────────────
+function renderPool() {
+  const strip = document.getElementById('poolStrip');
+  strip.innerHTML = '';
+  for (const src of poolFiles) {
+    const card = document.createElement('div');
+    card.className = 'pcard';
+    card.draggable = true;
+    const img  = document.createElement('img');
+    const name = document.createElement('div');
+    name.className = 'pcard-name';
+    name.textContent = src.split('/').pop();
+    card.append(img, name);
+    thumb(src).then(u => { if (u) img.src = u; });
+    card.addEventListener('dragstart', e => {
+      drag = { from: 'pool', src };
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+    strip.appendChild(card);
+  }
+}
+
+// ─── HOME SECTIONS ────────────────────────────────────────────────────────
+const HOME_SECTIONS = [
+  { key: 'heroPhotos',       label: 'Hero — Paysage',  hint: 'desktop', captions: true  },
+  { key: 'heroPhotosMobile', label: 'Hero — Portrait', hint: 'mobile',  captions: true  },
+  { key: 'showcasePhotos',   label: 'Grille accueil',  hint: '',        captions: false },
+];
+
+function renderHome() {
+  const main = document.getElementById('homeMain');
+  main.innerHTML = '';
+  for (const s of HOME_SECTIONS) {
+    main.appendChild(buildSection(s.key, s.label, s.hint, s.captions, cfg[s.key]));
+  }
+}
+
+function buildSection(key, label, hint, showCaptions, items) {
+  const block = document.createElement('div');
+  block.className = 'sblock';
+
+  const head = document.createElement('div');
+  head.className = 'sblock-head';
+  head.innerHTML = `${label} <span class="sblock-count" id="cnt-${key}">${items.length}</span>` +
+    (hint ? `<span class="sblock-hint">${hint}</span>` : '');
+  block.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'sblock-body';
+  body.dataset.key = key;
+
+  if (items.length === 0) {
+    body.innerHTML = '<span class="empty">Déposer des photos ici</span>';
+  } else {
+    items.forEach((it, i) => {
+      const src = typeof it === 'string' ? it : it.src;
+      const cap = typeof it === 'string' ? '' : (it.caption || '');
+      body.appendChild(buildCard(src, cap, key, i, showCaptions));
+    });
+  }
+
+  body.addEventListener('dragover',  e => onSectionDragOver(e, body));
+  body.addEventListener('dragleave', e => { if (!body.contains(e.relatedTarget)) clearOver(body); });
+  body.addEventListener('drop',      e => onSectionDrop(e, body, key));
+
+  block.appendChild(body);
+  return block;
+}
+
+function buildCard(src, caption, key, idx, showCaption) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.draggable = true;
+
+  const img = document.createElement('img');
+  card.appendChild(img);
+  thumb(src).then(u => { if (u) img.src = u; });
+
+  if (showCaption) {
+    const inp = document.createElement('input');
+    inp.className = 'card-cap';
+    inp.value = caption;
+    inp.placeholder = 'légende…';
+    inp.addEventListener('mousedown', e => e.stopPropagation());
+    inp.addEventListener('change', () => updateCaption(key, idx, inp.value));
+    card.appendChild(inp);
+  }
+
+  const rm = document.createElement('button');
+  rm.className = 'rm';
+  rm.textContent = '×';
+  rm.title = 'Retirer';
+  rm.addEventListener('click', e => {
+    e.stopPropagation();
+    cfg[key].splice(idx, 1);
+    renderHome();
+  });
+  card.appendChild(rm);
+
+  card.addEventListener('dragstart', e => {
+    requestAnimationFrame(() => card.classList.add('ghost'));
+    drag = { from: 'section', src, key, idx, caption };
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  card.addEventListener('dragend', () => {
+    card.classList.remove('ghost');
+  });
+
+  return card;
+}
+
+// ─── DRAG HELPERS ─────────────────────────────────────────────────────────
+function clearOver(container) {
+  container.classList.remove('over');
+  container.querySelectorAll('.insert-before').forEach(el => el.classList.remove('insert-before'));
+}
+
+function getInsertIndex(container, mx, my) {
+  const cards = [...container.querySelectorAll('.card')];
+  for (let i = 0; i < cards.length; i++) {
+    const r = cards[i].getBoundingClientRect();
+    if (my < r.bottom + 4 && mx < r.left + r.width / 2) return i;
+    if (my < r.top) return i;
+  }
+  return cards.length;
+}
+
+function showInsertIndicator(container, mx, my) {
+  container.querySelectorAll('.insert-before').forEach(el => el.classList.remove('insert-before'));
+  const idx = getInsertIndex(container, mx, my);
+  const cards = [...container.querySelectorAll('.card')];
+  if (idx < cards.length) cards[idx].classList.add('insert-before');
+}
+
+function onSectionDragOver(e, body) {
+  e.preventDefault();
+  body.classList.add('over');
+  showInsertIndicator(body, e.clientX, e.clientY);
+}
+
+function onSectionDrop(e, body, key) {
+  e.preventDefault();
+  clearOver(body);
+  if (!drag) return;
+
+  const insertAt = getInsertIndex(body, e.clientX, e.clientY);
+
+  if (drag.from === 'pool') {
+    const newItem = key === 'showcasePhotos'
+      ? drag.src
+      : { src: drag.src, caption: '' };
+    cfg[key].splice(insertAt, 0, newItem);
+
+  } else if (drag.from === 'section') {
+    const srcKey = drag.key;
+    const srcIdx = drag.idx;
+
+    if (srcKey === key) {
+      const [item] = cfg[key].splice(srcIdx, 1);
+      const adj = srcIdx < insertAt ? insertAt - 1 : insertAt;
+      cfg[key].splice(adj, 0, item);
+    } else {
+      const [item] = cfg[srcKey].splice(srcIdx, 1);
+      const newItem = key === 'showcasePhotos'
+        ? drag.src
+        : { src: drag.src, caption: drag.caption || '' };
+      cfg[key].splice(insertAt, 0, newItem);
+    }
+  }
+
+  drag = null;
+  renderHome();
+}
+
+function updateCaption(key, idx, val) {
+  const it = cfg[key][idx];
+  if (it && typeof it === 'object') it.caption = val;
+}
+
+// ─── PROJECT VIEW ─────────────────────────────────────────────────────────
+function renderProject(id) {
+  const body = document.getElementById('projBody');
+  body.innerHTML = '';
+  const p = cfg.projects[id];
+  const coverSrc = p.cover || (p.photos.length > 0 ? p.photos[0] : null);
+
+  // Current photos
+  body.appendChild(buildProjSection(
+    `Photos du projet`, p.photos.length,
+    p.photos, id, true, coverSrc
+  ));
+
+  // Available (in folder, not in project)
+  const inProj = new Set(p.photos);
+  const avail  = (projFiles[id] || []).filter(s => !inProj.has(s));
+  body.appendChild(buildProjSection(
+    `Disponibles dans le dossier`, avail.length,
+    avail, id, false, coverSrc
+  ));
+}
+
+function buildProjSection(label, count, items, projId, isCurrent, coverSrc) {
+  const block = document.createElement('div');
+  block.className = 'sblock';
+
+  const head = document.createElement('div');
+  head.className = 'sblock-head';
+  head.innerHTML = `${label} <span class="sblock-count">${count}</span>`;
+  block.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'sblock-body';
+  if (!isCurrent) body.style.opacity = '0.7';
+
+  if (items.length === 0) {
+    body.innerHTML = '<span class="empty">' +
+      (isCurrent ? 'Aucune photo — glisse depuis le bas' : 'Toutes les photos sont dans le projet') +
+      '</span>';
+  } else {
+    items.forEach((src, i) => {
+      body.appendChild(buildProjCard(src, projId, i, isCurrent, src === coverSrc));
+    });
+  }
+
+  if (isCurrent) {
+    body.addEventListener('dragover',  e => onSectionDragOver(e, body));
+    body.addEventListener('dragleave', e => { if (!body.contains(e.relatedTarget)) clearOver(body); });
+    body.addEventListener('drop',      e => onProjDrop(e, body, projId));
+  }
+
+  block.appendChild(body);
+  return block;
+}
+
+function buildProjCard(src, projId, idx, isCurrent, isCover) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.draggable = true;
+
+  const img = document.createElement('img');
+  card.appendChild(img);
+  thumb(src).then(u => { if (u) img.src = u; });
+
+  if (isCurrent) {
+    const rm = document.createElement('button');
+    rm.className = 'rm';
+    rm.textContent = '×';
+    rm.addEventListener('click', e => {
+      e.stopPropagation();
+      cfg.projects[projId].photos.splice(idx, 1);
+      if (cfg.projects[projId].cover === src) delete cfg.projects[projId].cover;
+      renderProject(projId);
+    });
+    card.appendChild(rm);
+  }
+
+  if (isCover) {
+    const badge = document.createElement('div');
+    badge.className = 'cover-badge';
+    badge.textContent = 'cover';
+    card.appendChild(badge);
+  } else {
+    const btn = document.createElement('button');
+    btn.className = 'set-cover';
+    btn.textContent = '★ cover';
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      cfg.projects[projId].cover = src;
+      renderProject(projId);
+    });
+    card.appendChild(btn);
+  }
+
+  card.addEventListener('dragstart', e => {
+    if (isCurrent) requestAnimationFrame(() => card.classList.add('ghost'));
+    drag = { from: isCurrent ? 'proj-current' : 'proj-avail', src, projId, idx };
+    e.dataTransfer.effectAllowed = isCurrent ? 'move' : 'copy';
+  });
+  card.addEventListener('dragend', () => card.classList.remove('ghost'));
+
+  return card;
+}
+
+function onProjDrop(e, body, projId) {
+  e.preventDefault();
+  clearOver(body);
+  if (!drag) return;
+
+  const photos   = cfg.projects[projId].photos;
+  const insertAt = getInsertIndex(body, e.clientX, e.clientY);
+
+  if (drag.from === 'proj-avail' && drag.projId === projId) {
+    photos.splice(insertAt, 0, drag.src);
+  } else if (drag.from === 'proj-current' && drag.projId === projId) {
+    const [item] = photos.splice(drag.idx, 1);
+    const adj = drag.idx < insertAt ? insertAt - 1 : insertAt;
+    photos.splice(adj, 0, item);
+  }
+
+  drag = null;
+  renderProject(projId);
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+    document.getElementById(`panel-${t.dataset.panel}`).classList.add('on');
+  });
+});
+
+document.getElementById('projSel').addEventListener('change', e => {
+  const id = e.target.value;
+  if (id) renderProject(id);
+  else document.getElementById('projBody').innerHTML = '<span class="empty">Sélectionne un projet</span>';
+});
+
+// ─── SAVE ─────────────────────────────────────────────────────────────────
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const status = document.getElementById('saveStatus');
+  try {
+    await writeCfg();
+    status.textContent = 'Enregistré ✓';
+    setTimeout(() => status.textContent = '', 2500);
+  } catch (e) {
+    status.textContent = 'Erreur: ' + e.message;
+  }
+});
+
+// ─── OPEN ─────────────────────────────────────────────────────────────────
+document.getElementById('openBtn').addEventListener('click', async () => {
+  try {
+    root = await window.showDirectoryPicker({ mode: 'readwrite' });
+    await init();
+  } catch (e) {
+    if (e.name !== 'AbortError') {
+      const el = document.getElementById('errMsg');
+      el.textContent = e.message;
+      el.style.display = 'block';
+    }
+  }
+});
+</script>
+</body>
+</html>

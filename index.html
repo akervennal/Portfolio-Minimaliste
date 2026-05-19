@@ -15,6 +15,7 @@
       href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap"
       rel="stylesheet"
     />
+    <script src="photos-config.js"></script>
 
     <style>
       :root {
@@ -1297,9 +1298,10 @@
 
     <script>
       // ============================================================
-      // PROJECT DATA
+      // PROJECT DATA  (edit via admin.html or photos-config.js)
       // ============================================================
-      const projects = {
+      const projects = PORTFOLIO_CONFIG.projects;
+      if (false) { const projects = {
         "la-bozage-2026": {
           title: "La Bozage",
           date: "2026",
@@ -1707,74 +1709,19 @@
             "images/port-nantes-2024/8-MEL_7649.jpg",
           ],
         },
-      };
+      }; }
 
       // ============================================================
       // HERO SLIDESHOW PHOTOS
       // ============================================================
       let activeHeroPhotos = [];
 
-      const heroPhotos = [
-        {
-          src: "images/showcase/hero/MEL_9528.jpg",
-          caption: "Viking Cup — Mars 2026",
-        },
-        {
-          src: "images/showcase/MEL_9768.jpg",
-          caption: "Viking Cup — Mars 2026",
-        },
-        {
-          
-          src: "images/showcase/MEL_9003.jpg",
-          caption: "Atelier — 2025",
-        },
-        {
-          src: "images/showcase/IMG_4776_TIF.jpg",
-          caption: "Angleterre — Décembre 2025",
-        },
-        {
-          src: "images/showcase/2-MEL_8835.jpg",
-          caption: "Campagne de Mézillac — Mars 2026",
-        },
-        {
-          src: "images/showcase/3-MEL_7745.jpg",
-          caption: "Fête Foraine de Rennes — Décembre 2025",
-        },
-        {
-          src: "images/showcase/6-MEL_7681.jpg",
-          caption: "Fête Foraine de Rennes — Décembre 2025",
-        },
-      ];
+      const heroPhotos = PORTFOLIO_CONFIG.heroPhotos;
 
       // ============================================================
       // SHOWCASE GRID PHOTOS (homepage)
       // ============================================================
-      const showcasePhotos = [
-        "images/showcase/MEL_9768.jpg",
-        "images/showcase/3-MEL_8150.jpg",
-        "images/showcase/7-MEL_8433.jpg",
-        "images/showcase/13-MEL_3579.jpg",
-        "images/showcase/MEL_0388.jpg",
-        "images/showcase/4-MEL_8103.jpg",
-        "images/showcase/9-MEL_3695.jpg",
-        "images/showcase/2-MEL_8725.jpg",
-        "images/showcase/5-IMG_4734_TIF.jpg",
-        "images/showcase/1-MEL_3166.jpg",
-        "images/showcase/6-MEL_7681.jpg",
-        "images/showcase/3-MEL_9879.jpg",
-        "images/showcase/8-MEL_8227.jpg",
-        "images/showcase/4-MEL_9344.jpg",
-        "images/showcase/IMG_4776_TIF.jpg",
-        "images/showcase/1-MEL_5634.jpg",
-        "images/showcase/2-MEL_9402.jpg",
-        "images/showcase/3-MEL_7745.jpg",
-        "images/showcase/MEL_6501.jpg",
-        "images/showcase/MEL_9003.jpg",
-        "images/showcase/2-MEL_8835.jpg",
-        "images/showcase/3-MEL_8724.jpg",
-        "images/showcase/5-MEL_7681.jpg",
-        "images/showcase/10-MEL_9110.jpg",
-      ];
+      const showcasePhotos = PORTFOLIO_CONFIG.showcasePhotos;
 
       // ============================================================
       // PAGE NAVIGATION
@@ -1831,14 +1778,7 @@
         const progress = document.getElementById("heroProgress");
         const caption = document.getElementById("heroCaption");
 
-        const heroPhotosMobile = [
-          { src: "images/showcase/1-MEL_3166.jpg", caption: "" },
-          { src: "images/showcase/2-MEL_8725.jpg", caption: "" },
-          { src: "images/showcase/13-MEL_3579.jpg", caption: "" },
-          { src: "images/showcase/3-MEL_9879.jpg", caption: "" },
-          { src: "images/showcase/4-MEL_9344.jpg", caption: "" },
-          { src: "images/showcase/MEL_0388.jpg", caption: "" },
-        ];
+        const heroPhotosMobile = PORTFOLIO_CONFIG.heroPhotosMobile;
 
         const isMobile = window.matchMedia("(max-width: 700px)").matches;
         activeHeroPhotos = isMobile ? heroPhotosMobile : heroPhotos;
