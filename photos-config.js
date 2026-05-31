@@ -82,6 +82,39 @@ var PORTFOLIO_CONFIG = {
     "images/showcase/10-MEL_9110.jpg"
   ],
   "projects": {
+    "la-trinite-sur-mer-2026": {
+      "title": "La Trinité-sur-Mer",
+      "date": "Mai 2026",
+      "dateLong": "Mai 2026",
+      "year": "2026",
+      "location": "Morbihan",
+      "photos": [
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/1-MEL_2926.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/2-MEL_2909.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/3-MEL_2897.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/4-MEL_2890.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/5-MEL_2834.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/6-MEL_2705.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/7-MEL_2639.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/8-MEL_2622.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/9-MEL_2544.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/10-MEL_2251.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/11-MEL_2236.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/12-MEL_2083.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/13-MEL_2051.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/14-MEL_2048.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/15-MEL_1988.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/16-MEL_1960.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/17-MEL_1931.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/18-MEL_1889.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/19-MEL_1879.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/20-MEL_1862.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/21-MEL_1765.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/22-MEL_1749.jpg",
+        "images/La%20trinit%C3%A9%20sur%20mer%202026/23-MEL_1744.jpg"
+      ],
+      "cover": "images/La%20trinit%C3%A9%20sur%20mer%202026/5-MEL_2834.jpg"
+    },
     "la-bozage-2026": {
       "title": "La Bozage",
       "date": "2026",
