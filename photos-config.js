@@ -5,6 +5,10 @@ var PORTFOLIO_CONFIG = {
       "caption": "Viking Cup — Mars 2026"
     },
     {
+      "src": "images/showcase/9-MEL_2544.jpg",
+      "caption": ""
+    },
+    {
       "src": "images/showcase/9-MEL_3695.jpg",
       "caption": ""
     },
@@ -14,6 +18,10 @@ var PORTFOLIO_CONFIG = {
     },
     {
       "src": "images/showcase/1-MEL_5634.jpg",
+      "caption": ""
+    },
+    {
+      "src": "images/showcase/6-MEL_2705.jpg",
       "caption": ""
     },
     {
@@ -30,6 +38,10 @@ var PORTFOLIO_CONFIG = {
     }
   ],
   "heroPhotosMobile": [
+    {
+      "src": "images/showcase/11-MEL_2236.jpg",
+      "caption": ""
+    },
     {
       "src": "images/showcase/1-MEL_3166.jpg",
       "caption": ""
@@ -56,15 +68,19 @@ var PORTFOLIO_CONFIG = {
     }
   ],
   "showcasePhotos": [
+    "images/showcase/11-MEL_2236.jpg",
     "images/showcase/MEL_9768.jpg",
     "images/showcase/3-MEL_8150.jpg",
     "images/showcase/7-MEL_8433.jpg",
     "images/showcase/13-MEL_3579.jpg",
+    "images/showcase/9-MEL_2544.jpg",
     "images/showcase/MEL_0388.jpg",
     "images/showcase/4-MEL_8103.jpg",
     "images/showcase/9-MEL_3695.jpg",
+    "images/showcase/19-MEL_1879.jpg",
     "images/showcase/2-MEL_8725.jpg",
     "images/showcase/5-IMG_4734_TIF.jpg",
+    "images/showcase/6-MEL_2705.jpg",
     "images/showcase/1-MEL_3166.jpg",
     "images/showcase/6-MEL_7681.jpg",
     "images/showcase/3-MEL_9879.jpg",
@@ -113,7 +129,23 @@ var PORTFOLIO_CONFIG = {
         "images/La%20trinit%C3%A9%20sur%20mer%202026/22-MEL_1749.jpg",
         "images/La%20trinit%C3%A9%20sur%20mer%202026/23-MEL_1744.jpg"
       ],
-      "cover": "images/La%20trinit%C3%A9%20sur%20mer%202026/5-MEL_2834.jpg"
+      "cover": "images/La%20trinit%C3%A9%20sur%20mer%202026/11-MEL_2236.jpg"
+    },
+    "guilvinec-2026": {
+      "title": "Guilvinec",
+      "date": "Mai 2026",
+      "dateLong": "Mai 2026",
+      "year": "2026",
+      "location": "Finistère",
+      "photos": [
+        "images/Guilvinec%202026/2-MEL_3014.jpg",
+        "images/Guilvinec%202026/3-MEL_2994.jpg",
+        "images/Guilvinec%202026/4-MEL_2976.jpg",
+        "images/Guilvinec%202026/5-MEL_2967.jpg",
+        "images/Guilvinec%202026/6-MEL_2956.jpg",
+        "images/Guilvinec%202026/7-MEL_2952.jpg"
+      ],
+      "cover": "images/Guilvinec%202026/3-MEL_2994.jpg"
     },
     "la-bozage-2026": {
       "title": "La Bozage",

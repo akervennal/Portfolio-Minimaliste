@@ -327,9 +327,6 @@ async function writeCfg() {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────
 async function init() {
-  document.getElementById('overlay').style.display = 'none';
-  document.getElementById('app').classList.add('on');
-
   cfg = await readCfg();
 
   // Scan showcase pool
@@ -690,14 +687,17 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
 
 // ─── OPEN ─────────────────────────────────────────────────────────────────
 document.getElementById('openBtn').addEventListener('click', async () => {
+  const errEl = document.getElementById('errMsg');
+  errEl.style.display = 'none';
   try {
     root = await window.showDirectoryPicker({ mode: 'readwrite' });
     await init();
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('app').classList.add('on');
   } catch (e) {
     if (e.name !== 'AbortError') {
-      const el = document.getElementById('errMsg');
-      el.textContent = e.message;
-      el.style.display = 'block';
+      errEl.textContent = e.message;
+      errEl.style.display = 'block';
     }
   }
 });
