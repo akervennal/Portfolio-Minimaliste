@@ -9,6 +9,10 @@ var PORTFOLIO_CONFIG = {
       "caption": ""
     },
     {
+      "src": "images/showcase/6-MEL_3648.jpg",
+      "caption": ""
+    },
+    {
       "src": "images/showcase/9-MEL_3695.jpg",
       "caption": ""
     },
@@ -78,6 +82,7 @@ var PORTFOLIO_CONFIG = {
     "images/showcase/4-MEL_8103.jpg",
     "images/showcase/9-MEL_3695.jpg",
     "images/showcase/19-MEL_1879.jpg",
+    "images/showcase/6-MEL_3648.jpg",
     "images/showcase/2-MEL_8725.jpg",
     "images/showcase/5-IMG_4734_TIF.jpg",
     "images/showcase/6-MEL_2705.jpg",
@@ -97,7 +102,70 @@ var PORTFOLIO_CONFIG = {
     "images/showcase/5-MEL_7681.jpg",
     "images/showcase/10-MEL_9110.jpg"
   ],
+  "content": {
+    "about": {
+      "approche": [
+        "Je développe une approche photographique basée sur l'exploration et la série. Principalement photographie automobile, paysage et de rue, souvent liée à des lieux, des voyages ou des événements.",
+        "Mon travail s'inscrit dans une démarche documentaire personnelle : observer, me déplacer, et construire au fil du temps un carnet visuel des endroits et des moments que je traverse.",
+        "Je privilégie une approche naturelle, avec une attention particulière portée à la lumière, à l'ambiance et au contexte plutôt qu'à la mise en scène."
+      ],
+      "gear": [
+        {
+          "label": "Boîtier",
+          "title": "Nikon D7500",
+          "paragraphs": [
+            "C'est mon boîtier principal, un outil robuste et très ergonomique. Il intègre le capteur de 21 mégapixels du Nikon D500, ce qui lui confère une très bonne gestion des ISO pour travailler sereinement dans des conditions de lumière difficiles. Cette définition est amplement suffisante pour des tirages grand format et offre un rendu qui n'a rien à envier au plein format pour la grande majorité des usages.",
+            "Je privilégie le reflex (DSLR) pour son aspect pratique et direct. L'autonomie de la batterie permet de tenir des journées entières sans s'en soucier. Surtout, le viseur optique (OVF) offre une vision de la scène sans latence ni filtre numérique. Cela m'encourage à bien maîtriser mes réglages en amont et à me concentrer uniquement sur l'instant. En photographiant en RAW, j'évite les simulations et les filtres intégrés pour garder une approche neutre à la prise de vue ; l'esthétique et l'étalonnage se gèrent ensuite en post-production.",
+            "Enfin, son moteur autofocus intégré permet d'utiliser de nombreux objectifs argentiques sans adaptateur. Couplé à un autofocus et une rafale efficaces, c'est un boîtier très complet et largement suffisant, à moins de faire de la photographie sportive très spécifique."
+          ]
+        },
+        {
+          "label": "Objectif standard",
+          "title": "AF-S Nikkor 50mm f/1.4G",
+          "paragraphs": [
+            "Monté sur un capteur APS-C, ce 50mm équivaut à un 75mm, ce qui en fait une focale particulièrement adaptée pour le portrait. C'est un objectif léger, compact et très agréable à manipuler.",
+            "Ses qualités optiques sont excellentes : le piqué est net dès les grandes ouvertures, le micro-contraste est bien présent et le rendu global est très qualitatif. L'autofocus est rapide et précis. C'est une optique simple mais extrêmement performante, qui offre un rendu très professionnel pour un budget maîtrisé."
+          ]
+        },
+        {
+          "label": "Zoom polyvalent",
+          "title": "Sigma 18-35mm f/1.8 DC HSM Art",
+          "paragraphs": [
+            "C'est l'objectif qui passe le plus de temps sur mon boîtier. Avoir une ouverture constante de f/1.8 sur un zoom est rare et apporte une grande souplesse de travail. Il couvre des focales allant de 27mm (grand angle documentaire) à 52mm (standard), combinant ainsi la luminosité et le flou d'arrière-plan (bokeh) d'une focale fixe avec la flexibilité d'un zoom.",
+            "La qualité de construction est solide et les performances optiques suivent : l'image est nette, très contrastée, avec beaucoup de détails. C'est un objectif particulièrement à l'aise en basse lumière, ce qui permet de s'adapter confortablement à presque toutes les situations sans que le manque d'éclairage ne devienne un frein."
+          ]
+        }
+      ]
+    },
+    "contact": {
+      "titleLine1": "Travaillons",
+      "titleLine2": "ensemble.",
+      "email": "akervennal@gmail.com",
+      "instagramHandle": "@armel_kervennal",
+      "instagramUrl": "https://instagram.com/armel_kervennal",
+      "location": "Nantes, France",
+      "note": "Toujours partant pour de nouveaux shootings ou projets photo — n'hésite pas à m'écrire."
+    }
+  },
   "projects": {
+    "24h-du-mans-2026": {
+      "title": "24h du Mans",
+      "date": "Juin 2026",
+      "dateLong": "Juin 2026",
+      "year": "2026",
+      "location": "Sarthe",
+      "photos": [
+        "images/24h-du-mans-2026/3-MEL_3934.jpg",
+        "images/24h-du-mans-2026/1-MEL_4073.jpg",
+        "images/24h-du-mans-2026/7-MEL_3370.jpg",
+        "images/24h-du-mans-2026/6-MEL_3648.jpg",
+        "images/24h-du-mans-2026/8-MEL_3292.jpg",
+        "images/24h-du-mans-2026/4-MEL_3817.jpg",
+        "images/24h-du-mans-2026/2-MEL_3956.jpg",
+        "images/24h-du-mans-2026/5-MEL_3751.jpg"
+      ],
+      "cover": "images/24h-du-mans-2026/8-MEL_3292.jpg"
+    },
     "la-trinite-sur-mer-2026": {
       "title": "La Trinité-sur-Mer",
       "date": "Mai 2026",

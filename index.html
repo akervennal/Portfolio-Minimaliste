@@ -1165,68 +1165,8 @@
              ABOUT
         ======================================================== -->
       <div class="page" id="page-about">
-        <div class="about-page">
-          <section class="about-section">
-            <h2 class="about-section-title">Approche</h2>
-            <div class="about-text">
-              <p>
-                Je développe une approche photographique basée sur
-                l'exploration et la série. Principalement photographie
-                automobile, paysage et de rue, souvent liée à des lieux, des
-                voyages ou des événements.
-              </p>
-              <p>
-                Mon travail s'inscrit dans une démarche documentaire
-                personnelle : observer, me déplacer, et construire au fil du
-                temps un carnet visuel des endroits et des moments que je
-                traverse.
-              </p>
-              <p>
-                Je privilégie une approche naturelle, avec une attention
-                particulière portée à la lumière, à l'ambiance et au contexte
-                plutôt qu'à la mise en scène.
-              </p>
-            </div>
-          </section>
-
-          <section class="about-section">
-            <h2 class="about-section-title">Équipement</h2>
-            <div class="gear-list">
-              <div class="gear-item">
-                <div class="gear-label">Boîtier</div>
-                <h3>Nikon D7500</h3>
-                <p>
-                  C'est mon boîtier principal, un outil robuste et très ergonomique. Il intègre le capteur de 21 mégapixels du Nikon D500, ce qui lui confère une très bonne gestion des ISO pour travailler sereinement dans des conditions de lumière difficiles. Cette définition est amplement suffisante pour des tirages grand format et offre un rendu qui n'a rien à envier au plein format pour la grande majorité des usages.
-                </p>
-                <p>
-                  Je privilégie le reflex (DSLR) pour son aspect pratique et direct. L'autonomie de la batterie permet de tenir des journées entières sans s'en soucier. Surtout, le viseur optique (OVF) offre une vision de la scène sans latence ni filtre numérique. Cela m'encourage à bien maîtriser mes réglages en amont et à me concentrer uniquement sur l'instant. En photographiant en RAW, j'évite les simulations et les filtres intégrés pour garder une approche neutre à la prise de vue ; l'esthétique et l'étalonnage se gèrent ensuite en post-production.
-                </p>
-                <p>
-                  Enfin, son moteur autofocus intégré permet d'utiliser de nombreux objectifs argentiques sans adaptateur. Couplé à un autofocus et une rafale efficaces, c'est un boîtier très complet et largement suffisant, à moins de faire de la photographie sportive très spécifique.
-                </p>
-              </div>
-              <div class="gear-item">
-                <div class="gear-label">Objectif standard</div>
-                <h3>AF-S Nikkor 50mm f/1.4G</h3>
-                <p>
-                  Monté sur un capteur APS-C, ce 50mm équivaut à un 75mm, ce qui en fait une focale particulièrement adaptée pour le portrait. C'est un objectif léger, compact et très agréable à manipuler.
-                </p>
-                <p>
-                  Ses qualités optiques sont excellentes : le piqué est net dès les grandes ouvertures, le micro-contraste est bien présent et le rendu global est très qualitatif. L'autofocus est rapide et précis. C'est une optique simple mais extrêmement performante, qui offre un rendu très professionnel pour un budget maîtrisé.
-                </p>
-              </div>
-              <div class="gear-item">
-                <div class="gear-label">Zoom polyvalent</div>
-                <h3>Sigma 18-35mm f/1.8 DC HSM Art</h3>
-                <p>
-                  C'est l'objectif qui passe le plus de temps sur mon boîtier. Avoir une ouverture constante de f/1.8 sur un zoom est rare et apporte une grande souplesse de travail. Il couvre des focales allant de 27mm (grand angle documentaire) à 52mm (standard), combinant ainsi la luminosité et le flou d'arrière-plan (bokeh) d'une focale fixe avec la flexibilité d'un zoom.
-                </p>
-                <p>
-                  La qualité de construction est solide et les performances optiques suivent : l'image est nette, très contrastée, avec beaucoup de détails. C'est un objectif particulièrement à l'aise en basse lumière, ce qui permet de s'adapter confortablement à presque toutes les situations sans que le manque d'éclairage ne devienne un frein.
-                </p>
-              </div>
-            </div>
-          </section>
+        <div class="about-page" id="aboutContainer">
+          <!-- injected by JS from PORTFOLIO_CONFIG.content.about -->
         </div>
 
         <footer class="footer">
@@ -1239,28 +1179,8 @@
              CONTACT
         ======================================================== -->
       <div class="page" id="page-contact">
-        <div class="contact-page">
-          <h1 class="contact-title">
-            Travaillons<br /><em>ensemble.</em>
-          </h1>
-          <dl class="contact-info">
-            <dt>Email</dt>
-            <dd>
-              <a href="mailto:akervennal@gmail.com">akervennal@gmail.com</a>
-            </dd>
-            <dt>Instagram</dt>
-            <dd>
-              <a href="https://instagram.com/armel_kervennal" target="_blank"
-                >@armel_kervennal</a
-              >
-            </dd>
-            <dt>Basé à</dt>
-            <dd>Nantes, France</dd>
-          </dl>
-          <p class="contact-note">
-            Toujours partant pour de nouveaux shootings ou projets photo —
-            n'hésite pas à m'écrire.
-          </p>
+        <div class="contact-page" id="contactContainer">
+          <!-- injected by JS from PORTFOLIO_CONFIG.content.contact -->
         </div>
       </div>
     </main>
@@ -1886,6 +1806,112 @@
       }
 
       // ============================================================
+      // ABOUT / CONTACT (from PORTFOLIO_CONFIG.content)
+      // ============================================================
+      function buildAbout() {
+        const content = PORTFOLIO_CONFIG.content && PORTFOLIO_CONFIG.content.about;
+        if (!content) return;
+        const container = document.getElementById("aboutContainer");
+        container.innerHTML = "";
+
+        const approcheSection = document.createElement("section");
+        approcheSection.className = "about-section";
+        const approcheTitle = document.createElement("h2");
+        approcheTitle.className = "about-section-title";
+        approcheTitle.textContent = "Approche";
+        const approcheText = document.createElement("div");
+        approcheText.className = "about-text";
+        (content.approche || []).forEach((paragraph) => {
+          const p = document.createElement("p");
+          p.textContent = paragraph;
+          approcheText.appendChild(p);
+        });
+        approcheSection.appendChild(approcheTitle);
+        approcheSection.appendChild(approcheText);
+        container.appendChild(approcheSection);
+
+        if ((content.gear || []).length) {
+          const gearSection = document.createElement("section");
+          gearSection.className = "about-section";
+          const gearTitle = document.createElement("h2");
+          gearTitle.className = "about-section-title";
+          gearTitle.textContent = "Équipement";
+          const gearList = document.createElement("div");
+          gearList.className = "gear-list";
+          content.gear.forEach((item) => {
+            const gearItem = document.createElement("div");
+            gearItem.className = "gear-item";
+            const label = document.createElement("div");
+            label.className = "gear-label";
+            label.textContent = item.label;
+            const h3 = document.createElement("h3");
+            h3.textContent = item.title;
+            gearItem.appendChild(label);
+            gearItem.appendChild(h3);
+            (item.paragraphs || []).forEach((paragraph) => {
+              const p = document.createElement("p");
+              p.textContent = paragraph;
+              gearItem.appendChild(p);
+            });
+            gearList.appendChild(gearItem);
+          });
+          gearSection.appendChild(gearTitle);
+          gearSection.appendChild(gearList);
+          container.appendChild(gearSection);
+        }
+      }
+
+      function buildContact() {
+        const content = PORTFOLIO_CONFIG.content && PORTFOLIO_CONFIG.content.contact;
+        if (!content) return;
+        const container = document.getElementById("contactContainer");
+        container.innerHTML = "";
+
+        const title = document.createElement("h1");
+        title.className = "contact-title";
+        title.innerHTML = `${content.titleLine1}<br /><em>${content.titleLine2}</em>`;
+        container.appendChild(title);
+
+        const dl = document.createElement("dl");
+        dl.className = "contact-info";
+
+        const dtEmail = document.createElement("dt");
+        dtEmail.textContent = "Email";
+        const ddEmail = document.createElement("dd");
+        const emailLink = document.createElement("a");
+        emailLink.href = `mailto:${content.email}`;
+        emailLink.textContent = content.email;
+        ddEmail.appendChild(emailLink);
+
+        const dtInsta = document.createElement("dt");
+        dtInsta.textContent = "Instagram";
+        const ddInsta = document.createElement("dd");
+        const instaLink = document.createElement("a");
+        instaLink.href = content.instagramUrl;
+        instaLink.target = "_blank";
+        instaLink.textContent = content.instagramHandle;
+        ddInsta.appendChild(instaLink);
+
+        const dtLoc = document.createElement("dt");
+        dtLoc.textContent = "Basé à";
+        const ddLoc = document.createElement("dd");
+        ddLoc.textContent = content.location;
+
+        dl.appendChild(dtEmail);
+        dl.appendChild(ddEmail);
+        dl.appendChild(dtInsta);
+        dl.appendChild(ddInsta);
+        dl.appendChild(dtLoc);
+        dl.appendChild(ddLoc);
+        container.appendChild(dl);
+
+        const note = document.createElement("p");
+        note.className = "contact-note";
+        note.textContent = content.note;
+        container.appendChild(note);
+      }
+
+      // ============================================================
       // OPEN PROJECT VIEW
       // ============================================================
       let currentProject = null;
@@ -2187,6 +2213,8 @@
       buildHero();
       buildShowcase();
       buildProjects();
+      buildAbout();
+      buildContact();
       bindPageLinks();
       setupYearObserver();
       observeImages();
