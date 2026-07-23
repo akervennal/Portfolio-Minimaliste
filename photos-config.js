@@ -79,27 +79,27 @@ var PORTFOLIO_CONFIG = {
     "images/showcase/13-MEL_3579.jpg",
     "images/showcase/9-MEL_2544.jpg",
     "images/showcase/MEL_0388.jpg",
+    "images/showcase/6-MEL_3648.jpg",
     "images/showcase/4-MEL_8103.jpg",
     "images/showcase/9-MEL_3695.jpg",
     "images/showcase/19-MEL_1879.jpg",
-    "images/showcase/6-MEL_3648.jpg",
-    "images/showcase/2-MEL_8725.jpg",
-    "images/showcase/5-IMG_4734_TIF.jpg",
     "images/showcase/6-MEL_2705.jpg",
-    "images/showcase/1-MEL_3166.jpg",
+    "images/showcase/2-MEL_8725.jpg",
     "images/showcase/6-MEL_7681.jpg",
-    "images/showcase/3-MEL_9879.jpg",
-    "images/showcase/8-MEL_8227.jpg",
-    "images/showcase/4-MEL_9344.jpg",
+    "images/showcase/5-IMG_4734_TIF.jpg",
     "images/showcase/IMG_4776_TIF.jpg",
+    "images/showcase/1-MEL_3166.jpg",
     "images/showcase/1-MEL_5634.jpg",
-    "images/showcase/2-MEL_9402.jpg",
+    "images/showcase/3-MEL_9879.jpg",
     "images/showcase/3-MEL_7745.jpg",
-    "images/showcase/MEL_6501.jpg",
+    "images/showcase/8-MEL_8227.jpg",
     "images/showcase/MEL_9003.jpg",
+    "images/showcase/4-MEL_9344.jpg",
     "images/showcase/2-MEL_8835.jpg",
-    "images/showcase/3-MEL_8724.jpg",
+    "images/showcase/2-MEL_9402.jpg",
     "images/showcase/5-MEL_7681.jpg",
+    "images/showcase/MEL_6501.jpg",
+    "images/showcase/3-MEL_8724.jpg",
     "images/showcase/10-MEL_9110.jpg"
   ],
   "content": {
@@ -148,6 +148,45 @@ var PORTFOLIO_CONFIG = {
     }
   },
   "projects": {
+    "ile-tudy-2026": {
+      "title": "île-Tudy",
+      "date": "Juillet 2026",
+      "dateLong": "Juillet 2026",
+      "year": "2026",
+      "location": "Bretagne",
+      "folder": "images/ile-tudy-2026",
+      "photos": [
+        "images/ile-tudy-2026/2-MEL_4821.jpg",
+        "images/ile-tudy-2026/1-MEL_4829.jpg",
+        "images/ile-tudy-2026/3-MEL_4796.jpg"
+      ]
+    },
+    "berlin-2026": {
+      "title": "Berlin",
+      "date": "Juin 2026",
+      "dateLong": "Juin 2026",
+      "year": "2026",
+      "location": "Berlin",
+      "folder": "images/berlin-2026",
+      "photos": [
+        "images/berlin-2026/10-MEL_4288.jpg",
+        "images/berlin-2026/11-MEL_4262.jpg",
+        "images/berlin-2026/13-MEL_4230.jpg",
+        "images/berlin-2026/14-MEL_4221.jpg",
+        "images/berlin-2026/7-MEL_4331.jpg",
+        "images/berlin-2026/2-MEL_4466.jpg",
+        "images/berlin-2026/1-MEL_4486[1].jpg",
+        "images/berlin-2026/3-MEL_4432.jpg",
+        "images/berlin-2026/12-MEL_4258.jpg",
+        "images/berlin-2026/15-MEL_4200.jpg",
+        "images/berlin-2026/4-MEL_4408.jpg",
+        "images/berlin-2026/8-MEL_4308.jpg",
+        "images/berlin-2026/9-MEL_4290.jpg",
+        "images/berlin-2026/6-MEL_4335.jpg",
+        "images/berlin-2026/5-MEL_4362.jpg"
+      ],
+      "cover": "images/berlin-2026/1-MEL_4486[1].jpg"
+    },
     "24h-du-mans-2026": {
       "title": "24h du Mans",
       "date": "Juin 2026",
@@ -197,7 +236,7 @@ var PORTFOLIO_CONFIG = {
         "images/La%20trinit%C3%A9%20sur%20mer%202026/22-MEL_1749.jpg",
         "images/La%20trinit%C3%A9%20sur%20mer%202026/23-MEL_1744.jpg"
       ],
-      "cover": "images/La%20trinit%C3%A9%20sur%20mer%202026/11-MEL_2236.jpg"
+      "cover": "images/La%20trinit%C3%A9%20sur%20mer%202026/14-MEL_2048.jpg"
     },
     "guilvinec-2026": {
       "title": "Guilvinec",

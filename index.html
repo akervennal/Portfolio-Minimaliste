@@ -325,16 +325,34 @@
         bottom: 40px;
         right: 40px;
         display: flex;
-        gap: 6px;
+        gap: 8px;
         z-index: 10;
       }
       .hero-progress span {
-        width: 18px;
-        height: 1px;
+        position: relative;
+        width: 28px;
+        height: 2px;
         background: rgba(255, 255, 255, 0.3);
-        transition: background 0.5s;
+        cursor: none;
+        transition: background 0.3s, height 0.3s, transform 0.3s;
+      }
+      .hero-progress span::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -9px;
+        bottom: -9px;
+      }
+      .hero-progress span:hover {
+        height: 3px;
+        background: rgba(255, 255, 255, 0.7);
+        transform: translateY(-0.5px);
       }
       .hero-progress span.active {
+        background: var(--text);
+      }
+      .hero-progress span.active:hover {
         background: var(--text);
       }
 
@@ -865,8 +883,8 @@
         width: 50%;
         z-index: 5;
       }
-      .lb-nav.prev { left: 0; cursor: w-resize; }
-      .lb-nav.next { right: 0; cursor: e-resize; }
+      .lb-nav.prev { left: 0; }
+      .lb-nav.next { right: 0; }
 
       /* ============================================================
            LAZY FADE-IN
@@ -1063,8 +1081,6 @@
         .lb-img-wrap { padding: 48px 16px 200px; }
         .lb-counter { bottom: auto; top: 20px; left: 20px; }
         .lb-close { top: 18px; right: 18px; }
-        .lb-nav.prev { cursor: default; }
-        .lb-nav.next { cursor: default; }
       }
     </style>
   </head>
@@ -1706,23 +1722,39 @@
 
           const dot = document.createElement("span");
           if (i === 0) dot.classList.add("active");
+          dot.addEventListener("click", () => {
+            goToHero(i);
+            restartHeroTimer();
+          });
           progress.appendChild(dot);
         });
         caption.textContent = activeHeroPhotos[0].caption;
       }
 
       let heroIndex = 0;
-      function cycleHero() {
+      let heroTimer = null;
+
+      function goToHero(index) {
         const slides = document.querySelectorAll(".hero-slide");
         const dots = document.querySelectorAll("#heroProgress span");
         if (!slides.length) return;
+        index = (index + slides.length) % slides.length;
         slides[heroIndex].classList.remove("active");
         dots[heroIndex].classList.remove("active");
-        heroIndex = (heroIndex + 1) % slides.length;
+        heroIndex = index;
         slides[heroIndex].classList.add("active");
         dots[heroIndex].classList.add("active");
         document.getElementById("heroCaption").textContent =
           activeHeroPhotos[heroIndex].caption;
+      }
+
+      function cycleHero() {
+        goToHero(heroIndex + 1);
+      }
+
+      function restartHeroTimer() {
+        if (heroTimer) clearInterval(heroTimer);
+        heroTimer = setInterval(cycleHero, 6500);
       }
 
       // ============================================================
@@ -2133,7 +2165,8 @@
             t.tagName === "A" ||
             t.tagName === "BUTTON" ||
             t.closest("[data-page]") ||
-            t.closest("[data-project]")
+            t.closest("[data-project]") ||
+            t.closest(".hero-progress span")
           ) {
             cursor.classList.add("cursor-link");
             cursorLabel.textContent = "";
@@ -2153,7 +2186,8 @@
             t.tagName === "A" ||
             t.tagName === "BUTTON" ||
             t.closest("[data-page]") ||
-            t.closest("[data-project]")
+            t.closest("[data-project]") ||
+            t.closest(".hero-progress span")
           ) {
             cursor.classList.remove("cursor-link");
           }
@@ -2220,7 +2254,7 @@
       observeImages();
 
       // Start hero cycle after first frame
-      setInterval(cycleHero, 6500);
+      restartHeroTimer();
     </script>
   </body>
 </html>
