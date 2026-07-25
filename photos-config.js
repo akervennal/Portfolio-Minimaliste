@@ -104,6 +104,10 @@ var PORTFOLIO_CONFIG = {
   ],
   "content": {
     "about": {
+      "hero": "images/pyrenees-2025/9-MEL_3695.jpg",
+      "quote": "The camera is an instrument that teaches people how to see without a camera.",
+      "quoteAuthor": "Dorothea Lange",
+      "portrait": "images/auto-portrait/IMG_0321(2).JPG",
       "approche": [
         "Je développe une approche photographique basée sur l'exploration et la série. Principalement photographie automobile, paysage et de rue, souvent liée à des lieux, des voyages ou des événements.",
         "Mon travail s'inscrit dans une démarche documentaire personnelle : observer, me déplacer, et construire au fil du temps un carnet visuel des endroits et des moments que je traverse.",

@@ -681,9 +681,63 @@
       /* ============================================================
            ABOUT
         ============================================================ */
+      .about-hero {
+        position: relative;
+        height: 100vh;
+        width: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+      .about-hero:empty {
+        display: none;
+      }
+      .about-hero img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transform: scale(1.15);
+        will-change: transform;
+      }
+      .about-hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.75) 0%,
+          rgba(0, 0, 0, 0.45) 22%,
+          rgba(0, 0, 0, 0) 45%
+        );
+        pointer-events: none;
+      }
       .about-page {
-        padding: 160px 40px 100px;
+        padding: 100px 40px 100px;
         max-width: 1100px;
+        margin: 0 auto;
+      }
+      .about-hero:empty + .about-page {
+        padding-top: 160px;
+      }
+      .about-quote {
+        font-family: var(--serif);
+        font-size: 40px;
+        font-weight: 400;
+        font-style: italic;
+        line-height: 1.35;
+        max-width: 820px;
+        margin-bottom: 24px;
+      }
+      .about-quote-author {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        margin-bottom: 100px;
+      }
+      .about-quote-author::before {
+        content: "— ";
       }
       .about-bio {
         margin-bottom: 120px;
@@ -703,6 +757,20 @@
         font-weight: 400;
         font-style: italic;
         margin-bottom: 40px;
+      }
+      .about-approche {
+        display: flex;
+        gap: 60px;
+        align-items: flex-start;
+      }
+      .about-portrait {
+        flex-shrink: 0;
+        width: 300px;
+      }
+      .about-portrait img {
+        width: 100%;
+        height: auto;
+        display: block;
       }
       .about-text {
         max-width: 620px;
@@ -890,10 +958,18 @@
            LAZY FADE-IN
         ============================================================ */
       .grid-col img,
-      .grid-2 img {
+      .grid-2 img,
+      .about-portrait img {
         opacity: 0;
         transform: translateY(10px);
         transition: opacity 1.2s var(--ease), transform 1s var(--ease);
+      }
+      .about-hero img {
+        opacity: 0;
+        transition: opacity 1.2s var(--ease);
+      }
+      .about-hero img.loaded {
+        opacity: 1;
       }
       .hero-slide img {
         opacity: 0;
@@ -904,7 +980,8 @@
         transition: opacity 1.2s var(--ease);
       }
       .grid-col img.loaded,
-      .grid-2 img.loaded {
+      .grid-2 img.loaded,
+      .about-portrait img.loaded {
         opacity: 1;
         transform: translateY(0);
       }
@@ -947,6 +1024,9 @@
         }
         .contact-title {
           font-size: 64px;
+        }
+        .about-quote {
+          font-size: 30px;
         }
       }
 
@@ -1050,8 +1130,22 @@
         .about-page {
           padding: 100px 20px 60px;
         }
+        .about-quote {
+          font-size: 24px;
+        }
+        .about-quote-author {
+          margin-bottom: 60px;
+        }
         .about-section-title {
           font-size: 24px;
+        }
+        .about-approche {
+          flex-direction: column;
+          gap: 32px;
+        }
+        .about-portrait {
+          order: -1;
+          width: 180px;
         }
         .gear-list {
           grid-template-columns: 1fr;
@@ -1181,6 +1275,9 @@
              ABOUT
         ======================================================== -->
       <div class="page" id="page-about">
+        <div class="about-hero" id="aboutHero">
+          <!-- injected by JS from PORTFOLIO_CONFIG.content.about.hero -->
+        </div>
         <div class="about-page" id="aboutContainer">
           <!-- injected by JS from PORTFOLIO_CONFIG.content.about -->
         </div>
@@ -1846,6 +1943,29 @@
         const container = document.getElementById("aboutContainer");
         container.innerHTML = "";
 
+        const aboutHero = document.getElementById("aboutHero");
+        aboutHero.innerHTML = "";
+        if (content.hero) {
+          const heroImg = document.createElement("img");
+          heroImg.src = content.hero;
+          heroImg.alt = "";
+          aboutHero.appendChild(heroImg);
+        }
+
+        if (content.quote) {
+          const quote = document.createElement("p");
+          quote.className = "about-quote";
+          quote.textContent = `“${content.quote}”`;
+          container.appendChild(quote);
+
+          if (content.quoteAuthor) {
+            const author = document.createElement("div");
+            author.className = "about-quote-author";
+            author.textContent = content.quoteAuthor;
+            container.appendChild(author);
+          }
+        }
+
         const approcheSection = document.createElement("section");
         approcheSection.className = "about-section";
         const approcheTitle = document.createElement("h2");
@@ -1859,7 +1979,22 @@
           approcheText.appendChild(p);
         });
         approcheSection.appendChild(approcheTitle);
-        approcheSection.appendChild(approcheText);
+
+        if (content.portrait) {
+          const approcheRow = document.createElement("div");
+          approcheRow.className = "about-approche";
+          const portrait = document.createElement("div");
+          portrait.className = "about-portrait";
+          const img = document.createElement("img");
+          img.src = content.portrait;
+          img.alt = "Armel Kervennal";
+          portrait.appendChild(img);
+          approcheRow.appendChild(approcheText);
+          approcheRow.appendChild(portrait);
+          approcheSection.appendChild(approcheRow);
+        } else {
+          approcheSection.appendChild(approcheText);
+        }
         container.appendChild(approcheSection);
 
         if ((content.gear || []).length) {
@@ -2238,6 +2373,14 @@
           document.querySelectorAll(".hero-slide img").forEach((img) => {
             img.style.transform = `translateY(${scrollY * 0.25}px)`;
           });
+        }
+
+        if (currentPage === "about") {
+          const scrollY = window.pageYOffset;
+          const aboutHeroImg = document.querySelector("#aboutHero img");
+          if (aboutHeroImg) {
+            aboutHeroImg.style.transform = `scale(1.15) translateY(${scrollY * 0.15}px)`;
+          }
         }
       }, { passive: true });
 

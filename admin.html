@@ -566,6 +566,50 @@ async function uploadFilesToFolder(folderPath, fileList) {
   return count;
 }
 
+async function uploadSingleFile(folderPath, file) {
+  const dir = await resolveDir(folderPath, true);
+  if (!dir) throw new Error('Dossier introuvable : ' + folderPath);
+  let name = file.name;
+  const exists = async (n) => dir.getFileHandle(n).then(() => true).catch(() => false);
+  if (await exists(name)) {
+    const dot  = name.lastIndexOf('.');
+    const base = dot > -1 ? name.slice(0, dot) : name;
+    const ext  = dot > -1 ? name.slice(dot) : '';
+    let i = 2, candidate;
+    do { candidate = `${base}-${i}${ext}`; i++; } while (await exists(candidate));
+    name = candidate;
+  }
+  const fh = await dir.getFileHandle(name, { create: true });
+  const w  = await fh.createWritable();
+  await w.write(file);
+  await w.close();
+  return `${folderPath}/${name}`;
+}
+
+function triggerSingleUpload(folderPath, onPicked) {
+  const input = document.getElementById('sharedFileInput');
+  const prevMultiple = input.multiple;
+  input.multiple = false;
+  input.onchange = async () => {
+    input.multiple = prevMultiple;
+    const file = input.files[0];
+    input.value = '';
+    if (!file) return;
+    if (!/\.(jpe?g|png|webp)$/i.test(file.name)) {
+      toast('Format d\'image non supporté', true);
+      return;
+    }
+    try {
+      const path = await uploadSingleFile(folderPath, file);
+      delete thumbs[path];
+      await onPicked(path);
+    } catch (err) {
+      toast('Erreur import : ' + err.message, true);
+    }
+  };
+  input.click();
+}
+
 function triggerUpload(folderPath, onDone) {
   const input = document.getElementById('sharedFileInput');
   input.onchange = async () => {
@@ -648,6 +692,10 @@ async function init() {
   if (!cfg.content.about) cfg.content.about = { approche: [], gear: [] };
   if (!cfg.content.about.approche) cfg.content.about.approche = [];
   if (!cfg.content.about.gear) cfg.content.about.gear = [];
+  if (!cfg.content.about.hero) cfg.content.about.hero = '';
+  if (!cfg.content.about.portrait) cfg.content.about.portrait = '';
+  if (!cfg.content.about.quote) cfg.content.about.quote = '';
+  if (!cfg.content.about.quoteAuthor) cfg.content.about.quoteAuthor = '';
   if (!cfg.content.contact) cfg.content.contact = {};
 
   document.getElementById('hdrFolder').textContent = root.name || '';
@@ -1215,6 +1263,102 @@ function buildGearBlock(gear) {
   return block;
 }
 
+const ABOUT_MEDIA_FOLDER = 'images/a-propos';
+const ABOUT_MEDIA_SLOTS = [
+  ['hero',      'Photo d’ouverture (plein écran)'],
+  ['portrait',  'Portrait'],
+];
+
+function buildAboutMediaBlock(about) {
+  const block = document.createElement('div');
+  block.className = 'sblock';
+  const head = document.createElement('div');
+  head.className = 'sblock-head';
+  head.textContent = 'Visuels';
+  block.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'sblock-body';
+
+  function renderSlots() {
+    body.innerHTML = '';
+    ABOUT_MEDIA_SLOTS.forEach(([key, label]) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.width = '140px';
+      card.draggable = false;
+
+      const img = document.createElement('img');
+      img.style.width = '140px';
+      img.style.height = '100px';
+      img.style.objectFit = 'cover';
+      if (about[key]) thumb(about[key]).then(u => { if (u) img.src = u; });
+      card.appendChild(img);
+
+      const cap = document.createElement('div');
+      cap.className = 'card-cap';
+      cap.textContent = label;
+      card.appendChild(cap);
+
+      const btn = document.createElement('button');
+      btn.className = 'set-cover';
+      btn.style.opacity = '1';
+      btn.textContent = about[key] ? 'Changer' : '+ Ajouter';
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerSingleUpload(ABOUT_MEDIA_FOLDER, async (path) => {
+          about[key] = path;
+          renderSlots();
+          toast('Photo mise à jour');
+        });
+      });
+      card.appendChild(btn);
+
+      body.appendChild(card);
+    });
+  }
+  renderSlots();
+  block.appendChild(body);
+  return block;
+}
+
+function buildAboutQuoteBlock(about) {
+  const block = document.createElement('div');
+  block.className = 'sblock';
+  const head = document.createElement('div');
+  head.className = 'sblock-head';
+  head.textContent = 'Citation';
+  block.appendChild(head);
+
+  const body = document.createElement('div');
+  body.style.paddingTop = '4px';
+
+  const quoteRow = document.createElement('div');
+  quoteRow.className = 'field-row';
+  const quoteLbl = document.createElement('label');
+  quoteLbl.textContent = 'Citation';
+  const quoteTa = document.createElement('textarea');
+  quoteTa.value = about.quote || '';
+  quoteTa.addEventListener('change', () => { about.quote = quoteTa.value; });
+  quoteRow.appendChild(quoteLbl);
+  quoteRow.appendChild(quoteTa);
+  body.appendChild(quoteRow);
+
+  const authorRow = document.createElement('div');
+  authorRow.className = 'field-row';
+  const authorLbl = document.createElement('label');
+  authorLbl.textContent = 'Auteur';
+  const authorInp = document.createElement('input');
+  authorInp.value = about.quoteAuthor || '';
+  authorInp.addEventListener('change', () => { about.quoteAuthor = authorInp.value; });
+  authorRow.appendChild(authorLbl);
+  authorRow.appendChild(authorInp);
+  body.appendChild(authorRow);
+
+  block.appendChild(body);
+  return block;
+}
+
 function buildContactBlock(contact) {
   const block = document.createElement('div');
   block.className = 'sblock';
@@ -1268,6 +1412,8 @@ function renderContent() {
   const about   = cfg.content.about;
   const contact = cfg.content.contact;
 
+  body.appendChild(buildAboutMediaBlock(about));
+  body.appendChild(buildAboutQuoteBlock(about));
   body.appendChild(buildTextListBlock('Approche', '', about.approche, () => {}));
   body.appendChild(buildGearBlock(about.gear));
   body.appendChild(buildContactBlock(contact));
