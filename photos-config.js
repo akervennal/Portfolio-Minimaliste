@@ -1,15 +1,11 @@
 var PORTFOLIO_CONFIG = {
   "heroPhotos": [
     {
-      "src": "images/showcase/hero/MEL_9528.jpg",
-      "caption": "Viking Cup — Mars 2026"
-    },
-    {
-      "src": "images/showcase/9-MEL_2544.jpg",
+      "src": "images/showcase/6-MEL_3648.jpg",
       "caption": ""
     },
     {
-      "src": "images/showcase/6-MEL_3648.jpg",
+      "src": "images/showcase/9-MEL_2544.jpg",
       "caption": ""
     },
     {
@@ -19,6 +15,10 @@ var PORTFOLIO_CONFIG = {
     {
       "src": "images/showcase/IMG_4776_TIF.jpg",
       "caption": "Angleterre — Décembre 2025"
+    },
+    {
+      "src": "images/showcase/hero/MEL_9528.jpg",
+      "caption": "Viking Cup — Mars 2026"
     },
     {
       "src": "images/showcase/1-MEL_5634.jpg",

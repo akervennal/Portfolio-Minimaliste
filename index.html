@@ -2305,8 +2305,8 @@
       });
 
       function animateCursor() {
-        cursorRX += (cursorX - cursorRX) * 0.25;
-        cursorRY += (cursorY - cursorRY) * 0.25;
+        cursorRX += (cursorX - cursorRX) * 0.7;
+        cursorRY += (cursorY - cursorRY) * 0.7;
         cursor.style.transform = `translate(${cursorRX}px, ${cursorRY}px) translate(-50%, -50%)`;
         requestAnimationFrame(animateCursor);
       }
