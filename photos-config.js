@@ -106,31 +106,35 @@ var PORTFOLIO_CONFIG = {
       "quoteAuthor": "Dorothea Lange",
       "portrait": "images/auto-portrait/IMG_0321(2).JPG",
       "approche": [
-        "Je développe une approche photographique basée sur l'exploration et la série. Principalement photographie automobile, paysage et de rue, souvent liée à des lieux, des voyages ou des événements.",
-        "Mon travail s'inscrit dans une démarche documentaire personnelle : observer, me déplacer, et construire au fil du temps un carnet visuel des endroits et des moments que je traverse.",
-        "Je privilégie une approche naturelle, avec une attention particulière portée à la lumière, à l'ambiance et au contexte plutôt qu'à la mise en scène."
+        "Ma mère m'a mis un appareil entre les mains en 2018. Je ne l'ai plus reposé depuis.",
+        "Comme tous les débutants, j'ai d'abord cherché à impressionner : couleurs poussées, compositions travaillées. Cette période m'a appris la technique. Elle ne m'a pas appris à voir. Ce qui m'intéresse aujourd'hui, c'est plutôt l'inverse, effacer ma présence pour laisser parler l'instant.",
+        "Une photo trop stylisée finit par raconter le photographe. Je préfère qu'elle raconte ce que j'ai ressenti en la prenant. Je garde donc mes images neutres, presque sobres.",
+        "Je photographie des paysages autant que des événements. Dans les deux cas, la place des gens dans mes photos a augmenté avec le temps,  je suis passé de simples silhouettes au loin à de vrais sujets, dont je me rapproche d'année en année. L'idée, c'est qu'en regardant une photo, on se demande qui est cette personne et ce qu'elle fait là. C'est cette curiosité, plus qu'une recherche esthétique, qui me rapproche du documentaire plutôt que du fine art."
       ],
       "gear": [
         {
           "label": "Boîtier",
           "title": "Nikon D7500",
           "paragraphs": [
-            "Mon boîtier principal, choisi pour sa robustesse et sa prise en main directe. Le viseur optique et l'autonomie de la batterie me laissent une liberté totale sur le terrain, sans jamais avoir à y penser.",
-            "Je photographie en RAW pour garder une approche neutre à la prise de vue : l'esthétique se construit ensuite, en post-production."
-          ]
-        },
-        {
-          "label": "Objectif standard",
-          "title": "AF-S Nikkor 50mm f/1.4G",
-          "paragraphs": [
-            "Une focale portrait, légère et d'un piqué remarquable dès la pleine ouverture. C'est l'objectif que je monte quand je veux un rendu simple et précis."
+            "Sorti en 2017, le D7500 reprend le capteur 20,9 mégapixels du D500, le haut de gamme APS-C de Nikon, dans un boîtier plus léger et plus abordable. Pas de filtre passe-bas, autofocus à 51 points, bonne réactivité en rafale. Le corps est plus large que la moyenne des boîtiers DX, ce qui se traduit en pratique par une meilleure prise en main ; sur les longues journées, je préfère ce compromis à un boîtier plus léger mais moins agréable à tenir.",
+            "Comme la plupart des reflex, l'autonomie est excellente, plus de 900 déclenchements par charge, largement au-dessus de ce qu'offrent la plupart des hybrides. Et j'ai une préférence pour le viseur optique, que je trouve plus agréable à l'usage qu'un viseur électronique.",
+            "Je shoote systématiquement en RAW : ça m'évite d'arbitrer tous les réglages sur le moment, pour me concentrer sur le cadrage et le sujet. Les ajustements viennent après, en post-traitement."
           ]
         },
         {
           "label": "Zoom polyvalent",
           "title": "Sigma 18-35mm f/1.8 DC HSM Art",
           "paragraphs": [
-            "L'objectif qui reste le plus souvent sur mon boîtier : une ouverture constante de f/1.8, rare sur un zoom, qui combine la flexibilité d'un zoom et la luminosité d'une focale fixe. Idéal en basse lumière, pour ne jamais être limité par les conditions."
+            "Sorti en 2013, c'est le premier zoom de l'histoire à offrir une ouverture constante de f1.8 sur toute sa plage focale, une prouesse toujours rare aujourd'hui. La plage de zoom est courte, pensée uniquement pour les capteurs APS-C (27-52,5mm en équivalent 24x36). Mais la comparaison avec trois focales fixes réunies en un seul objectif revient souvent chez les testeurs, et elle tient à la conception optique : 17 éléments répartis en 12 groupes, dont cinq en verre à faible dispersion et quatre éléments asphériques moulés, pensés pour maîtriser les aberrations sur l'ensemble de la plage plutôt qu'au centre uniquement. Un zoom classique perd généralement en netteté vers les extrémités de sa plage ou à pleine ouverture ; celui-ci reste net à 18mm comme à 35mm, ouvert à 1.8 comme fermé, une constance qu'on trouve d'ordinaire seulement chez les focales fixes.",
+            "Le zoom est à mécanisme interne : contrairement à la plupart des zooms, le barillet ne s'allonge pas en zoomant, ce qui limite les entrées de poussière, un vrai plus, puisque l'objectif n'a pas de tropicalisation. Sa motorisation HSM est rapide et silencieuse. Il est lourd, mais cette contrainte reste un prix raisonnable à payer pour ce niveau de performance : beaucoup le considèrent comme l'un des meilleurs objectifs jamais conçus pour l'APS-C."
+          ]
+        },
+        {
+          "label": "Objectif standard",
+          "title": "AF-S Nikkor 50mm f/1.4G",
+          "paragraphs": [
+            "Sorti en 2011 en remplacement de l'ancien 50mm f1.8D, ce 50mm ajoute une motorisation intégrée (AF-S) et reste étonnamment compact et léger,  environ 35 % plus léger que son grand frère, le 50mm f1.4G. Les tests optiques entre les deux sont partagés : le 1.4G garde un léger avantage en piqué et en flou d'arrière-plan, mais l'écart est assez faible pour que beaucoup considèrent le 1.8G comme le meilleur rapport qualité-prix des deux.",
+            "Conçu pour le plein format, il n'utilise sur mon boîtier APS-C que la partie centrale de son image, généralement la plus nette de tout objectif. Sur un capteur DX, ça donne l'équivalent d'un 75mm : bien pour le portrait, un peu long pour le paysage ou la photo documentaire en intérieur, ce qui explique qu'il reste le moins utilisé des trois."
           ]
         }
       ]
