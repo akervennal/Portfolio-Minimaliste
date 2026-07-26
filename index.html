@@ -2,7 +2,7 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Armel Kervennal — Photographe</title>
     <meta
       name="description"
@@ -141,6 +141,7 @@
         left: 0;
         right: 0;
         padding: 22px 40px;
+        padding-top: calc(22px + env(safe-area-inset-top));
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -161,7 +162,7 @@
         z-index: 0;
       }
       .header.scrolled {
-        padding-top: 14px;
+        padding-top: calc(14px + env(safe-area-inset-top));
         padding-bottom: 14px;
       }
       .header.scrolled::before {
@@ -1063,6 +1064,7 @@
         }
         .header {
           padding: 20px 20px;
+          padding-top: calc(20px + env(safe-area-inset-top));
         }
         .header-blur {
           bottom: -40px;
