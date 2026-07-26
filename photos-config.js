@@ -115,25 +115,22 @@ var PORTFOLIO_CONFIG = {
           "label": "Boîtier",
           "title": "Nikon D7500",
           "paragraphs": [
-            "C'est mon boîtier principal, un outil robuste et très ergonomique. Il intègre le capteur de 21 mégapixels du Nikon D500, ce qui lui confère une très bonne gestion des ISO pour travailler sereinement dans des conditions de lumière difficiles. Cette définition est amplement suffisante pour des tirages grand format et offre un rendu qui n'a rien à envier au plein format pour la grande majorité des usages.",
-            "Je privilégie le reflex (DSLR) pour son aspect pratique et direct. L'autonomie de la batterie permet de tenir des journées entières sans s'en soucier. Surtout, le viseur optique (OVF) offre une vision de la scène sans latence ni filtre numérique. Cela m'encourage à bien maîtriser mes réglages en amont et à me concentrer uniquement sur l'instant. En photographiant en RAW, j'évite les simulations et les filtres intégrés pour garder une approche neutre à la prise de vue ; l'esthétique et l'étalonnage se gèrent ensuite en post-production.",
-            "Enfin, son moteur autofocus intégré permet d'utiliser de nombreux objectifs argentiques sans adaptateur. Couplé à un autofocus et une rafale efficaces, c'est un boîtier très complet et largement suffisant, à moins de faire de la photographie sportive très spécifique."
+            "Mon boîtier principal, choisi pour sa robustesse et sa prise en main directe. Le viseur optique et l'autonomie de la batterie me laissent une liberté totale sur le terrain, sans jamais avoir à y penser.",
+            "Je photographie en RAW pour garder une approche neutre à la prise de vue : l'esthétique se construit ensuite, en post-production."
           ]
         },
         {
           "label": "Objectif standard",
           "title": "AF-S Nikkor 50mm f/1.4G",
           "paragraphs": [
-            "Monté sur un capteur APS-C, ce 50mm équivaut à un 75mm, ce qui en fait une focale particulièrement adaptée pour le portrait. C'est un objectif léger, compact et très agréable à manipuler.",
-            "Ses qualités optiques sont excellentes : le piqué est net dès les grandes ouvertures, le micro-contraste est bien présent et le rendu global est très qualitatif. L'autofocus est rapide et précis. C'est une optique simple mais extrêmement performante, qui offre un rendu très professionnel pour un budget maîtrisé."
+            "Une focale portrait, légère et d'un piqué remarquable dès la pleine ouverture. C'est l'objectif que je monte quand je veux un rendu simple et précis."
           ]
         },
         {
           "label": "Zoom polyvalent",
           "title": "Sigma 18-35mm f/1.8 DC HSM Art",
           "paragraphs": [
-            "C'est l'objectif qui passe le plus de temps sur mon boîtier. Avoir une ouverture constante de f/1.8 sur un zoom est rare et apporte une grande souplesse de travail. Il couvre des focales allant de 27mm (grand angle documentaire) à 52mm (standard), combinant ainsi la luminosité et le flou d'arrière-plan (bokeh) d'une focale fixe avec la flexibilité d'un zoom.",
-            "La qualité de construction est solide et les performances optiques suivent : l'image est nette, très contrastée, avec beaucoup de détails. C'est un objectif particulièrement à l'aise en basse lumière, ce qui permet de s'adapter confortablement à presque toutes les situations sans que le manque d'éclairage ne devienne un frein."
+            "L'objectif qui reste le plus souvent sur mon boîtier : une ouverture constante de f/1.8, rare sur un zoom, qui combine la flexibilité d'un zoom et la luminosité d'une focale fixe. Idéal en basse lumière, pour ne jamais être limité par les conditions."
           ]
         }
       ]

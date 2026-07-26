@@ -274,6 +274,7 @@
       .hero {
         position: relative;
         height: 100vh;
+        height: 100dvh;
         width: 100%;
         overflow: hidden;
         background: #000;
@@ -358,17 +359,22 @@
 
       .scroll-hint {
         position: absolute;
-        bottom: 36px;
+        bottom: 34px;
         left: 50%;
-        transform: translateX(-50%);
-        font-family: var(--mono);
-        font-size: 9px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: var(--text);
+        width: 10px;
+        height: 10px;
         opacity: 0.5;
         z-index: 10;
         animation: bob 2.5s ease-in-out infinite;
+        pointer-events: none;
+      }
+      .scroll-hint::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-right: 1px solid var(--text);
+        border-bottom: 1px solid var(--text);
+        transform: rotate(45deg);
       }
       @keyframes bob {
         0%,
@@ -684,6 +690,7 @@
       .about-hero {
         position: relative;
         height: 100vh;
+        height: 100dvh;
         width: 100%;
         overflow: hidden;
         background: #000;
@@ -707,7 +714,9 @@
           to bottom,
           rgba(0, 0, 0, 0.75) 0%,
           rgba(0, 0, 0, 0.45) 22%,
-          rgba(0, 0, 0, 0) 45%
+          rgba(0, 0, 0, 0) 45%,
+          rgba(0, 0, 0, 0.4) 78%,
+          rgba(0, 0, 0, 0.78) 100%
         );
         pointer-events: none;
       }
@@ -1076,10 +1085,14 @@
           right: unset;
           left: 50%;
           transform: translateX(-50%);
-          bottom: 28px;
+          bottom: 42px;
         }
         .scroll-hint {
           display: none;
+        }
+        .about-hero .scroll-hint {
+          display: block;
+          bottom: 26px;
         }
         .showcase {
           padding: 80px 20px 60px;
@@ -1219,7 +1232,7 @@
           <!-- slides injected by JS -->
           <div class="hero-caption" id="heroCaption"></div>
           <div class="hero-progress" id="heroProgress"></div>
-          <div class="scroll-hint">scroll ↓</div>
+          <div class="scroll-hint" aria-hidden="true"></div>
         </section>
 
         <section class="showcase">
@@ -1958,6 +1971,11 @@
           heroImg.src = heroSrc;
           heroImg.alt = "";
           aboutHero.appendChild(heroImg);
+
+          const scrollHint = document.createElement("div");
+          scrollHint.className = "scroll-hint";
+          scrollHint.setAttribute("aria-hidden", "true");
+          aboutHero.appendChild(scrollHint);
         }
 
         if (content.quote) {
