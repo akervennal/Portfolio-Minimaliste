@@ -205,6 +205,10 @@
     }
     .card:hover  { border-color: var(--border2); }
     .card.ghost  { opacity: 0.25; }
+    .card.drop-over {
+      outline: 1px dashed rgba(200, 184, 154, 0.7);
+      outline-offset: -3px;
+    }
     .card.insert-before::before {
       content: ''; position: absolute; left: -5px; top: 0; bottom: 0;
       width: 3px; background: var(--accent); z-index: 10; border-radius: 2px;
@@ -428,6 +432,7 @@ let thumbs       = {};       // { path: objectURL }
 let poolFiles    = [];       // all src paths under images/showcase/
 let projFiles    = {};       // { id: [srcPath] }
 let projFolder   = {};       // { id: encodedFolderPath }
+let aboutFiles   = [];       // all src paths under images/a-propos/
 let drag         = null;     // active drag payload
 
 // ─── TOASTS ───────────────────────────────────────────────────────────────
@@ -693,6 +698,7 @@ async function init() {
   if (!cfg.content.about.approche) cfg.content.about.approche = [];
   if (!cfg.content.about.gear) cfg.content.about.gear = [];
   if (!cfg.content.about.hero) cfg.content.about.hero = '';
+  if (!cfg.content.about.heroMobile) cfg.content.about.heroMobile = '';
   if (!cfg.content.about.portrait) cfg.content.about.portrait = '';
   if (!cfg.content.about.quote) cfg.content.about.quote = '';
   if (!cfg.content.about.quoteAuthor) cfg.content.about.quoteAuthor = '';
@@ -703,6 +709,9 @@ async function init() {
   // Scan showcase pool
   poolFiles = await scanDir('images/showcase');
   document.getElementById('poolCount').textContent = `(${poolFiles.length})`;
+
+  // Scan about-page media pool
+  aboutFiles = await scanDir(ABOUT_MEDIA_FOLDER);
 
   // Scan each project's folder
   projFiles = {};
@@ -1265,8 +1274,9 @@ function buildGearBlock(gear) {
 
 const ABOUT_MEDIA_FOLDER = 'images/a-propos';
 const ABOUT_MEDIA_SLOTS = [
-  ['hero',      'Photo d’ouverture (plein écran)'],
-  ['portrait',  'Portrait'],
+  ['hero',       'Photo d’ouverture (plein écran)'],
+  ['heroMobile', 'Photo d’ouverture — mobile'],
+  ['portrait',   'Portrait'],
 ];
 
 function buildAboutMediaBlock(about) {
@@ -1314,11 +1324,92 @@ function buildAboutMediaBlock(about) {
       });
       card.appendChild(btn);
 
+      card.addEventListener('dragover', e => {
+        if (isFileDrag(e)) return;
+        if (!drag || !drag.src) return;
+        e.preventDefault();
+        card.classList.add('drop-over');
+      });
+      card.addEventListener('dragleave', () => card.classList.remove('drop-over'));
+      card.addEventListener('drop', e => {
+        if (isFileDrag(e)) return;
+        e.preventDefault();
+        card.classList.remove('drop-over');
+        if (!drag || !drag.src) return;
+        about[key] = drag.src;
+        renderSlots();
+        toast('Photo mise à jour');
+      });
+
       body.appendChild(card);
     });
   }
   renderSlots();
   block.appendChild(body);
+
+  // Pool of photos already in the about-page folder — drag any of them
+  // onto a slot above, same interaction as the homepage pool.
+  const poolBlock = document.createElement('div');
+  poolBlock.className = 'pool';
+  poolBlock.style.borderTop = 'none';
+
+  const poolHead = document.createElement('div');
+  poolHead.className = 'pool-head';
+  const poolCount = document.createElement('span');
+  poolCount.className = 'pool-count';
+  poolHead.append(`Pool — ${ABOUT_MEDIA_FOLDER}`, poolCount);
+  const poolSpacer = document.createElement('span');
+  poolSpacer.className = 'spacer';
+  poolHead.appendChild(poolSpacer);
+  const importBtn = document.createElement('button');
+  importBtn.className = 'btn-ghost small';
+  importBtn.textContent = '+ Importer des photos';
+  importBtn.addEventListener('click', () => {
+    triggerUpload(ABOUT_MEDIA_FOLDER, async () => {
+      aboutFiles = await scanDir(ABOUT_MEDIA_FOLDER);
+      renderAboutPool();
+    });
+  });
+  poolHead.appendChild(importBtn);
+  poolBlock.appendChild(poolHead);
+
+  const poolStrip = document.createElement('div');
+  poolStrip.className = 'pool-strip';
+  poolBlock.appendChild(poolStrip);
+
+  function renderAboutPool() {
+    poolCount.textContent = `(${aboutFiles.length})`;
+    poolStrip.innerHTML = '';
+    if (!aboutFiles.length) {
+      poolStrip.innerHTML = '<span class="empty">Aucune photo — importe ou dépose ici</span>';
+      return;
+    }
+    for (const src of aboutFiles) {
+      const pcard = document.createElement('div');
+      pcard.className = 'pcard';
+      pcard.draggable = true;
+      const img = document.createElement('img');
+      img.draggable = false;
+      const name = document.createElement('div');
+      name.className = 'pcard-name';
+      name.textContent = src.split('/').pop();
+      pcard.append(img, name);
+      thumb(src).then(u => { if (u) img.src = u; });
+      pcard.addEventListener('dragstart', e => {
+        drag = { from: 'about-pool', src };
+        e.dataTransfer.effectAllowed = 'copy';
+        e.dataTransfer.setData('text/plain', src);
+      });
+      poolStrip.appendChild(pcard);
+    }
+  }
+  renderAboutPool();
+  attachUploadDropzone(poolStrip, () => ABOUT_MEDIA_FOLDER, async () => {
+    aboutFiles = await scanDir(ABOUT_MEDIA_FOLDER);
+    renderAboutPool();
+  });
+
+  block.appendChild(poolBlock);
   return block;
 }
 

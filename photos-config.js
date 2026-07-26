@@ -35,10 +35,6 @@ var PORTFOLIO_CONFIG = {
     {
       "src": "images/showcase/2-MEL_8835.jpg",
       "caption": "Campagne de Mézillac — Mars 2026"
-    },
-    {
-      "src": "images/showcase/6-MEL_7681.jpg",
-      "caption": "Fête Foraine de Rennes — Décembre 2025"
     }
   ],
   "heroPhotosMobile": [
@@ -105,6 +101,7 @@ var PORTFOLIO_CONFIG = {
   "content": {
     "about": {
       "hero": "images/pyrenees-2025/9-MEL_3695.jpg",
+      "heroMobile": "images/a-propos/13-MEL_3579.jpg",
       "quote": "The camera is an instrument that teaches people how to see without a camera.",
       "quoteAuthor": "Dorothea Lange",
       "portrait": "images/auto-portrait/IMG_0321(2).JPG",

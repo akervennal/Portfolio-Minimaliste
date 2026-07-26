@@ -1145,7 +1145,13 @@
         }
         .about-portrait {
           order: -1;
-          width: 180px;
+          width: 55%;
+          max-width: 220px;
+          margin: 0 auto;
+        }
+        .about-portrait img {
+          aspect-ratio: 3 / 4;
+          object-fit: cover;
         }
         .gear-list {
           grid-template-columns: 1fr;
@@ -1945,9 +1951,11 @@
 
         const aboutHero = document.getElementById("aboutHero");
         aboutHero.innerHTML = "";
-        if (content.hero) {
+        const isMobileHero = window.matchMedia("(max-width: 700px)").matches;
+        const heroSrc = (isMobileHero && content.heroMobile) || content.hero;
+        if (heroSrc) {
           const heroImg = document.createElement("img");
-          heroImg.src = content.hero;
+          heroImg.src = heroSrc;
           heroImg.alt = "";
           aboutHero.appendChild(heroImg);
         }
