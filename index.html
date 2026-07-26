@@ -469,35 +469,6 @@
         padding: 160px 40px 100px;
       }
 
-      .year-group {
-        margin-bottom: 80px;
-      }
-      .year-group:last-child {
-        margin-bottom: 0;
-      }
-      .year-num {
-        font-family: var(--mono);
-        font-size: 11px;
-        letter-spacing: 0.2em;
-        color: var(--text-faint);
-        margin-bottom: 12px;
-      }
-      .year-label {
-        padding-bottom: 20px;
-        border-bottom: 1px solid var(--line);
-        margin-bottom: 48px;
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-      }
-      .year-label-count {
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.15em;
-        opacity: 0.5;
-        font-style: normal;
-      }
-
       .projects-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -657,28 +628,6 @@
         display: flex;
         gap: 32px;
         align-items: flex-start;
-      }
-
-      /* ============================================================
-           FLOATING YEAR INDICATOR
-        ============================================================ */
-      .year-indicator {
-        position: fixed;
-        top: 50%;
-        right: 24px;
-        transform: translateY(-50%);
-        font-family: var(--mono);
-        font-size: 10px;
-        color: var(--text-muted);
-        letter-spacing: 0.3em;
-        writing-mode: vertical-rl;
-        transition: opacity 0.5s;
-        opacity: 0;
-        z-index: 50;
-        pointer-events: none;
-      }
-      .year-indicator.visible {
-        opacity: 1;
       }
 
 
@@ -1135,9 +1084,6 @@
         .projects-page {
           padding: 100px 20px 60px;
         }
-        .year-group {
-          margin-bottom: 60px;
-        }
         .projects-grid {
           grid-template-columns: 1fr;
           gap: 40px;
@@ -1208,9 +1154,6 @@
         .contact-info dt {
           padding-top: 16px;
         }
-        .year-indicator {
-          display: none;
-        }
         .footer {
           flex-direction: column;
           gap: 8px;
@@ -1242,9 +1185,6 @@
         <a href="#" data-page="contact">contact</a>
       </nav>
     </header>
-
-    <!-- Floating year indicator -->
-    <div class="year-indicator" id="yearIndicator">2026</div>
 
     <!-- Photo caption on hover -->
 
@@ -1800,18 +1740,28 @@
       };
 
       let currentPage = "home";
+      let projectsScrollY = 0;
 
       function showPage(name) {
         if (currentPage === name) return;
         const current = pages[currentPage];
         const next = pages[name];
 
+        if (currentPage === "projects") {
+          projectsScrollY = window.scrollY;
+        }
+
         // fade out current
         current.classList.remove("fade-in");
         setTimeout(() => {
           current.classList.remove("active");
+          // reset so images fade back in next time this page is shown,
+          // instead of snapping straight to their loaded state
+          current.querySelectorAll("img.loaded").forEach((img) => {
+            img.classList.remove("loaded");
+          });
           next.classList.add("active");
-          window.scrollTo(0, 0);
+          window.scrollTo(0, name === "projects" ? projectsScrollY : 0);
           requestAnimationFrame(() => {
             next.classList.add("fade-in");
             observeImages();
@@ -2398,39 +2348,9 @@
         true,
       );
 
-      // ============================================================
-      // FLOATING YEAR INDICATOR
-      // ============================================================
-      const yearIndicator = document.getElementById("yearIndicator");
-      let yearObserver = null;
-
-      function setupYearObserver() {
-        if (yearObserver) yearObserver.disconnect();
-        yearObserver = new IntersectionObserver(
-          (entries) => {
-            // pick entry closest to top of viewport
-            const visible = entries
-              .filter((e) => e.isIntersecting)
-              .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-            if (visible.length > 0) {
-              yearIndicator.textContent = visible[0].target.dataset.year;
-              yearIndicator.classList.add("visible");
-            }
-          },
-          { rootMargin: "-30% 0px -50% 0px" },
-        );
-        document
-          .querySelectorAll(".year-group")
-          .forEach((g) => yearObserver.observe(g));
-      }
-
       const header = document.querySelector(".header");
       window.addEventListener("scroll", () => {
         header.classList.toggle("scrolled", window.pageYOffset > 40);
-
-        if (currentPage !== "projects") {
-          yearIndicator.classList.remove("visible");
-        }
 
         if (currentPage === "home") {
           const scrollY = window.pageYOffset;
@@ -2461,7 +2381,6 @@
       buildAbout();
       buildContact();
       bindPageLinks();
-      setupYearObserver();
       observeImages();
 
       // Start hero cycle after first frame
