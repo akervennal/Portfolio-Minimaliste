@@ -158,12 +158,32 @@
         transform: none;
       }
 
+      /* When a same-document navigation goes through the View
+         Transitions API (below), that API already crossfades the whole
+         view on its own — skip the hidden-start fade above on top of
+         it, or the two compete: the transition crossfades to a still-
+         invisible frame, then the reveal fades it in a second time,
+         which reads as a flicker/flash. Browsers without View
+         Transition support never set this class, so they keep the
+         plain fade above as their only transition. */
+      .vt-nav .reveal {
+        opacity: 1;
+        transform: none;
+      }
+
       /* Same-document navigation (year → location → grid) crossfades
          via the View Transitions API, matching the cross-document
          crossfade already used between index/about/archive. */
       ::view-transition-old(root),
       ::view-transition-new(root) {
         animation-duration: 0.4s;
+        animation-timing-function: var(--ease);
+      }
+
+      /* Lightbox open/close: the clicked thumbnail morphs into (and
+         back out of) the centered photo — see openLightbox/closeLightbox. */
+      ::view-transition-group(lb-photo) {
+        animation-duration: 0.5s;
         animation-timing-function: var(--ease);
       }
 
@@ -352,9 +372,6 @@
         inset: 0;
         z-index: 200;
         background: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.35s var(--ease);
@@ -363,20 +380,32 @@
         opacity: 1;
         pointer-events: auto;
       }
+      /* Two images share this grid cell so they can overlap while one
+         slides out and the other slides in — see .lb-img below. */
+      .lb-stage {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+      }
       .lb-img {
+        grid-area: 1 / 1;
         max-width: 88vw;
         max-height: 86vh;
         object-fit: contain;
         display: block;
         opacity: 0;
-        transform: scale(0.985);
         transition:
-          opacity 0.35s var(--ease),
-          transform 0.45s var(--ease);
+          opacity 0.4s var(--ease),
+          transform 0.5s var(--ease);
       }
       .lb-img.shown {
         opacity: 1;
-        transform: none;
+      }
+      /* The outgoing photo during a next/prev slide — inert, and only
+         ever visible mid-transition (JS drives its transform/opacity). */
+      #lbImgOut {
+        pointer-events: none;
       }
       .lb-close,
       .lb-nav {
@@ -493,7 +522,10 @@
     <div class="lb" id="lb">
       <button class="lb-close" id="lbClose">fermer · esc</button>
       <button class="lb-nav prev" id="lbPrev" aria-label="Photo précédente"></button>
-      <img class="lb-img" id="lbImg" alt="" />
+      <div class="lb-stage">
+        <img class="lb-img" id="lbImg" alt="" />
+        <img class="lb-img" id="lbImgOut" alt="" aria-hidden="true" />
+      </div>
       <button class="lb-nav next" id="lbNext" aria-label="Photo suivante"></button>
       <div class="lb-counter" id="lbCounter"></div>
     </div>
@@ -551,9 +583,20 @@
 
       // Same-document crossfade between archive states, when the
       // browser supports it; falls straight back to a plain render.
+      // "vt-nav" tells the reveal CSS above to stand down for the
+      // duration — see the comment there for why.
       function renderTransitioned() {
-        if (document.startViewTransition) document.startViewTransition(render);
-        else render();
+        if (document.startViewTransition) {
+          document.documentElement.classList.add("vt-nav");
+          const transition = document.startViewTransition(render);
+          // .finished rejects if a rapid second navigation skips this
+          // transition before it settles — expected, not an error.
+          transition.finished.catch(() => {}).finally(() => {
+            document.documentElement.classList.remove("vt-nav");
+          });
+        } else {
+          render();
+        }
       }
 
       function navigate(y, pid) {
@@ -751,7 +794,7 @@
           img.decoding = "async";
           thumb.appendChild(img);
           btn.appendChild(thumb);
-          btn.addEventListener("click", () => openLightbox(photos, i));
+          btn.addEventListener("click", () => openLightbox(photos, i, img));
           cell.appendChild(btn);
 
           revealItem(cell);
@@ -771,53 +814,149 @@
 
       // ============================================================
       // LIGHTBOX — full-bleed single photo, arrow keys, swipe, esc
+      //
+      // Opening/closing morphs the clicked thumbnail into the centered
+      // photo (and back) via the View Transitions API's shared-element
+      // matching: both images briefly carry the same view-transition-
+      // name, one in the "old" tree and one in the "new" tree, and the
+      // browser interpolates position/size between them on its own.
+      // Next/prev instead slides two images past each other — a
+      // regular transform animation, not a shared-element match, since
+      // both photos are visible at once mid-swipe.
       // ============================================================
       const lb = document.getElementById("lb");
       const lbImg = document.getElementById("lbImg");
+      const lbImgOut = document.getElementById("lbImgOut");
       const lbCounter = document.getElementById("lbCounter");
       let lbPhotos = [];
       let lbIndex = 0;
-      let lbFirstShow = true;
 
-      function showLbIndex(i) {
-        lbIndex = (i + lbPhotos.length) % lbPhotos.length;
-        lbImg.classList.remove("shown");
-        const swap = () => {
-          lbImg.src = resolveSrc(lbPhotos[lbIndex]);
-          lbImg.alt = "Photo " + (lbIndex + 1) + " sur " + lbPhotos.length;
-          requestAnimationFrame(() => lbImg.classList.add("shown"));
-        };
-        if (lbFirstShow) {
-          lbFirstShow = false;
-          swap();
-        } else {
-          setTimeout(swap, 180);
-        }
+      // The grid stays mounted under the lightbox, so the thumbnail for
+      // any index is just its button's img, in DOM order.
+      function findThumbImg(index) {
+        const btns = document.querySelectorAll(".grid button");
+        const btn = btns[index];
+        return btn ? btn.querySelector("img") : null;
+      }
+
+      function showLbIndex(i, dir) {
+        const newIndex = (i + lbPhotos.length) % lbPhotos.length;
+        if (newIndex === lbIndex) return;
+        const goingNext = dir >= 0;
+
+        // Outgoing: freeze what's currently shown into the second
+        // image, right where lbImg is now, so it can slide away while
+        // lbImg swaps to the new photo underneath it.
+        lbImgOut.src = lbImg.src;
+        lbImgOut.alt = lbImg.alt;
+        lbImgOut.style.transition = "none";
+        lbImgOut.style.transform = "translateX(0)";
+        lbImgOut.style.opacity = "1";
+        lbImgOut.classList.add("shown");
+
+        // Incoming: park the new photo off-screen on the entry side,
+        // no transition yet, then release both on the next frame.
+        lbIndex = newIndex;
+        lbImg.style.transition = "none";
+        lbImg.style.transform = "translateX(" + (goingNext ? "100%" : "-100%") + ")";
+        lbImg.src = resolveSrc(lbPhotos[lbIndex]);
+        lbImg.alt = "Photo " + (lbIndex + 1) + " sur " + lbPhotos.length;
+        lbImg.classList.add("shown");
+
+        // Force layout so the "no transition" starting styles commit
+        // before transitions are re-enabled and the resting styles are
+        // applied below — otherwise the browser coalesces all of it
+        // into one paint and nothing slides.
+        void lbImg.offsetWidth;
+        lbImgOut.style.transition = "";
+        lbImg.style.transition = "";
+
+        requestAnimationFrame(() => {
+          lbImgOut.style.transform = "translateX(" + (goingNext ? "-100%" : "100%") + ")";
+          lbImgOut.style.opacity = "0";
+          lbImg.style.transform = "translateX(0)";
+        });
+
         lbCounter.textContent = lbIndex + 1 + " / " + lbPhotos.length;
       }
 
-      function openLightbox(photos, i) {
+      function openLightbox(photos, i, thumbImg) {
         lbPhotos = photos;
-        lbFirstShow = true;
-        lb.classList.add("open");
+        lbIndex = (i + photos.length) % photos.length;
         document.body.style.overflow = "hidden";
-        showLbIndex(i);
+
+        const src = resolveSrc(lbPhotos[lbIndex]);
+        const alt = "Photo " + (lbIndex + 1) + " sur " + lbPhotos.length;
+
+        const apply = () => {
+          lb.classList.add("open");
+          lbImg.style.transform = "";
+          lbImg.classList.add("shown");
+          lbCounter.textContent = lbIndex + 1 + " / " + lbPhotos.length;
+        };
+
+        if (thumbImg && document.startViewTransition) {
+          thumbImg.style.viewTransitionName = "lb-photo";
+          // Not awaiting decode() here on purpose: the update callback
+          // has its own spec'd timeout, and a slow/stalled decode would
+          // abort the whole transition rather than just its animation —
+          // it's the same file the thumbnail already displayed, so it's
+          // already decoded from cache in practice.
+          const transition = document.startViewTransition(() => {
+            lbImg.src = src;
+            lbImg.alt = alt;
+            lbImg.style.viewTransitionName = "lb-photo";
+            apply();
+            thumbImg.style.viewTransitionName = "";
+          });
+          // A rapid second interaction (e.g. closing before this one
+          // settles) skips it; every promise on the transition object
+          // rejects independently, so each needs its own no-op catch
+          // or it surfaces as an unhandled rejection.
+          transition.updateCallbackDone.catch(() => {});
+          transition.ready.catch(() => {});
+          transition.finished.catch(() => {}).finally(() => {
+            lbImg.style.viewTransitionName = "";
+          });
+        } else {
+          lbImg.src = src;
+          lbImg.alt = alt;
+          apply();
+        }
       }
 
       function closeLightbox() {
-        lb.classList.remove("open");
+        const thumbImg = findThumbImg(lbIndex);
         document.body.style.overflow = "";
+
+        const apply = () => lb.classList.remove("open");
+
+        if (thumbImg && document.startViewTransition) {
+          lbImg.style.viewTransitionName = "lb-photo";
+          const transition = document.startViewTransition(() => {
+            thumbImg.style.viewTransitionName = "lb-photo";
+            apply();
+            lbImg.style.viewTransitionName = "";
+          });
+          transition.updateCallbackDone.catch(() => {});
+          transition.ready.catch(() => {});
+          transition.finished.catch(() => {}).finally(() => {
+            thumbImg.style.viewTransitionName = "";
+          });
+        } else {
+          apply();
+        }
       }
 
       document.getElementById("lbClose").addEventListener("click", closeLightbox);
-      document.getElementById("lbPrev").addEventListener("click", () => showLbIndex(lbIndex - 1));
-      document.getElementById("lbNext").addEventListener("click", () => showLbIndex(lbIndex + 1));
+      document.getElementById("lbPrev").addEventListener("click", () => showLbIndex(lbIndex - 1, -1));
+      document.getElementById("lbNext").addEventListener("click", () => showLbIndex(lbIndex + 1, 1));
 
       window.addEventListener("keydown", (e) => {
         if (!lb.classList.contains("open")) return;
         if (e.key === "Escape") closeLightbox();
-        else if (e.key === "ArrowRight") showLbIndex(lbIndex + 1);
-        else if (e.key === "ArrowLeft") showLbIndex(lbIndex - 1);
+        else if (e.key === "ArrowRight") showLbIndex(lbIndex + 1, 1);
+        else if (e.key === "ArrowLeft") showLbIndex(lbIndex - 1, -1);
       });
 
       let lbTouchX = 0;
@@ -833,7 +972,8 @@
         (e) => {
           const dx = e.changedTouches[0].clientX - lbTouchX;
           if (Math.abs(dx) < 40) return;
-          showLbIndex(lbIndex + (dx < 0 ? 1 : -1));
+          const dir = dx < 0 ? 1 : -1;
+          showLbIndex(lbIndex + dir, dir);
         },
         { passive: true },
       );
