@@ -380,32 +380,39 @@
         opacity: 1;
         pointer-events: auto;
       }
-      /* Two images share this grid cell so they can overlap while one
-         slides out and the other slides in — see .lb-img below. */
+      /* One .lb-item per photo, all absolutely stacked and positioned
+         by JS (layoutLightbox) exactly like the homepage's group
+         carousel: centered active photo, a sliver of its neighbours
+         peeking in at each edge, everything else parked just off-
+         screen at opacity 0. Moving the active index only ever changes
+         each item's target transform/opacity — this transition is what
+         animates the slide, there's no separate JS-driven animation. */
       .lb-stage {
         position: absolute;
         inset: 0;
-        display: grid;
-        place-items: center;
+        overflow: hidden;
+        touch-action: pan-y;
       }
-      .lb-img {
-        grid-area: 1 / 1;
-        max-width: 88vw;
-        max-height: 86vh;
+      .lb-item {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        max-width: 78vw;
+        max-height: 80vh;
         object-fit: contain;
         display: block;
         opacity: 0;
+        transform: translate3d(0, -50%, 0);
         transition:
-          opacity 0.5s var(--ease),
-          transform 0.7s var(--ease);
-      }
-      .lb-img.shown {
-        opacity: 1;
-      }
-      /* The outgoing photo during a next/prev slide — inert, and only
-         ever visible mid-transition (JS drives its transform/opacity). */
-      #lbImgOut {
+          transform 0.7s var(--ease),
+          opacity 0.5s var(--ease);
         pointer-events: none;
+      }
+      /* Suspends the transition above so the initial layout on open
+         (and any resize) can snap items into place instead of sliding
+         in from their untouched default position. */
+      .lb-no-anim .lb-item {
+        transition: none;
       }
       .lb-close,
       .lb-nav {
@@ -492,7 +499,7 @@
         .grid button,
         .grid-thumb img,
         .lb,
-        .lb-img {
+        .lb-item {
           transition: none;
         }
         ::view-transition-group(*),
@@ -522,10 +529,7 @@
     <div class="lb" id="lb">
       <button class="lb-close" id="lbClose">fermer · esc</button>
       <button class="lb-nav prev" id="lbPrev" aria-label="Photo précédente"></button>
-      <div class="lb-stage">
-        <img class="lb-img" id="lbImg" alt="" />
-        <img class="lb-img" id="lbImgOut" alt="" aria-hidden="true" />
-      </div>
+      <div class="lb-stage" id="lbStage"></div>
       <button class="lb-nav next" id="lbNext" aria-label="Photo suivante"></button>
       <div class="lb-counter" id="lbCounter"></div>
     </div>
@@ -813,22 +817,28 @@
       }
 
       // ============================================================
-      // LIGHTBOX — full-bleed single photo, arrow keys, swipe, esc
+      // LIGHTBOX — full-bleed photo viewer, arrow keys, swipe, esc
       //
-      // Opening/closing morphs the clicked thumbnail into the centered
-      // photo (and back) via the View Transitions API's shared-element
-      // matching: both images briefly carry the same view-transition-
-      // name, one in the "old" tree and one in the "new" tree, and the
-      // browser interpolates position/size between them on its own.
-      // Next/prev instead slides two images past each other — a
-      // regular transform animation, not a shared-element match, since
-      // both photos are visible at once mid-swipe.
+      // The photo strip works exactly like the homepage's group
+      // carousel (see index.html): one absolutely-positioned <img> per
+      // photo, all laid out by a single function that only cares about
+      // each item's offset from the active index — centered at 0, a
+      // sliver peeking in at ±1, parked off-screen everywhere else.
+      // Changing the active index just recomputes that layout; the
+      // slide is the CSS transition animating between the old and new
+      // transform, not a JS-driven animation.
+      //
+      // Opening/closing additionally morphs the clicked thumbnail into
+      // the centered photo (and back) via the View Transitions API's
+      // shared-element matching — both images briefly carry the same
+      // view-transition-name, one in the "old" tree and one in the
+      // "new" tree, and the browser interpolates between them.
       // ============================================================
       const lb = document.getElementById("lb");
-      const lbImg = document.getElementById("lbImg");
-      const lbImgOut = document.getElementById("lbImgOut");
+      const lbStage = document.getElementById("lbStage");
       const lbCounter = document.getElementById("lbCounter");
       let lbPhotos = [];
+      let lbItems = []; // one <img> per photo, index-aligned with lbPhotos
       let lbIndex = 0;
 
       // The grid stays mounted under the lightbox, so the thumbnail for
@@ -839,44 +849,107 @@
         return btn ? btn.querySelector("img") : null;
       }
 
-      function showLbIndex(i, dir) {
-        const newIndex = (i + lbPhotos.length) % lbPhotos.length;
-        if (newIndex === lbIndex) return;
-        const goingNext = dir >= 0;
+      function lbSliverWidth() {
+        return window.innerWidth < 700 ? 28 : 48;
+      }
 
-        // Outgoing: freeze what's currently shown into the second
-        // image, right where lbImg is now, so it can slide away while
-        // lbImg swaps to the new photo underneath it.
-        lbImgOut.src = lbImg.src;
-        lbImgOut.alt = lbImg.alt;
-        lbImgOut.style.transition = "none";
-        lbImgOut.style.transform = "translateX(0)";
-        lbImgOut.style.opacity = "1";
-        lbImgOut.classList.add("shown");
+      // Shortest signed distance from `active` to `k`, wrapping around
+      // both ends of the array — so the photo after the last one is
+      // the first, and vice versa, and a sliver is always there to peek
+      // at no matter where in the set the active photo sits.
+      function wrapOffset(k, active, n) {
+        let offset = k - active;
+        if (offset > n / 2) offset -= n;
+        else if (offset < -n / 2) offset += n;
+        return offset;
+      }
 
-        // Incoming: park the new photo off-screen on the entry side,
-        // no transition yet, then release both on the next frame.
-        lbIndex = newIndex;
-        lbImg.style.transition = "none";
-        lbImg.style.transform = "translateX(" + (goingNext ? "100%" : "-100%") + ")";
-        lbImg.src = resolveSrc(lbPhotos[lbIndex]);
-        lbImg.alt = "Photo " + (lbIndex + 1) + " sur " + lbPhotos.length;
-        lbImg.classList.add("shown");
-
-        // Force layout so the "no transition" starting styles commit
-        // before transitions are re-enabled and the resting styles are
-        // applied below — otherwise the browser coalesces all of it
-        // into one paint and nothing slides.
-        void lbImg.offsetWidth;
-        lbImgOut.style.transition = "";
-        lbImg.style.transition = "";
-
-        requestAnimationFrame(() => {
-          lbImgOut.style.transform = "translateX(" + (goingNext ? "-100%" : "100%") + ")";
-          lbImgOut.style.opacity = "0";
-          lbImg.style.transform = "translateX(0)";
+      function layoutLightbox() {
+        const W = lbStage.clientWidth;
+        const S = lbSliverWidth();
+        const n = lbItems.length;
+        lbItems.forEach((img, k) => {
+          const offset = wrapOffset(k, lbIndex, n);
+          const w = img.offsetWidth;
+          let tx, op;
+          if (offset === 0) {
+            tx = (W - w) / 2;
+            op = 1;
+          } else if (offset === 1) {
+            tx = W - S;
+            op = 1;
+          } else if (offset === -1) {
+            tx = S - w;
+            op = 1;
+          } else if (offset > 1) {
+            tx = W + 40;
+            op = 0;
+          } else {
+            tx = -w - 40;
+            op = 0;
+          }
+          img.style.transform = "translate3d(" + tx + "px, -50%, 0)";
+          img.style.opacity = op;
         });
+      }
 
+      // Only the active photo and its immediate neighbours need real
+      // pixels — everything else stays an empty <img> (data-src) until
+      // browsing brings it within range, so opening a 45-photo gallery
+      // doesn't fetch 45 full-resolution photos at once.
+      const LB_PRELOAD = 2;
+      function promoteLightbox() {
+        const n = lbItems.length;
+        lbItems.forEach((img, k) => {
+          if (Math.abs(wrapOffset(k, lbIndex, n)) > LB_PRELOAD) return;
+          if (!img.dataset.src) return;
+          img.src = img.dataset.src;
+          delete img.dataset.src;
+        });
+      }
+
+      function buildLightboxItems(photos) {
+        lbStage.innerHTML = "";
+        lbItems = photos.map((src, k) => {
+          const img = document.createElement("img");
+          img.className = "lb-item";
+          img.alt = "Photo " + (k + 1) + " sur " + photos.length;
+          img.decoding = "async";
+          img.dataset.src = resolveSrc(src);
+          // Position/opacity are computed from the image's own size, which
+          // isn't known until it loads — re-snap once it does, or a photo
+          // that was still fetching settles into place a beat late instead
+          // of landing where it belongs from the start.
+          img.addEventListener(
+            "load",
+            () => {
+              if (lb.classList.contains("open")) layoutLightboxInstant();
+            },
+            { once: true },
+          );
+          lbStage.appendChild(img);
+          return img;
+        });
+      }
+
+      // Snaps everything into its target position/opacity with no
+      // transition (used on open and on resize), instead of letting it
+      // slide in from each item's untouched default position.
+      function layoutLightboxInstant() {
+        lbStage.classList.add("lb-no-anim");
+        layoutLightbox();
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => lbStage.classList.remove("lb-no-anim")),
+        );
+      }
+
+      function showLbIndex(i) {
+        const n = lbPhotos.length;
+        const next = ((i % n) + n) % n;
+        if (next === lbIndex) return;
+        lbIndex = next;
+        promoteLightbox();
+        layoutLightbox();
         lbCounter.textContent = lbIndex + 1 + " / " + lbPhotos.length;
       }
 
@@ -885,27 +958,20 @@
         lbIndex = (i + photos.length) % photos.length;
         document.body.style.overflow = "hidden";
 
-        const src = resolveSrc(lbPhotos[lbIndex]);
-        const alt = "Photo " + (lbIndex + 1) + " sur " + lbPhotos.length;
+        buildLightboxItems(photos);
+        promoteLightbox();
+        const activeImg = lbItems[lbIndex];
 
         const apply = () => {
           lb.classList.add("open");
-          lbImg.style.transform = "";
-          lbImg.classList.add("shown");
+          layoutLightboxInstant();
           lbCounter.textContent = lbIndex + 1 + " / " + lbPhotos.length;
         };
 
         if (thumbImg && document.startViewTransition) {
           thumbImg.style.viewTransitionName = "lb-photo";
-          // Not awaiting decode() here on purpose: the update callback
-          // has its own spec'd timeout, and a slow/stalled decode would
-          // abort the whole transition rather than just its animation —
-          // it's the same file the thumbnail already displayed, so it's
-          // already decoded from cache in practice.
           const transition = document.startViewTransition(() => {
-            lbImg.src = src;
-            lbImg.alt = alt;
-            lbImg.style.viewTransitionName = "lb-photo";
+            activeImg.style.viewTransitionName = "lb-photo";
             apply();
             thumbImg.style.viewTransitionName = "";
           });
@@ -916,27 +982,26 @@
           transition.updateCallbackDone.catch(() => {});
           transition.ready.catch(() => {});
           transition.finished.catch(() => {}).finally(() => {
-            lbImg.style.viewTransitionName = "";
+            activeImg.style.viewTransitionName = "";
           });
         } else {
-          lbImg.src = src;
-          lbImg.alt = alt;
           apply();
         }
       }
 
       function closeLightbox() {
         const thumbImg = findThumbImg(lbIndex);
+        const activeImg = lbItems[lbIndex];
         document.body.style.overflow = "";
 
         const apply = () => lb.classList.remove("open");
 
-        if (thumbImg && document.startViewTransition) {
-          lbImg.style.viewTransitionName = "lb-photo";
+        if (thumbImg && activeImg && document.startViewTransition) {
+          activeImg.style.viewTransitionName = "lb-photo";
           const transition = document.startViewTransition(() => {
             thumbImg.style.viewTransitionName = "lb-photo";
             apply();
-            lbImg.style.viewTransitionName = "";
+            activeImg.style.viewTransitionName = "";
           });
           transition.updateCallbackDone.catch(() => {});
           transition.ready.catch(() => {});
@@ -949,14 +1014,14 @@
       }
 
       document.getElementById("lbClose").addEventListener("click", closeLightbox);
-      document.getElementById("lbPrev").addEventListener("click", () => showLbIndex(lbIndex - 1, -1));
-      document.getElementById("lbNext").addEventListener("click", () => showLbIndex(lbIndex + 1, 1));
+      document.getElementById("lbPrev").addEventListener("click", () => showLbIndex(lbIndex - 1));
+      document.getElementById("lbNext").addEventListener("click", () => showLbIndex(lbIndex + 1));
 
       window.addEventListener("keydown", (e) => {
         if (!lb.classList.contains("open")) return;
         if (e.key === "Escape") closeLightbox();
-        else if (e.key === "ArrowRight") showLbIndex(lbIndex + 1, 1);
-        else if (e.key === "ArrowLeft") showLbIndex(lbIndex - 1, -1);
+        else if (e.key === "ArrowRight") showLbIndex(lbIndex + 1);
+        else if (e.key === "ArrowLeft") showLbIndex(lbIndex - 1);
       });
 
       let lbTouchX = 0;
@@ -972,11 +1037,16 @@
         (e) => {
           const dx = e.changedTouches[0].clientX - lbTouchX;
           if (Math.abs(dx) < 40) return;
-          const dir = dx < 0 ? 1 : -1;
-          showLbIndex(lbIndex + dir, dir);
+          showLbIndex(lbIndex + (dx < 0 ? 1 : -1));
         },
         { passive: true },
       );
+
+      // Keeps the carousel's pixel-based layout correct across
+      // orientation changes / window resizes while it's open.
+      window.addEventListener("resize", () => {
+        if (lb.classList.contains("open")) layoutLightboxInstant();
+      });
 
       // ============================================================
       // HEADER HIDE ON SCROLL — same behaviour as the other pages
