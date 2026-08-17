@@ -272,7 +272,11 @@ var SITE_CONFIG = {
       "photos": [
         "images/ile-tudy-2026/1-MEL_4829.jpg",
         "images/ile-tudy-2026/2-MEL_4821.jpg",
-        "images/ile-tudy-2026/3-MEL_4796.jpg"
+        "images/ile-tudy-2026/3-MEL_4796.jpg",
+        "images/ile-tudy-2026/1-MEL_4919.jpg",
+        "images/ile-tudy-2026/2-MEL_4873.jpg",
+        "images/ile-tudy-2026/3-MEL_4868.jpg",
+        "images/ile-tudy-2026/4-IMG_9974.jpg"
       ]
     },
     "berlin-2026": {
