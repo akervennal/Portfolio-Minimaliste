@@ -917,13 +917,21 @@
           img.decoding = "async";
           img.dataset.src = resolveSrc(src);
           // Position/opacity are computed from the image's own size, which
-          // isn't known until it loads — re-snap once it does, or a photo
-          // that was still fetching settles into place a beat late instead
-          // of landing where it belongs from the start.
+          // isn't known until it loads — re-run the (animated) layout once
+          // it does, or a photo that was still fetching settles into place
+          // a beat late instead of landing where it belongs from the
+          // start. Deliberately NOT the instant/no-anim version: that
+          // forces transition:none on every item for a couple of frames,
+          // and if a load happens to land mid-swipe it freezes whatever
+          // slide is currently in flight — the swipe reads as instant
+          // instead of animated. A plain re-layout only changes the
+          // transform of the item whose size just became known; every
+          // other item gets the same target it already had, which is a
+          // no-op for an in-progress transition, not an interruption.
           img.addEventListener(
             "load",
             () => {
-              if (lb.classList.contains("open")) layoutLightboxInstant();
+              if (lb.classList.contains("open")) layoutLightbox();
             },
             { once: true },
           );
