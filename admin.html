@@ -1,1618 +1,1345 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Photo Manager — Portfolio</title>
-  <style>
-    :root {
-      --bg:     #0a0a0a;
-      --bg2:    #141414;
-      --bg3:    #1e1e1e;
-      --bg4:    #262626;
-      --text:   #f0ede4;
-      --muted:  #8a857c;
-      --faint:  #3a3830;
-      --border: rgba(240, 237, 228, 0.1);
-      --border2: rgba(240, 237, 228, 0.18);
-      --accent: #c8b89a;
-      --danger: #c47a6e;
-    }
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      font-size: 13px;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── OVERLAY ──────────────────────────────────────────── */
-    #overlay {
-      position: fixed; inset: 0;
-      background:
-        radial-gradient(ellipse 900px 600px at 50% 0%, rgba(200,184,154,0.07), transparent 60%),
-        var(--bg);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 18px; z-index: 200;
-    }
-    .overlay-mark {
-      width: 34px; height: 34px; border: 1px solid var(--border2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; letter-spacing: 0.02em; color: var(--accent);
-      margin-bottom: 4px;
-    }
-    #overlay h1 { font-size: 19px; font-weight: 400; letter-spacing: 0.03em; }
-    #overlay p  { color: var(--muted); font-size: 12px; text-align: center; line-height: 1.8; max-width: 320px; }
-    #overlayFolder {
-      font-size: 11px; color: var(--accent); letter-spacing: 0.04em;
-      border: 1px solid var(--border); padding: 5px 12px; margin-top: -4px;
-    }
-    .open-btn {
-      padding: 12px 36px;
-      border: 1px solid var(--border2);
-      background: none; color: var(--text);
-      font-size: 11px; letter-spacing: 0.15em;
-      text-transform: uppercase; cursor: pointer;
-      transition: all 0.18s; font-family: inherit;
-    }
-    .open-btn:hover { background: var(--text); color: var(--bg); border-color: var(--text); }
-    .open-btn.secondary {
-      border-color: transparent; color: var(--muted); padding: 8px 20px;
-      font-size: 10px; margin-top: -6px;
-    }
-    .open-btn.secondary:hover { background: none; color: var(--text); text-decoration: underline; }
-    #errMsg { color: var(--danger); font-size: 11px; display: none; max-width: 400px; text-align: center; }
-
-    /* ── APP SHELL ────────────────────────────────────────── */
-    #app { display: none; flex-direction: column; height: 100vh; }
-    #app.on { display: flex; }
-
-    /* ── HEADER ──────────────────────────────────────────── */
-    .hdr {
-      display: flex; align-items: center; gap: 16px;
-      padding: 0 20px; height: 50px; flex-shrink: 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .hdr-mark {
-      width: 20px; height: 20px; border: 1px solid var(--border2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 10px; color: var(--accent); flex-shrink: 0;
-    }
-    .hdr-title { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
-    .hdr-folder {
-      font-size: 10px; color: var(--faint); letter-spacing: 0.03em;
-      padding-left: 14px; border-left: 1px solid var(--border);
-    }
-    .tabs { display: flex; gap: 2px; margin-left: 8px; }
-    .tab {
-      padding: 7px 18px; font-size: 11px;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      cursor: pointer; border: 1px solid transparent;
-      background: none; color: var(--muted);
-      transition: all 0.15s; font-family: inherit;
-    }
-    .tab:hover { color: var(--text); }
-    .tab.on { color: var(--text); border-color: var(--border); background: var(--bg2); }
-    .spacer { flex: 1; }
-    #saveBtn {
-      padding: 9px 24px; background: var(--text); color: var(--bg);
-      border: none; font-size: 11px; letter-spacing: 0.12em;
-      text-transform: uppercase; cursor: pointer; font-family: inherit;
-      transition: opacity 0.15s;
-    }
-    #saveBtn:hover { opacity: 0.85; }
-    #saveBtn:active { opacity: 0.7; }
-
-    .btn-ghost {
-      padding: 7px 14px; border: 1px solid var(--border2); background: none;
-      color: var(--muted); font-size: 10px; letter-spacing: 0.08em;
-      text-transform: uppercase; cursor: pointer; font-family: inherit;
-      transition: all 0.15s; white-space: nowrap;
-    }
-    .btn-ghost:hover { color: var(--text); border-color: var(--text); }
-    .btn-ghost.small { padding: 5px 10px; font-size: 9px; }
-    .btn-ghost.danger:hover { color: var(--danger); border-color: var(--danger); }
-
-    /* ── PANELS ──────────────────────────────────────────── */
-    .panel { display: none; flex: 1; flex-direction: column; overflow: hidden; }
-    .panel.on { display: flex; }
-
-    /* ── HOME PANEL ──────────────────────────────────────── */
-    .home-main { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-
-    /* ── PROJECT PANEL ───────────────────────────────────── */
-    .proj-bar {
-      display: flex; align-items: center; gap: 14px;
-      padding: 12px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
-    }
-    .proj-bar label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
-    #projSel {
-      background: var(--bg2); border: 1px solid var(--border);
-      color: var(--text); padding: 6px 10px; font-size: 12px;
-      font-family: inherit; cursor: pointer; flex: 1; max-width: 380px;
-    }
-    .proj-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-
-    /* ── CONTENT PANEL ───────────────────────────────────── */
-    .content-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
-    .content-list { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-    .content-row { display: flex; gap: 8px; align-items: flex-start; }
-    .content-row textarea {
-      flex: 1; min-height: 54px; resize: vertical;
-      background: var(--bg2); border: 1px solid var(--border);
-      color: var(--text); padding: 8px 10px; font-size: 12px;
-      font-family: inherit; line-height: 1.5;
-    }
-    .content-row textarea:focus { outline: none; border-color: var(--border2); }
-    .rm-text {
-      width: 24px; height: 24px; flex-shrink: 0; background: none;
-      border: 1px solid var(--border); color: var(--muted); font-size: 14px;
-      cursor: pointer; font-family: inherit; transition: all 0.15s;
-    }
-    .rm-text:hover { color: var(--danger); border-color: var(--danger); }
-    .gear-card {
-      border: 1px solid var(--border); padding: 12px; display: flex;
-      flex-direction: column; gap: 8px; background: var(--bg2);
-    }
-    .gear-card input {
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text); padding: 7px 10px; font-size: 12px; font-family: inherit;
-    }
-    .gear-card input:focus { outline: none; border-color: var(--border2); }
-    .gear-card input::placeholder, .content-row textarea::placeholder { color: var(--faint); }
-    .field-row { display: flex; flex-direction: column; gap: 5px; padding: 0 14px 10px; }
-    .field-row:first-child { padding-top: 10px; }
-    .field-row label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
-    .field-row input, .field-row textarea {
-      background: var(--bg2); border: 1px solid var(--border);
-      color: var(--text); padding: 8px 10px; font-size: 12px; font-family: inherit;
-    }
-    .field-row textarea { min-height: 54px; resize: vertical; line-height: 1.5; }
-    .field-row input:focus, .field-row textarea:focus { outline: none; border-color: var(--border2); }
-
-    /* ── SECTION BLOCK ───────────────────────────────────── */
-    .sblock { border: 1px solid var(--border); }
-    .sblock-head {
-      padding: 9px 14px; display: flex; align-items: center; gap: 10px;
-      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--muted); border-bottom: 1px solid var(--border);
-    }
-    .sblock-count { background: var(--bg3); padding: 2px 7px; font-size: 9px; border-radius: 2px; }
-    .sblock-hint  { font-size: 9px; color: var(--faint); margin-left: auto; letter-spacing: 0.1em; }
-
-    .sblock-body {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      padding: 10px; min-height: 78px; transition: background 0.15s;
-    }
-    .sblock-body.over {
-      background: rgba(200, 184, 154, 0.06);
-      outline: 1px dashed rgba(200, 184, 154, 0.5);
-      outline-offset: -4px;
-    }
-
-    /* ── CARD (section) ──────────────────────────────────── */
-    .card {
-      position: relative; width: 90px; flex-shrink: 0;
-      cursor: grab; border: 1px solid transparent; transition: border-color 0.15s;
-      user-select: none;
-    }
-    .card:hover  { border-color: var(--border2); }
-    .card.ghost  { opacity: 0.25; }
-    .card.drop-over {
-      outline: 1px dashed rgba(200, 184, 154, 0.7);
-      outline-offset: -3px;
-    }
-    .card.insert-before::before {
-      content: ''; position: absolute; left: -5px; top: 0; bottom: 0;
-      width: 3px; background: var(--accent); z-index: 10; border-radius: 2px;
-    }
-    .card img {
-      width: 90px; height: auto; display: block;
-      background: var(--bg3);
-      -webkit-user-drag: none;
-    }
-    .card-cap {
-      width: 100%; background: var(--bg2); border: none;
-      border-top: 1px solid var(--border); color: var(--muted);
-      font-size: 9px; padding: 4px 6px; font-family: inherit;
-    }
-    .card-cap:focus { outline: none; color: var(--text); background: var(--bg3); }
-    .card-cap::placeholder { color: var(--faint); }
-    .rm {
-      position: absolute; top: 2px; right: 2px;
-      width: 18px; height: 18px; background: rgba(10,10,10,0.85);
-      border: none; color: var(--muted); font-size: 14px; line-height: 1;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity 0.15s; font-family: inherit; border-radius: 1px;
-    }
-    .card:hover .rm { opacity: 1; }
-    .rm:hover { color: var(--text); }
-    .cover-badge {
-      position: absolute; bottom: 2px; left: 2px;
-      background: rgba(200, 184, 154, 0.92); color: #0a0a0a;
-      font-size: 7px; letter-spacing: 0.12em; text-transform: uppercase;
-      padding: 2px 5px; pointer-events: none; border-radius: 1px;
-    }
-    .set-cover {
-      position: absolute; bottom: 2px; left: 2px;
-      background: rgba(10,10,10,0.85); border: none;
-      color: var(--muted); font-size: 9px; letter-spacing: 0.08em;
-      text-transform: uppercase; padding: 2px 5px; cursor: pointer;
-      opacity: 0; transition: opacity 0.15s; font-family: inherit;
-      border-radius: 1px;
-    }
-    .card:hover .set-cover { opacity: 1; }
-
-    /* ── POOL ────────────────────────────────────────────── */
-    .pool {
-      border-top: 1px solid var(--border); flex-shrink: 0;
-      max-height: 185px; display: flex; flex-direction: column;
-    }
-    .pool-head {
-      padding: 8px 14px; flex-shrink: 0;
-      font-size: 10px; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--muted);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .pool-count { font-size: 9px; color: var(--faint); }
-    .pool-strip {
-      display: flex; flex-wrap: nowrap; gap: 6px;
-      padding: 4px 10px 10px; overflow-x: auto; flex: 1;
-      transition: background 0.15s;
-    }
-    .pool-strip.over {
-      background: rgba(200, 184, 154, 0.06);
-      outline: 1px dashed rgba(200, 184, 154, 0.5);
-      outline-offset: -4px;
-    }
-    .pool-strip::-webkit-scrollbar { height: 3px; }
-    .pool-strip::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 2px; }
-
-    .pcard {
-      width: 76px; flex-shrink: 0; cursor: grab;
-      opacity: 0.6; transition: opacity 0.15s; user-select: none;
-    }
-    .pcard:hover { opacity: 1; }
-    .pcard img {
-      width: 76px; height: auto; display: block;
-      background: var(--bg3); border: 1px solid transparent; transition: border-color 0.15s;
-    }
-    .pcard:hover img { border-color: var(--border); }
-    .pcard-name {
-      font-size: 8px; color: var(--faint); padding: 3px 1px;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 76px;
-    }
-
-    /* ── MISC ────────────────────────────────────────────── */
-    .empty {
-      font-size: 10px; color: var(--faint); letter-spacing: 0.1em;
-      text-transform: uppercase; padding: 16px 8px; align-self: center;
-    }
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 2px; }
-
-    /* ── MODAL ───────────────────────────────────────────── */
-    .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(10,10,10,0.75);
-      display: none; align-items: center; justify-content: center; z-index: 300;
-    }
-    .modal-backdrop.on { display: flex; }
-    .modal {
-      width: 340px; background: var(--bg2); border: 1px solid var(--border2);
-      padding: 22px; display: flex; flex-direction: column; gap: 12px;
-    }
-    .modal h3 { font-size: 13px; font-weight: 400; letter-spacing: 0.05em; margin-bottom: 2px; }
-    .modal label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); display: block; margin-bottom: 5px; }
-    .modal input {
-      width: 100%; background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text); padding: 8px 10px; font-size: 12px; font-family: inherit;
-    }
-    .modal input:focus { outline: none; border-color: var(--border2); }
-    .modal-field { display: flex; flex-direction: column; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
-    .modal-err { font-size: 10px; color: var(--danger); display: none; }
-
-    /* ── TOASTS ──────────────────────────────────────────── */
-    #toastHost {
-      position: fixed; bottom: 18px; right: 18px; z-index: 400;
-      display: flex; flex-direction: column-reverse; gap: 8px; align-items: flex-end;
-    }
-    .toast {
-      background: var(--bg3); border: 1px solid var(--border2); color: var(--text);
-      font-size: 11px; letter-spacing: 0.03em; padding: 10px 16px;
-      opacity: 0; transform: translateY(6px); transition: all 0.25s;
-      max-width: 320px;
-    }
-    .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.error { border-color: rgba(196, 122, 110, 0.6); color: var(--danger); }
-  </style>
-</head>
-<body>
-
-<!-- ── OVERLAY ─────────────────────────────────────────────────────────── -->
-<div id="overlay">
-  <div class="overlay-mark">PM</div>
-  <h1 id="overlayTitle">Photo Manager</h1>
-  <p id="overlaySubtitle">Ouvre le dossier racine du portfolio.<br>Fonctionne sur Chrome / Edge uniquement.</p>
-  <span id="overlayFolder" style="display:none"></span>
-  <button class="open-btn" id="openBtn">Ouvrir le dossier</button>
-  <button class="open-btn secondary" id="switchBtn" style="display:none">Choisir un autre dossier</button>
-  <span id="errMsg"></span>
-</div>
-
-<!-- ── APP ─────────────────────────────────────────────────────────────── -->
-<div id="app">
-  <header class="hdr">
-    <span class="hdr-mark">PM</span>
-    <span class="hdr-title">Photo Manager</span>
-    <span class="hdr-folder" id="hdrFolder"></span>
-    <div class="tabs">
-      <button class="tab on" data-panel="home">Accueil</button>
-      <button class="tab"    data-panel="proj">Projets</button>
-      <button class="tab"    data-panel="content">Contenu</button>
-    </div>
-    <span class="spacer"></span>
-    <button id="saveBtn">Enregistrer</button>
-  </header>
-
-  <!-- Homepage panel -->
-  <div class="panel on" id="panel-home">
-    <div class="home-main" id="homeMain"></div>
-    <div class="pool">
-      <div class="pool-head">
-        Pool — images/showcase
-        <span class="pool-count" id="poolCount"></span>
-        <span class="spacer"></span>
-        <button class="btn-ghost small" id="poolUploadBtn">+ Importer des photos</button>
-      </div>
-      <div class="pool-strip" id="poolStrip"></div>
-    </div>
-  </div>
-
-  <!-- Projects panel -->
-  <div class="panel" id="panel-proj">
-    <div class="proj-bar">
-      <label>Projet</label>
-      <select id="projSel"><option value="">— sélectionner —</option></select>
-      <button class="btn-ghost" id="newProjBtn">+ Nouveau projet</button>
-    </div>
-    <div class="proj-body" id="projBody">
-      <span class="empty">Sélectionne un projet</span>
-    </div>
-  </div>
-
-  <!-- Content panel -->
-  <div class="panel" id="panel-content">
-    <div class="content-body" id="contentBody"></div>
-  </div>
-</div>
-
-<!-- ── NEW PROJECT MODAL ─────────────────────────────────────────────── -->
-<div class="modal-backdrop" id="newProjModal">
-  <div class="modal">
-    <h3>Nouveau projet</h3>
-    <div class="modal-field">
-      <label>Titre</label>
-      <input id="npTitle" type="text" placeholder="ex. 24h du Mans">
-    </div>
-    <div class="modal-field">
-      <label>Date</label>
-      <input id="npDate" type="text" placeholder="ex. Juin 2026">
-    </div>
-    <div class="modal-field">
-      <label>Lieu</label>
-      <input id="npLocation" type="text" placeholder="ex. Sarthe">
-    </div>
-    <span class="modal-err" id="npErr"></span>
-    <div class="modal-actions">
-      <button class="btn-ghost" id="npCancel">Annuler</button>
-      <button class="open-btn" id="npCreate" style="padding:9px 22px">Créer</button>
-    </div>
-  </div>
-</div>
-
-<div id="toastHost"></div>
-
-<input type="file" id="sharedFileInput" accept="image/*" multiple style="display:none">
-
-<script>
-// ─── STATE ────────────────────────────────────────────────────────────────
-let cfg          = null;
-let root         = null;
-let storedHandle = null;
-let thumbs       = {};       // { path: objectURL }
-let poolFiles    = [];       // all src paths under images/showcase/
-let projFiles    = {};       // { id: [srcPath] }
-let projFolder   = {};       // { id: encodedFolderPath }
-let aboutFiles   = [];       // all src paths under images/a-propos/
-let drag         = null;     // active drag payload
-
-// ─── TOASTS ───────────────────────────────────────────────────────────────
-function toast(msg, isError) {
-  const host = document.getElementById('toastHost');
-  const el = document.createElement('div');
-  el.className = 'toast' + (isError ? ' error' : '');
-  el.textContent = msg;
-  host.appendChild(el);
-  requestAnimationFrame(() => el.classList.add('show'));
-  setTimeout(() => {
-    el.classList.remove('show');
-    setTimeout(() => el.remove(), 300);
-  }, isError ? 4200 : 2200);
-}
-
-// ─── INDEXEDDB (remember the opened folder) ────────────────────────────────
-const IDB_NAME  = 'portfolio-admin';
-const IDB_STORE = 'handles';
-
-function idbOpen() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(IDB_NAME, 1);
-    req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror   = () => reject(req.error);
-  });
-}
-async function idbSaveHandle(handle) {
-  const db = await idbOpen();
-  await new Promise((resolve, reject) => {
-    const tx = db.transaction(IDB_STORE, 'readwrite');
-    tx.objectStore(IDB_STORE).put(handle, 'root');
-    tx.oncomplete = resolve;
-    tx.onerror = () => reject(tx.error);
-  });
-}
-async function idbLoadHandle() {
-  const db = await idbOpen();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(IDB_STORE, 'readonly');
-    const req = tx.objectStore(IDB_STORE).get('root');
-    req.onsuccess = () => resolve(req.result || null);
-    req.onerror   = () => reject(req.error);
-  });
-}
-
-// ─── FILE SYSTEM ──────────────────────────────────────────────────────────
-async function resolveFile(path) {
-  const parts = path.split('/').filter(Boolean);
-  let h = root;
-  for (let i = 0; i < parts.length - 1; i++) {
-    h = await h.getDirectoryHandle(decodeURIComponent(parts[i])).catch(() => null);
-    if (!h) return null;
-  }
-  return h.getFileHandle(decodeURIComponent(parts[parts.length - 1])).catch(() => null);
-}
-
-async function resolveDir(path, create) {
-  const parts = path.split('/').filter(Boolean);
-  let h = root;
-  for (const p of parts) {
-    h = await h.getDirectoryHandle(decodeURIComponent(p), { create: !!create }).catch(() => null);
-    if (!h) return null;
-  }
-  return h;
-}
-
-async function scanDir(encodedPath) {
-  const dh = await resolveDir(encodedPath);
-  if (!dh) return [];
-  const out = [];
-  for await (const [name, h] of dh.entries()) {
-    if (h.kind === 'file' && /\.(jpg|jpeg|png|webp)$/i.test(name)) {
-      out.push(`${encodedPath}/${name}`);
-    } else if (h.kind === 'directory') {
-      out.push(...await scanDir(`${encodedPath}/${encodeURIComponent(name)}`));
-    }
-  }
-  return out.sort();
-}
-
-async function thumb(src) {
-  if (thumbs[src]) return thumbs[src];
-  const fh = await resolveFile(src);
-  if (!fh) return '';
-  const url = URL.createObjectURL(await fh.getFile());
-  thumbs[src] = url;
-  return url;
-}
-
-async function readCfg() {
-  const fh = await resolveFile('photos-config.js');
-  if (!fh) throw new Error('photos-config.js introuvable dans ce dossier');
-  const text = await (await fh.getFile()).text();
-  const json = text.replace(/^var PORTFOLIO_CONFIG\s*=\s*/, '').replace(/;\s*$/, '');
-  return JSON.parse(json);
-}
-
-async function writeCfg() {
-  const fh = await root.getFileHandle('photos-config.js', { create: false });
-  const w  = await fh.createWritable();
-  await w.write(`var PORTFOLIO_CONFIG = ${JSON.stringify(cfg, null, 2)};\n`);
-  await w.close();
-}
-
-function projectFolderPath(p) {
-  if (p.folder) return p.folder;
-  if (p.photos && p.photos[0]) return p.photos[0].split('/').slice(0, -1).join('/');
-  return null;
-}
-
-// ─── UPLOAD ───────────────────────────────────────────────────────────────
-async function uploadFilesToFolder(folderPath, fileList) {
-  const dir = await resolveDir(folderPath, true);
-  if (!dir) throw new Error('Dossier introuvable : ' + folderPath);
-  let count = 0;
-  for (const file of fileList) {
-    if (!/\.(jpe?g|png|webp)$/i.test(file.name)) continue;
-    let name = file.name;
-    const exists = async (n) => dir.getFileHandle(n).then(() => true).catch(() => false);
-    if (await exists(name)) {
-      const dot  = name.lastIndexOf('.');
-      const base = dot > -1 ? name.slice(0, dot) : name;
-      const ext  = dot > -1 ? name.slice(dot) : '';
-      let i = 2, candidate;
-      do { candidate = `${base}-${i}${ext}`; i++; } while (await exists(candidate));
-      name = candidate;
-    }
-    const fh = await dir.getFileHandle(name, { create: true });
-    const w  = await fh.createWritable();
-    await w.write(file);
-    await w.close();
-    count++;
-  }
-  return count;
-}
-
-async function uploadSingleFile(folderPath, file) {
-  const dir = await resolveDir(folderPath, true);
-  if (!dir) throw new Error('Dossier introuvable : ' + folderPath);
-  let name = file.name;
-  const exists = async (n) => dir.getFileHandle(n).then(() => true).catch(() => false);
-  if (await exists(name)) {
-    const dot  = name.lastIndexOf('.');
-    const base = dot > -1 ? name.slice(0, dot) : name;
-    const ext  = dot > -1 ? name.slice(dot) : '';
-    let i = 2, candidate;
-    do { candidate = `${base}-${i}${ext}`; i++; } while (await exists(candidate));
-    name = candidate;
-  }
-  const fh = await dir.getFileHandle(name, { create: true });
-  const w  = await fh.createWritable();
-  await w.write(file);
-  await w.close();
-  return `${folderPath}/${name}`;
-}
-
-function triggerSingleUpload(folderPath, onPicked) {
-  const input = document.getElementById('sharedFileInput');
-  const prevMultiple = input.multiple;
-  input.multiple = false;
-  input.onchange = async () => {
-    input.multiple = prevMultiple;
-    const file = input.files[0];
-    input.value = '';
-    if (!file) return;
-    if (!/\.(jpe?g|png|webp)$/i.test(file.name)) {
-      toast('Format d\'image non supporté', true);
-      return;
-    }
-    try {
-      const path = await uploadSingleFile(folderPath, file);
-      delete thumbs[path];
-      await onPicked(path);
-    } catch (err) {
-      toast('Erreur import : ' + err.message, true);
-    }
-  };
-  input.click();
-}
-
-function triggerUpload(folderPath, onDone) {
-  const input = document.getElementById('sharedFileInput');
-  input.onchange = async () => {
-    const files = [...input.files];
-    input.value = '';
-    if (!files.length) return;
-    try {
-      const count = await uploadFilesToFolder(folderPath, files);
-      await onDone();
-      toast(count ? `${count} photo(s) importée(s)` : 'Aucune image valide sélectionnée', !count);
-    } catch (err) {
-      toast('Erreur import : ' + err.message, true);
-    }
-  };
-  input.click();
-}
-
-function attachUploadDropzone(el, getFolderPath, onDone) {
-  el.addEventListener('dragover', (e) => {
-    if (!isFileDrag(e)) return;
-    e.preventDefault();
-    el.classList.add('over');
-  });
-  el.addEventListener('dragleave', (e) => {
-    if (!el.contains(e.relatedTarget)) el.classList.remove('over');
-  });
-  el.addEventListener('drop', async (e) => {
-    if (!isFileDrag(e)) return;
-    e.preventDefault();
-    el.classList.remove('over');
-    const files = [...e.dataTransfer.files];
-    if (!files.length) return;
-    try {
-      const count = await uploadFilesToFolder(getFolderPath(), files);
-      await onDone();
-      toast(count ? `${count} photo(s) importée(s)` : 'Aucune image valide déposée', !count);
-    } catch (err) {
-      toast('Erreur import : ' + err.message, true);
-    }
-  });
-}
-
-// ─── SLUG / NEW PROJECT ─────────────────────────────────────────────────────
-function slugify(s) {
-  const stripped = s.toString().normalize('NFD')
-    .split('')
-    .filter(ch => { const c = ch.charCodeAt(0); return c < 0x0300 || c > 0x036f; })
-    .join('');
-  return stripped
-    .toLowerCase().trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-async function createProject(title, date, location) {
-  const yearMatch = date.match(/\d{4}/);
-  const year = yearMatch ? yearMatch[0] : String(new Date().getFullYear());
-  const base = slugify(title) + '-' + year;
-  let slug = base, n = 2;
-  while (cfg.projects[slug]) { slug = `${base}-${n}`; n++; }
-
-  const imagesDir = await root.getDirectoryHandle('images', { create: true });
-  await imagesDir.getDirectoryHandle(slug, { create: true });
-
-  const entry = {
-    title, date, dateLong: date, year, location,
-    folder: `images/${slug}`,
-    photos: []
-  };
-  cfg.projects = { [slug]: entry, ...cfg.projects };
-  projFiles[slug]  = [];
-  projFolder[slug] = `images/${slug}`;
-  return slug;
-}
-
-// ─── INIT ─────────────────────────────────────────────────────────────────
-async function init() {
-  cfg = await readCfg();
-  if (!cfg.content) cfg.content = {};
-  if (!cfg.content.about) cfg.content.about = { approche: [], gear: [] };
-  if (!cfg.content.about.approche) cfg.content.about.approche = [];
-  if (!cfg.content.about.gear) cfg.content.about.gear = [];
-  if (!cfg.content.about.hero) cfg.content.about.hero = '';
-  if (!cfg.content.about.heroMobile) cfg.content.about.heroMobile = '';
-  if (!cfg.content.about.portrait) cfg.content.about.portrait = '';
-  if (!cfg.content.about.quote) cfg.content.about.quote = '';
-  if (!cfg.content.about.quoteAuthor) cfg.content.about.quoteAuthor = '';
-  if (!cfg.content.contact) cfg.content.contact = {};
-
-  document.getElementById('hdrFolder').textContent = root.name || '';
-
-  // Scan showcase pool
-  poolFiles = await scanDir('images/showcase');
-  document.getElementById('poolCount').textContent = `(${poolFiles.length})`;
-
-  // Scan about-page media pool
-  aboutFiles = await scanDir(ABOUT_MEDIA_FOLDER);
-
-  // Scan each project's folder
-  projFiles = {};
-  projFolder = {};
-  for (const [id, p] of Object.entries(cfg.projects)) {
-    const folder = projectFolderPath(p);
-    if (!folder) { projFiles[id] = []; continue; }
-    projFolder[id] = folder;
-    projFiles[id] = await scanDir(folder);
-  }
-
-  renderProjSelector();
-  renderHome();
-  renderPool();
-  renderContent();
-}
-
-function renderProjSelector() {
-  const sel = document.getElementById('projSel');
-  const prev = sel.value;
-  sel.innerHTML = '<option value="">— sélectionner —</option>';
-  for (const [id, p] of Object.entries(cfg.projects)) {
-    const o = document.createElement('option');
-    o.value = id;
-    o.textContent = `${p.title} · ${p.date}`;
-    sel.appendChild(o);
-  }
-  if (prev && cfg.projects[prev]) sel.value = prev;
-}
-
-// ─── POOL ─────────────────────────────────────────────────────────────────
-function renderPool() {
-  const strip = document.getElementById('poolStrip');
-  strip.innerHTML = '';
-  for (const src of poolFiles) {
-    const card = document.createElement('div');
-    card.className = 'pcard';
-    card.draggable = true;
-    const img  = document.createElement('img');
-    img.draggable = false;
-    const name = document.createElement('div');
-    name.className = 'pcard-name';
-    name.textContent = src.split('/').pop();
-    card.append(img, name);
-    thumb(src).then(u => { if (u) img.src = u; });
-    card.addEventListener('dragstart', e => {
-      drag = { from: 'pool', src };
-      e.dataTransfer.effectAllowed = 'copy';
-      e.dataTransfer.setData('text/plain', src);
-    });
-    strip.appendChild(card);
-  }
-}
-
-document.getElementById('poolUploadBtn').addEventListener('click', () => {
-  triggerUpload('images/showcase', async () => {
-    poolFiles = await scanDir('images/showcase');
-    document.getElementById('poolCount').textContent = `(${poolFiles.length})`;
-    renderPool();
-  });
-});
-
-attachUploadDropzone(
-  document.getElementById('poolStrip'),
-  () => 'images/showcase',
-  async () => {
-    poolFiles = await scanDir('images/showcase');
-    document.getElementById('poolCount').textContent = `(${poolFiles.length})`;
-    renderPool();
-  }
-);
-
-// ─── HOME SECTIONS ────────────────────────────────────────────────────────
-const HOME_SECTIONS = [
-  { key: 'heroPhotos',       label: 'Hero — Paysage',  hint: 'desktop', captions: true  },
-  { key: 'heroPhotosMobile', label: 'Hero — Portrait', hint: 'mobile',  captions: true  },
-  { key: 'showcasePhotos',   label: 'Grille accueil',  hint: '',        captions: false },
-];
-
-function renderHome() {
-  const main = document.getElementById('homeMain');
-  main.innerHTML = '';
-  for (const s of HOME_SECTIONS) {
-    main.appendChild(buildSection(s.key, s.label, s.hint, s.captions, cfg[s.key]));
-  }
-}
-
-function buildSection(key, label, hint, showCaptions, items) {
-  const block = document.createElement('div');
-  block.className = 'sblock';
-
-  const head = document.createElement('div');
-  head.className = 'sblock-head';
-  head.innerHTML = `${label} <span class="sblock-count" id="cnt-${key}">${items.length}</span>` +
-    (hint ? `<span class="sblock-hint">${hint}</span>` : '');
-  block.appendChild(head);
-
-  const body = document.createElement('div');
-  body.className = 'sblock-body';
-  body.dataset.key = key;
-
-  if (items.length === 0) {
-    body.innerHTML = '<span class="empty">Déposer des photos ici</span>';
-  } else {
-    items.forEach((it, i) => {
-      const src = typeof it === 'string' ? it : it.src;
-      const cap = typeof it === 'string' ? '' : (it.caption || '');
-      body.appendChild(buildCard(src, cap, key, i, showCaptions));
-    });
-  }
-
-  body.addEventListener('dragover',  e => onSectionDragOver(e, body));
-  body.addEventListener('dragleave', e => { if (!body.contains(e.relatedTarget)) clearOver(body); });
-  body.addEventListener('drop',      e => onSectionDrop(e, body, key));
-
-  block.appendChild(body);
-  return block;
-}
-
-function buildCard(src, caption, key, idx, showCaption) {
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.draggable = true;
-
-  const img = document.createElement('img');
-  img.draggable = false;
-  card.appendChild(img);
-  thumb(src).then(u => { if (u) img.src = u; });
-
-  if (showCaption) {
-    const inp = document.createElement('input');
-    inp.className = 'card-cap';
-    inp.value = caption;
-    inp.placeholder = 'légende…';
-    inp.addEventListener('mousedown', e => e.stopPropagation());
-    inp.addEventListener('change', () => updateCaption(key, idx, inp.value));
-    card.appendChild(inp);
-  }
-
-  const rm = document.createElement('button');
-  rm.className = 'rm';
-  rm.textContent = '×';
-  rm.title = 'Retirer';
-  rm.addEventListener('click', e => {
-    e.stopPropagation();
-    cfg[key].splice(idx, 1);
-    renderHome();
-  });
-  card.appendChild(rm);
-
-  card.addEventListener('dragstart', e => {
-    requestAnimationFrame(() => card.classList.add('ghost'));
-    drag = { from: 'section', src, key, idx, caption };
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', src);
-  });
-  card.addEventListener('dragend', () => {
-    card.classList.remove('ghost');
-  });
-
-  return card;
-}
-
-function isFileDrag(e) {
-  try {
-    return Array.prototype.indexOf.call(e.dataTransfer.types || [], 'Files') !== -1;
-  } catch (err) {
-    return false;
-  }
-}
-
-// ─── DRAG HELPERS ─────────────────────────────────────────────────────────
-function clearOver(container) {
-  container.classList.remove('over');
-  container.querySelectorAll('.insert-before').forEach(el => el.classList.remove('insert-before'));
-}
-
-function getInsertIndex(container, mx, my) {
-  const cards = [...container.querySelectorAll('.card')];
-  for (let i = 0; i < cards.length; i++) {
-    const r = cards[i].getBoundingClientRect();
-    if (my < r.bottom + 4 && mx < r.left + r.width / 2) return i;
-    if (my < r.top) return i;
-  }
-  return cards.length;
-}
-
-function showInsertIndicator(container, mx, my) {
-  container.querySelectorAll('.insert-before').forEach(el => el.classList.remove('insert-before'));
-  const idx = getInsertIndex(container, mx, my);
-  const cards = [...container.querySelectorAll('.card')];
-  if (idx < cards.length) cards[idx].classList.add('insert-before');
-}
-
-function onSectionDragOver(e, body) {
-  if (isFileDrag(e)) return; // handled elsewhere (upload), not reorder
-  e.preventDefault();
-  body.classList.add('over');
-  showInsertIndicator(body, e.clientX, e.clientY);
-}
-
-function onSectionDrop(e, body, key) {
-  if (isFileDrag(e)) return;
-  e.preventDefault();
-  clearOver(body);
-  if (!drag) return;
-
-  const insertAt = getInsertIndex(body, e.clientX, e.clientY);
-
-  if (drag.from === 'pool') {
-    const newItem = key === 'showcasePhotos'
-      ? drag.src
-      : { src: drag.src, caption: '' };
-    cfg[key].splice(insertAt, 0, newItem);
-
-  } else if (drag.from === 'section') {
-    const srcKey = drag.key;
-    const srcIdx = drag.idx;
-
-    if (srcKey === key) {
-      const [item] = cfg[key].splice(srcIdx, 1);
-      const adj = srcIdx < insertAt ? insertAt - 1 : insertAt;
-      cfg[key].splice(adj, 0, item);
-    } else {
-      const [item] = cfg[srcKey].splice(srcIdx, 1);
-      const newItem = key === 'showcasePhotos'
-        ? drag.src
-        : { src: drag.src, caption: drag.caption || '' };
-      cfg[key].splice(insertAt, 0, newItem);
-    }
-  }
-
-  drag = null;
-  renderHome();
-}
-
-function updateCaption(key, idx, val) {
-  const it = cfg[key][idx];
-  if (it && typeof it === 'object') it.caption = val;
-}
-
-// ─── PROJECT VIEW ─────────────────────────────────────────────────────────
-async function rescanProject(projId) {
-  const folder = projFolder[projId] || projectFolderPath(cfg.projects[projId]);
-  if (folder) {
-    projFolder[projId] = folder;
-    projFiles[projId] = await scanDir(folder);
-  }
-  renderProject(projId);
-}
-
-function renderProject(id) {
-  const body = document.getElementById('projBody');
-  body.innerHTML = '';
-  const p = cfg.projects[id];
-  if (!p) return;
-  const coverSrc = p.cover || (p.photos.length > 0 ? p.photos[0] : null);
-  const folder = projFolder[id] || projectFolderPath(p);
-
-  // Current photos
-  body.appendChild(buildProjSection(
-    `Photos du projet`, p.photos.length,
-    p.photos, id, true, coverSrc, folder, p.photos.length > 0
-  ));
-
-  // Available (in folder, not in project)
-  const inProj = new Set(p.photos);
-  const avail  = (projFiles[id] || []).filter(s => !inProj.has(s));
-  body.appendChild(buildProjSection(
-    `Disponibles dans le dossier`, avail.length,
-    avail, id, false, coverSrc, folder, p.photos.length > 0
-  ));
-}
-
-function buildProjSection(label, count, items, projId, isCurrent, coverSrc, folder, hasCurrent) {
-  const block = document.createElement('div');
-  block.className = 'sblock';
-
-  const head = document.createElement('div');
-  head.className = 'sblock-head';
-  head.innerHTML = `${label} <span class="sblock-count">${count}</span>`;
-  if (!isCurrent && folder) {
-    const btn = document.createElement('button');
-    btn.className = 'btn-ghost small';
-    btn.style.marginLeft = 'auto';
-    btn.textContent = '+ Importer des photos';
-    btn.addEventListener('click', () => {
-      triggerUpload(folder, () => rescanProject(projId));
-    });
-    head.appendChild(btn);
-  }
-  block.appendChild(head);
-
-  const body = document.createElement('div');
-  body.className = 'sblock-body';
-  if (!isCurrent) body.style.opacity = '0.7';
-
-  if (items.length === 0) {
-    const msg = isCurrent
-      ? 'Aucune photo — glisse depuis le bas'
-      : (hasCurrent ? 'Toutes les photos sont dans le projet' : 'Aucune photo — importe depuis ton PC');
-    body.innerHTML = `<span class="empty">${msg}</span>`;
-  } else {
-    items.forEach((src, i) => {
-      body.appendChild(buildProjCard(src, projId, i, isCurrent, src === coverSrc));
-    });
-  }
-
-  if (isCurrent) {
-    body.addEventListener('dragover',  e => onSectionDragOver(e, body));
-    body.addEventListener('dragleave', e => { if (!body.contains(e.relatedTarget)) clearOver(body); });
-    body.addEventListener('drop',      e => onProjDrop(e, body, projId));
-  } else if (folder) {
-    attachUploadDropzone(body, () => folder, () => rescanProject(projId));
-  }
-
-  block.appendChild(body);
-  return block;
-}
-
-function buildProjCard(src, projId, idx, isCurrent, isCover) {
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.draggable = true;
-
-  const img = document.createElement('img');
-  img.draggable = false;
-  card.appendChild(img);
-  thumb(src).then(u => { if (u) img.src = u; });
-
-  if (isCurrent) {
-    const rm = document.createElement('button');
-    rm.className = 'rm';
-    rm.textContent = '×';
-    rm.addEventListener('click', e => {
-      e.stopPropagation();
-      cfg.projects[projId].photos.splice(idx, 1);
-      if (cfg.projects[projId].cover === src) delete cfg.projects[projId].cover;
-      renderProject(projId);
-    });
-    card.appendChild(rm);
-  }
-
-  if (isCover) {
-    const badge = document.createElement('div');
-    badge.className = 'cover-badge';
-    badge.textContent = 'cover';
-    card.appendChild(badge);
-  } else {
-    const btn = document.createElement('button');
-    btn.className = 'set-cover';
-    btn.textContent = '★ cover';
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      cfg.projects[projId].cover = src;
-      renderProject(projId);
-    });
-    card.appendChild(btn);
-  }
-
-  card.addEventListener('dragstart', e => {
-    if (isCurrent) requestAnimationFrame(() => card.classList.add('ghost'));
-    drag = { from: isCurrent ? 'proj-current' : 'proj-avail', src, projId, idx };
-    e.dataTransfer.effectAllowed = isCurrent ? 'move' : 'copy';
-    e.dataTransfer.setData('text/plain', src);
-  });
-  card.addEventListener('dragend', () => card.classList.remove('ghost'));
-
-  return card;
-}
-
-function onProjDrop(e, body, projId) {
-  if (isFileDrag(e)) return;
-  e.preventDefault();
-  clearOver(body);
-  if (!drag) return;
-
-  const photos   = cfg.projects[projId].photos;
-  const insertAt = getInsertIndex(body, e.clientX, e.clientY);
-
-  if (drag.from === 'proj-avail' && drag.projId === projId) {
-    photos.splice(insertAt, 0, drag.src);
-  } else if (drag.from === 'proj-current' && drag.projId === projId) {
-    const [item] = photos.splice(drag.idx, 1);
-    const adj = drag.idx < insertAt ? insertAt - 1 : insertAt;
-    photos.splice(adj, 0, item);
-  }
-
-  drag = null;
-  renderProject(projId);
-}
-
-// ─── NEW PROJECT MODAL ────────────────────────────────────────────────────
-const newProjModal = document.getElementById('newProjModal');
-
-document.getElementById('newProjBtn').addEventListener('click', () => {
-  document.getElementById('npTitle').value = '';
-  document.getElementById('npDate').value = '';
-  document.getElementById('npLocation').value = '';
-  document.getElementById('npErr').style.display = 'none';
-  newProjModal.classList.add('on');
-  document.getElementById('npTitle').focus();
-});
-
-document.getElementById('npCancel').addEventListener('click', () => {
-  newProjModal.classList.remove('on');
-});
-newProjModal.addEventListener('click', (e) => {
-  if (e.target === newProjModal) newProjModal.classList.remove('on');
-});
-
-document.getElementById('npCreate').addEventListener('click', async () => {
-  const title    = document.getElementById('npTitle').value.trim();
-  const date     = document.getElementById('npDate').value.trim();
-  const location = document.getElementById('npLocation').value.trim();
-  const errEl    = document.getElementById('npErr');
-
-  if (!title || !date) {
-    errEl.textContent = 'Titre et date sont requis.';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  try {
-    const slug = await createProject(title, date, location);
-    renderProjSelector();
-    document.getElementById('projSel').value = slug;
-    renderProject(slug);
-    newProjModal.classList.remove('on');
-    document.querySelector('.tab[data-panel="proj"]').click();
-    toast(`Projet « ${title} » créé`);
-  } catch (err) {
-    errEl.textContent = 'Erreur : ' + err.message;
-    errEl.style.display = 'block';
-  }
-});
-
-// ─── CONTENT (About / Contact) ─────────────────────────────────────────────
-function buildTextListBlock(label, hint, items, onCommit) {
-  const block = document.createElement('div');
-  block.className = 'sblock';
-  const head = document.createElement('div');
-  head.className = 'sblock-head';
-  head.innerHTML = `${label}` + (hint ? `<span class="sblock-hint">${hint}</span>` : '');
-  block.appendChild(head);
-
-  const body = document.createElement('div');
-  body.className = 'content-list';
-
-  function renderItems() {
-    body.innerHTML = '';
-    items.forEach((val, i) => {
-      const row = document.createElement('div');
-      row.className = 'content-row';
-      const ta = document.createElement('textarea');
-      ta.value = val;
-      ta.addEventListener('change', () => { items[i] = ta.value; onCommit(); });
-      const rm = document.createElement('button');
-      rm.className = 'rm-text';
-      rm.textContent = '×';
-      rm.title = 'Retirer';
-      rm.addEventListener('click', () => { items.splice(i, 1); onCommit(); renderItems(); });
-      row.appendChild(ta);
-      row.appendChild(rm);
-      body.appendChild(row);
-    });
-    const addBtn = document.createElement('button');
-    addBtn.className = 'btn-ghost small';
-    addBtn.style.alignSelf = 'flex-start';
-    addBtn.textContent = '+ Ajouter un paragraphe';
-    addBtn.addEventListener('click', () => { items.push(''); onCommit(); renderItems(); });
-    body.appendChild(addBtn);
-  }
-  renderItems();
-  block.appendChild(body);
-  return block;
-}
-
-function buildGearBlock(gear) {
-  const block = document.createElement('div');
-  block.className = 'sblock';
-  const head = document.createElement('div');
-  head.className = 'sblock-head';
-  head.textContent = 'Équipement';
-  block.appendChild(head);
-
-  const body = document.createElement('div');
-  body.className = 'content-list';
-
-  function renderGear() {
-    body.innerHTML = '';
-    gear.forEach((item, i) => {
-      if (!item.paragraphs) item.paragraphs = [];
-      const card = document.createElement('div');
-      card.className = 'gear-card';
-
-      const labelInp = document.createElement('input');
-      labelInp.placeholder = 'Catégorie (ex. Boîtier)';
-      labelInp.value = item.label || '';
-      labelInp.addEventListener('change', () => { item.label = labelInp.value; });
-
-      const titleInp = document.createElement('input');
-      titleInp.placeholder = 'Nom du matériel';
-      titleInp.value = item.title || '';
-      titleInp.addEventListener('change', () => { item.title = titleInp.value; });
-
-      const paraWrap = document.createElement('div');
-      paraWrap.style.display = 'flex';
-      paraWrap.style.flexDirection = 'column';
-      paraWrap.style.gap = '8px';
-
-      function renderParas() {
-        paraWrap.innerHTML = '';
-        item.paragraphs.forEach((val, pi) => {
-          const row = document.createElement('div');
-          row.className = 'content-row';
-          const ta = document.createElement('textarea');
-          ta.value = val;
-          ta.addEventListener('change', () => { item.paragraphs[pi] = ta.value; });
-          const rm = document.createElement('button');
-          rm.className = 'rm-text';
-          rm.textContent = '×';
-          rm.addEventListener('click', () => { item.paragraphs.splice(pi, 1); renderParas(); });
-          row.appendChild(ta);
-          row.appendChild(rm);
-          paraWrap.appendChild(row);
-        });
-        const addP = document.createElement('button');
-        addP.className = 'btn-ghost small';
-        addP.style.alignSelf = 'flex-start';
-        addP.textContent = '+ Paragraphe';
-        addP.addEventListener('click', () => { item.paragraphs.push(''); renderParas(); });
-        paraWrap.appendChild(addP);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administration</title>
+    <style>
+      :root {
+        --bg: #101012;
+        --panel: #17171a;
+        --card: #1e1e22;
+        --line: #2c2c32;
+        --ink: #e9e9ec;
+        --muted: #8b8b95;
+        --accent: #6ea8fe;
+        --danger: #d9534f;
       }
-      renderParas();
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+      }
+      button, input, select, textarea { font: inherit; color: inherit; }
+      button { cursor: pointer; }
 
-      const rmItem = document.createElement('button');
-      rmItem.className = 'btn-ghost small danger';
-      rmItem.style.alignSelf = 'flex-start';
-      rmItem.textContent = 'Supprimer cet équipement';
-      rmItem.addEventListener('click', () => { gear.splice(i, 1); renderGear(); });
+      /* ---------- gate ---------- */
+      #overlay {
+        position: fixed; inset: 0; z-index: 100;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 14px; text-align: center; padding: 24px;
+        background: var(--bg);
+      }
+      #overlay h1 { font-size: 22px; font-weight: 600; }
+      #overlay p { color: var(--muted); max-width: 460px; }
+      .btn {
+        background: var(--accent); color: #06121f; border: 0;
+        padding: 10px 18px; border-radius: 6px; font-weight: 600;
+      }
+      .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+      #overlayFolder {
+        display: none; padding: 4px 10px; border: 1px solid var(--line);
+        border-radius: 999px; font-size: 12px; color: var(--muted);
+      }
+      #errMsg { display: none; color: var(--danger); }
+      #switchBtn { display: none; }
 
-      card.appendChild(labelInp);
-      card.appendChild(titleInp);
-      card.appendChild(paraWrap);
-      card.appendChild(rmItem);
-      body.appendChild(card);
-    });
-    const addItem = document.createElement('button');
-    addItem.className = 'btn-ghost small';
-    addItem.style.alignSelf = 'flex-start';
-    addItem.textContent = '+ Ajouter un équipement';
-    addItem.addEventListener('click', () => { gear.push({ label: '', title: '', paragraphs: [''] }); renderGear(); });
-    body.appendChild(addItem);
-  }
-  renderGear();
-  block.appendChild(body);
-  return block;
-}
+      /* ---------- app ---------- */
+      #app { display: none; }
+      #app.on { display: block; }
+      .sticky-head {
+        position: sticky; top: 0; z-index: 20;
+        background: var(--panel);
+      }
+      .top {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 18px; background: var(--panel);
+        border-bottom: 1px solid var(--line);
+      }
+      .top .folder { color: var(--muted); font-size: 12px; }
+      .top .spacer { flex: 1; }
+      .tabs {
+        display: flex; gap: 4px; padding: 12px 18px 0;
+        background: var(--panel); border-bottom: 1px solid var(--line);
+      }
+      .tab {
+        background: none; border: 0; padding: 8px 14px;
+        color: var(--muted); border-bottom: 2px solid transparent;
+      }
+      .tab.on { color: var(--ink); border-bottom-color: var(--accent); }
+      .panel { display: none; padding: 18px; }
+      .panel.on { display: block; }
+      .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: none; }
+      .dot.on { display: block; }
 
-const ABOUT_MEDIA_FOLDER = 'images/a-propos';
-const ABOUT_MEDIA_SLOTS = [
-  ['hero',       'Photo d’ouverture (plein écran)'],
-  ['heroMobile', 'Photo d’ouverture — mobile'],
-  ['portrait',   'Portrait'],
-];
+      /* ---------- sequence ---------- */
+      .row {
+        display: flex; align-items: center; gap: 12px;
+        background: var(--card); border: 1px solid var(--line);
+        border-radius: 8px; padding: 10px; margin-bottom: 8px;
+      }
+      .row.drag { opacity: 0.4; }
+      .grip { color: var(--muted); cursor: grab; padding: 0 4px; }
+      .row .idx { color: var(--muted); font-size: 12px; width: 24px; }
+      .thumbs { display: flex; gap: 3px; }
+      .thumbs img {
+        width: 62px; height: 44px; object-fit: cover;
+        border-radius: 3px; background: #000; display: block;
+      }
+      .more { color: var(--muted); font-size: 12px; align-self: center; }
+      .row .grow { flex: 1; }
+      .swatch {
+        width: 30px; height: 30px; padding: 0; border: 1px solid var(--line);
+        border-radius: 5px; background: none;
+      }
+      .hex {
+        width: 88px; background: var(--panel); border: 1px solid var(--line);
+        border-radius: 5px; padding: 6px 8px; font-family: monospace;
+      }
+      .mini {
+        background: var(--panel); border: 1px solid var(--line);
+        border-radius: 5px; padding: 6px 10px; font-size: 12px; color: var(--muted);
+      }
+      .mini:hover { color: var(--ink); }
+      .mini.del:hover { color: var(--danger); border-color: var(--danger); }
+      .drawer {
+        border: 1px solid var(--line); border-top: 0;
+        border-radius: 0 0 8px 8px; background: var(--panel);
+        padding: 10px; margin: -12px 0 8px; display: flex; gap: 6px; flex-wrap: wrap;
+      }
+      .drawer .gp { position: relative; }
+      .drawer .gp img {
+        width: 84px; height: 58px; object-fit: cover;
+        border-radius: 3px; display: block; cursor: grab;
+      }
+      .drawer .gp button {
+        position: absolute; top: 2px; right: 2px;
+        background: rgba(0,0,0,.7); border: 0; color: #fff;
+        border-radius: 3px; width: 18px; height: 18px; line-height: 1; font-size: 12px;
+      }
+      .ins { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-function buildAboutMediaBlock(about) {
-  const block = document.createElement('div');
-  block.className = 'sblock';
-  const head = document.createElement('div');
-  head.className = 'sblock-head';
-  head.textContent = 'Visuels';
-  block.appendChild(head);
+      /* ---------- pool ---------- */
+      .pool {
+        position: sticky; bottom: 0; margin-top: 18px;
+        background: var(--panel); border: 1px solid var(--line);
+        border-radius: 8px; padding: 10px;
+      }
+      .poolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+      select {
+        background: var(--card); border: 1px solid var(--line);
+        border-radius: 5px; padding: 6px 8px; max-width: 280px;
+      }
+      #poolGrid, #projPoolGrid { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+      #poolGrid img, #projPoolGrid img {
+        width: 84px; height: 58px; object-fit: cover; border-radius: 3px;
+        cursor: grab; flex: 0 0 auto; background: #000;
+      }
 
-  const body = document.createElement('div');
-  body.className = 'sblock-body';
+      /* ---------- content ---------- */
+      .block {
+        background: var(--card); border: 1px solid var(--line);
+        border-radius: 8px; padding: 14px; margin-bottom: 14px;
+      }
+      .block h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 12px; }
+      .fld { margin-bottom: 10px; }
+      .fld label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+      .fld input, .fld textarea {
+        width: 100%; background: var(--panel); border: 1px solid var(--line);
+        border-radius: 5px; padding: 8px 10px;
+      }
+      .fld textarea { min-height: 78px; resize: vertical; line-height: 1.55; }
+      .listrow { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+      .listrow textarea {
+        flex: 1; background: var(--panel); border: 1px solid var(--line);
+        border-radius: 5px; padding: 8px 10px; min-height: 78px;
+        resize: vertical; line-height: 1.55;
+      }
+      .gearitem { border: 1px solid var(--line); border-radius: 6px; padding: 12px; margin-bottom: 10px; }
 
-  function renderSlots() {
-    body.innerHTML = '';
-    ABOUT_MEDIA_SLOTS.forEach(([key, label]) => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.style.width = '140px';
-      card.draggable = false;
+      /* ---------- projects ---------- */
+      .projfld {
+        background: var(--panel); border: 1px solid var(--line); border-radius: 5px;
+        padding: 6px 8px; font-size: 12px; width: 110px;
+      }
+      .projfld.title { width: 170px; }
+      .projfld.year { width: 56px; }
+      .gp.is-cover { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-      const img = document.createElement('img');
-      img.style.width = '140px';
-      img.style.height = '100px';
-      img.style.objectFit = 'cover';
-      if (about[key]) thumb(about[key]).then(u => { if (u) img.src = u; });
-      card.appendChild(img);
+      #toast {
+        position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+        background: #000; border: 1px solid var(--line); color: var(--ink);
+        padding: 10px 16px; border-radius: 6px; opacity: 0;
+        transition: opacity .25s; pointer-events: none; z-index: 200;
+      }
+      #toast.on { opacity: 1; }
+    </style>
+  </head>
 
-      const cap = document.createElement('div');
-      cap.className = 'card-cap';
-      cap.textContent = label;
-      card.appendChild(cap);
+  <body>
+    <div id="overlay">
+      <h1 id="overlayTitle">Administration</h1>
+      <p id="overlaySubtitle">
+        Choisis le dossier racine du portfolio (celui qui contient
+        <code>images/</code> et <code>index.html</code>).<br />
+        Fonctionne uniquement dans Chrome ou Edge, en local.
+      </p>
+      <span id="overlayFolder"></span>
+      <div style="display: flex; gap: 8px">
+        <button class="btn" id="openBtn">Ouvrir le dossier</button>
+        <button class="btn ghost" id="switchBtn">Choisir un autre dossier</button>
+      </div>
+      <p id="errMsg"></p>
+    </div>
 
-      const btn = document.createElement('button');
-      btn.className = 'set-cover';
-      btn.style.opacity = '1';
-      btn.textContent = about[key] ? 'Changer' : '+ Ajouter';
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        triggerSingleUpload(ABOUT_MEDIA_FOLDER, async (path) => {
-          about[key] = path;
-          renderSlots();
-          toast('Photo mise à jour');
+    <div id="app">
+      <div class="sticky-head">
+        <div class="top">
+          <strong>Portfolio</strong>
+          <span class="folder" id="folderName"></span>
+          <span class="dot" id="dirtyDot" title="Modifications non enregistrées"></span>
+          <span class="spacer"></span>
+          <button class="mini" id="previewBtn">Aperçu</button>
+          <button class="mini" id="reloadBtn">Recharger</button>
+          <button class="btn" id="saveBtn">Enregistrer</button>
+        </div>
+
+        <div class="tabs">
+          <button class="tab on" data-panel="seq">Séquence</button>
+          <button class="tab" data-panel="proj">Projets</button>
+          <button class="tab" data-panel="content">Contenu</button>
+        </div>
+      </div>
+
+      <section class="panel on" id="panel-seq">
+        <div id="seqList"></div>
+        <div class="pool">
+          <div class="poolbar">
+            <select id="folderSel"></select>
+            <button class="mini" id="uploadBtn">Importer des images…</button>
+            <span class="folder">Glisse une vignette dans la séquence pour l'ajouter.</span>
+          </div>
+          <div id="poolGrid"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-proj">
+        <div id="projList"></div>
+        <button class="btn" id="addProjBtn" style="margin-bottom: 18px">+ Nouveau projet</button>
+        <div class="pool">
+          <div class="poolbar">
+            <select id="projFolderSel"></select>
+            <button class="mini" id="projUploadBtn">Importer des images…</button>
+            <span class="folder">Glisse une vignette dans un projet ouvert pour l'ajouter. L'archive du site regroupe les projets par année puis par lieu — un lieu par projet.</span>
+          </div>
+          <div id="projPoolGrid"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-content"></section>
+    </div>
+
+    <div id="toast"></div>
+    <input type="file" id="sharedFileInput" accept="image/*" multiple hidden />
+
+    <script>
+      // ══════════════════════════════════════════════════════════════
+      // State
+      // ══════════════════════════════════════════════════════════════
+      let root = null;
+      let storedHandle = null;
+      let cfg = null;
+      let dirty = false;
+      const thumbs = {};
+      let poolFiles = [];
+      let openGroup = -1;
+
+      const CFG_DIR = "";
+      const CFG_FILE = "site-config.js";
+      const CFG_VAR = "SITE_CONFIG";
+
+      function markDirty() {
+        dirty = true;
+        document.getElementById("dirtyDot").classList.add("on");
+      }
+      function clearDirty() {
+        dirty = false;
+        document.getElementById("dirtyDot").classList.remove("on");
+      }
+
+      let toastT;
+      function toast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("on");
+        clearTimeout(toastT);
+        toastT = setTimeout(() => t.classList.remove("on"), 2200);
+      }
+
+      // ══════════════════════════════════════════════════════════════
+      // IndexedDB — remember the chosen folder.
+      // Same DB/store/key as the root admin on purpose: both tools want
+      // the same folder, so this reconnects silently if that one was used.
+      // ══════════════════════════════════════════════════════════════
+      const IDB_NAME = "portfolio-admin";
+      const IDB_STORE = "handles";
+
+      function idbOpen() {
+        return new Promise((res, rej) => {
+          const r = indexedDB.open(IDB_NAME, 1);
+          r.onupgradeneeded = () => r.result.createObjectStore(IDB_STORE);
+          r.onsuccess = () => res(r.result);
+          r.onerror = () => rej(r.error);
+        });
+      }
+      async function idbSaveHandle(h) {
+        const db = await idbOpen();
+        await new Promise((res, rej) => {
+          const tx = db.transaction(IDB_STORE, "readwrite");
+          tx.objectStore(IDB_STORE).put(h, "root");
+          tx.oncomplete = res;
+          tx.onerror = () => rej(tx.error);
+        });
+      }
+      async function idbLoadHandle() {
+        const db = await idbOpen();
+        return new Promise((res, rej) => {
+          const tx = db.transaction(IDB_STORE, "readonly");
+          const q = tx.objectStore(IDB_STORE).get("root");
+          q.onsuccess = () => res(q.result || null);
+          q.onerror = () => rej(q.error);
+        });
+      }
+
+      // ══════════════════════════════════════════════════════════════
+      // File system
+      // ══════════════════════════════════════════════════════════════
+      async function resolveFile(path) {
+        const parts = path.split("/").filter(Boolean);
+        let h = root;
+        for (let i = 0; i < parts.length - 1; i++) {
+          h = await h.getDirectoryHandle(decodeURIComponent(parts[i])).catch(() => null);
+          if (!h) return null;
+        }
+        return h.getFileHandle(decodeURIComponent(parts[parts.length - 1])).catch(() => null);
+      }
+
+      async function resolveDir(path, create) {
+        const parts = path.split("/").filter(Boolean);
+        let h = root;
+        for (const p of parts) {
+          h = await h
+            .getDirectoryHandle(decodeURIComponent(p), { create: !!create })
+            .catch(() => null);
+          if (!h) return null;
+        }
+        return h;
+      }
+
+      async function scanDir(encodedPath) {
+        const dh = await resolveDir(encodedPath);
+        if (!dh) return [];
+        const out = [];
+        for await (const [name, h] of dh.entries()) {
+          if (h.kind === "file" && /\.(jpg|jpeg|png|webp)$/i.test(name)) {
+            out.push(encodedPath + "/" + name);
+          } else if (h.kind === "directory") {
+            out.push(...(await scanDir(encodedPath + "/" + encodeURIComponent(name))));
+          }
+        }
+        return out.sort();
+      }
+
+      async function listImageFolders() {
+        const dh = await resolveDir("images");
+        if (!dh) return [];
+        const out = [];
+        for await (const [name, h] of dh.entries()) {
+          if (h.kind === "directory") out.push("images/" + encodeURIComponent(name));
+        }
+        return out.sort();
+      }
+
+      async function thumb(src) {
+        if (thumbs[src]) return thumbs[src];
+        const fh = await resolveFile(src);
+        if (!fh) return "";
+        const url = URL.createObjectURL(await fh.getFile());
+        thumbs[src] = url;
+        return url;
+      }
+      function setThumb(img, src) {
+        thumb(src).then((u) => {
+          if (u) img.src = u;
+        });
+      }
+
+      async function readCfg() {
+        const fh = await resolveFile(CFG_DIR + "/" + CFG_FILE);
+        if (!fh) throw new Error(CFG_FILE + " introuvable dans ce dossier.");
+        const text = await (await fh.getFile()).text();
+        const json = text
+          .replace(new RegExp("^var\\s+" + CFG_VAR + "\\s*=\\s*"), "")
+          .replace(/;\s*$/, "");
+        return JSON.parse(json);
+      }
+
+      async function writeCfg() {
+        // Paranoia gate: the site and this editor both read the file back
+        // with a regex strip + JSON.parse, so one malformed write bricks
+        // both. Prove it round-trips before touching the disk.
+        const payload = JSON.stringify(cfg, null, 2);
+        JSON.parse(payload);
+        if (/\bundefined\b|\bNaN\b/.test(payload)) {
+          throw new Error("Configuration invalide — enregistrement annulé.");
+        }
+        const dir = await resolveDir(CFG_DIR, true);
+        if (!dir) throw new Error("Dossier racine introuvable.");
+        const fh = await dir.getFileHandle(CFG_FILE, { create: true });
+        const w = await fh.createWritable();
+        await w.write("var " + CFG_VAR + " = " + payload + ";\n");
+        await w.close();
+      }
+
+      // ══════════════════════════════════════════════════════════════
+      // Upload
+      // ══════════════════════════════════════════════════════════════
+      async function uploadFilesToFolder(folderPath, fileList) {
+        const dir = await resolveDir(folderPath, true);
+        if (!dir) throw new Error("Dossier introuvable : " + folderPath);
+        const added = [];
+        for (const file of fileList) {
+          if (!/\.(jpe?g|png|webp)$/i.test(file.name)) continue;
+          let name = file.name;
+          const exists = (n) => dir.getFileHandle(n).then(() => true).catch(() => false);
+          if (await exists(name)) {
+            const dot = name.lastIndexOf(".");
+            const base = dot > -1 ? name.slice(0, dot) : name;
+            const ext = dot > -1 ? name.slice(dot) : "";
+            let i = 2, cand;
+            do { cand = base + "-" + i + ext; i++; } while (await exists(cand));
+            name = cand;
+          }
+          const fh = await dir.getFileHandle(name, { create: true });
+          const w = await fh.createWritable();
+          await w.write(file);
+          await w.close();
+          added.push(folderPath + "/" + name);
+        }
+        return added;
+      }
+
+      // ══════════════════════════════════════════════════════════════
+      // Sequence panel
+      // ══════════════════════════════════════════════════════════════
+      const seqList = document.getElementById("seqList");
+      let dragSrc = null; // {kind:'row'|'pool'|'gp', ...}
+
+      function entryPhotos(e) {
+        return e.type === "group" ? e.photos || [] : [e.src];
+      }
+
+      function renderSeq() {
+        seqList.innerHTML = "";
+        (cfg.sequence || []).forEach((entry, i) => {
+          const row = document.createElement("div");
+          row.className = "row";
+          row.draggable = true;
+          row.dataset.i = i;
+
+          const grip = document.createElement("span");
+          grip.className = "grip";
+          grip.textContent = "⋮⋮";
+          row.appendChild(grip);
+
+          const idx = document.createElement("span");
+          idx.className = "idx";
+          idx.textContent = i + 1;
+          row.appendChild(idx);
+
+          const tw = document.createElement("div");
+          tw.className = "thumbs";
+          const photos = entryPhotos(entry);
+          photos.slice(0, 4).forEach((src) => {
+            const im = document.createElement("img");
+            setThumb(im, src);
+            tw.appendChild(im);
+          });
+          row.appendChild(tw);
+          if (photos.length > 4) {
+            const m = document.createElement("span");
+            m.className = "more";
+            m.textContent = "+" + (photos.length - 4);
+            row.appendChild(m);
+          }
+
+          const grow = document.createElement("span");
+          grow.className = "grow";
+          row.appendChild(grow);
+
+          // colour
+          const sw = document.createElement("input");
+          sw.type = "color";
+          sw.className = "swatch";
+          sw.value = entry.bg || "#ffffff";
+          const hex = document.createElement("input");
+          hex.className = "hex";
+          hex.value = entry.bg || "#ffffff";
+          sw.addEventListener("input", () => {
+            entry.bg = sw.value;
+            hex.value = sw.value;
+            markDirty();
+          });
+          hex.addEventListener("change", () => {
+            const v = hex.value.trim();
+            if (/^#[0-9a-f]{6}$/i.test(v)) {
+              entry.bg = v;
+              sw.value = v;
+              markDirty();
+            } else {
+              hex.value = entry.bg || "#ffffff";
+            }
+          });
+          row.appendChild(sw);
+          row.appendChild(hex);
+
+          const white = document.createElement("button");
+          white.className = "mini";
+          white.textContent = "blanc";
+          white.addEventListener("click", () => {
+            entry.bg = "#ffffff";
+            markDirty();
+            renderSeq();
+          });
+          row.appendChild(white);
+
+          // group / ungroup
+          const gbtn = document.createElement("button");
+          gbtn.className = "mini";
+          if (entry.type === "group") {
+            gbtn.textContent = openGroup === i ? "fermer" : "série (" + photos.length + ")";
+            gbtn.addEventListener("click", () => {
+              openGroup = openGroup === i ? -1 : i;
+              renderSeq();
+            });
+          } else {
+            gbtn.textContent = "→ série";
+            gbtn.addEventListener("click", () => {
+              cfg.sequence[i] = { type: "group", bg: entry.bg || "#ffffff", photos: [entry.src] };
+              openGroup = i;
+              markDirty();
+              renderSeq();
+            });
+          }
+          row.appendChild(gbtn);
+
+          if (entry.type === "group" && photos.length === 1) {
+            const u = document.createElement("button");
+            u.className = "mini";
+            u.textContent = "→ seule";
+            u.addEventListener("click", () => {
+              cfg.sequence[i] = { type: "single", bg: entry.bg || "#ffffff", src: photos[0] };
+              openGroup = -1;
+              markDirty();
+              renderSeq();
+            });
+            row.appendChild(u);
+          }
+
+          const del = document.createElement("button");
+          del.className = "mini del";
+          del.textContent = "×";
+          del.addEventListener("click", () => {
+            cfg.sequence.splice(i, 1);
+            openGroup = -1;
+            markDirty();
+            renderSeq();
+          });
+          row.appendChild(del);
+
+          // drag reorder
+          row.addEventListener("dragstart", (e) => {
+            dragSrc = { kind: "row", i: i };
+            row.classList.add("drag");
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", String(i));
+          });
+          row.addEventListener("dragend", () => {
+            row.classList.remove("drag");
+            clearIns();
+            dragSrc = null;
+          });
+
+          seqList.appendChild(row);
+
+          // group drawer
+          if (entry.type === "group" && openGroup === i) {
+            seqList.appendChild(buildDrawer(entry, i));
+          }
+        });
+      }
+
+      function buildDrawer(entry, ei) {
+        const d = document.createElement("div");
+        d.className = "drawer";
+        d.dataset.group = ei;
+
+        (entry.photos || []).forEach((src, k) => {
+          const gp = document.createElement("div");
+          gp.className = "gp";
+          gp.draggable = true;
+          gp.dataset.k = k;
+
+          const im = document.createElement("img");
+          setThumb(im, src);
+          gp.appendChild(im);
+
+          const x = document.createElement("button");
+          x.textContent = "×";
+          x.addEventListener("click", () => {
+            entry.photos.splice(k, 1);
+            if (entry.photos.length === 0) {
+              cfg.sequence.splice(ei, 1);
+              openGroup = -1;
+            }
+            markDirty();
+            renderSeq();
+          });
+          gp.appendChild(x);
+
+          gp.addEventListener("dragstart", (e) => {
+            e.stopPropagation();
+            dragSrc = { kind: "gp", group: ei, k: k };
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", "gp");
+          });
+          gp.addEventListener("dragend", () => {
+            clearIns();
+            dragSrc = null;
+          });
+
+          d.appendChild(gp);
+        });
+
+        const hint = document.createElement("span");
+        hint.className = "folder";
+        hint.style.alignSelf = "center";
+        hint.textContent = "Glisse une vignette ici pour l'ajouter à la série.";
+        d.appendChild(hint);
+
+        d.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          d.classList.add("ins");
+        });
+        d.addEventListener("dragleave", () => d.classList.remove("ins"));
+        d.addEventListener("drop", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          d.classList.remove("ins");
+          if (!dragSrc) return;
+          if (dragSrc.kind === "pool") {
+            entry.photos.push(dragSrc.src);
+          } else if (dragSrc.kind === "gp" && dragSrc.group === ei) {
+            const at = insertIndexH(d, e.clientX);
+            const [m] = entry.photos.splice(dragSrc.k, 1);
+            entry.photos.splice(at > dragSrc.k ? at - 1 : at, 0, m);
+          } else if (dragSrc.kind === "row") {
+            const from = cfg.sequence[dragSrc.i];
+            entryPhotos(from).forEach((s) => entry.photos.push(s));
+            cfg.sequence.splice(dragSrc.i, 1);
+            if (dragSrc.i < ei) openGroup = ei - 1;
+          }
+          markDirty();
+          renderSeq();
+        });
+
+        return d;
+      }
+
+      function insertIndexH(container, x) {
+        const kids = [...container.querySelectorAll(".gp")];
+        for (let i = 0; i < kids.length; i++) {
+          const r = kids[i].getBoundingClientRect();
+          if (x < r.left + r.width / 2) return i;
+        }
+        return kids.length;
+      }
+
+      function clearIns() {
+        document.querySelectorAll(".ins").forEach((n) => n.classList.remove("ins"));
+      }
+
+      // vertical insertion point within the sequence list
+      function insertIndexV(y) {
+        const rows = [...seqList.querySelectorAll(".row")];
+        for (let i = 0; i < rows.length; i++) {
+          const r = rows[i].getBoundingClientRect();
+          if (y < r.top + r.height / 2) return i;
+        }
+        return rows.length;
+      }
+
+      seqList.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = dragSrc && dragSrc.kind === "pool" ? "copy" : "move";
+      });
+      seqList.addEventListener("drop", (e) => {
+        e.preventDefault();
+        if (!dragSrc) return;
+        const at = insertIndexV(e.clientY);
+        if (dragSrc.kind === "row") {
+          const [m] = cfg.sequence.splice(dragSrc.i, 1);
+          cfg.sequence.splice(at > dragSrc.i ? at - 1 : at, 0, m);
+        } else if (dragSrc.kind === "pool") {
+          cfg.sequence.splice(at, 0, {
+            type: "single",
+            src: dragSrc.src,
+            bg: "#ffffff",
+          });
+        } else if (dragSrc.kind === "gp") {
+          const g = cfg.sequence[dragSrc.group];
+          const [s] = g.photos.splice(dragSrc.k, 1);
+          cfg.sequence.splice(at, 0, { type: "single", src: s, bg: g.bg || "#ffffff" });
+          if (g.photos.length === 0) cfg.sequence.splice(cfg.sequence.indexOf(g), 1);
+        }
+        openGroup = -1;
+        markDirty();
+        renderSeq();
+      });
+
+      // ══════════════════════════════════════════════════════════════
+      // Pool
+      // ══════════════════════════════════════════════════════════════
+      const folderSel = document.getElementById("folderSel");
+      const poolGrid = document.getElementById("poolGrid");
+
+      async function renderPool() {
+        poolGrid.innerHTML = "";
+        poolFiles = await scanDir(folderSel.value);
+        poolFiles.forEach((src) => {
+          const im = document.createElement("img");
+          im.draggable = true;
+          im.title = src.split("/").pop();
+          setThumb(im, src);
+          im.addEventListener("dragstart", (e) => {
+            dragSrc = { kind: "pool", src: src };
+            e.dataTransfer.effectAllowed = "copy";
+            e.dataTransfer.setData("text/plain", src);
+          });
+          im.addEventListener("dragend", () => {
+            clearIns();
+            dragSrc = null;
+          });
+          poolGrid.appendChild(im);
+        });
+      }
+
+      folderSel.addEventListener("change", renderPool);
+
+      document.getElementById("uploadBtn").addEventListener("click", () => {
+        const input = document.getElementById("sharedFileInput");
+        input.onchange = async () => {
+          const files = [...input.files];
+          input.value = "";
+          if (!files.length) return;
+          try {
+            const added = await uploadFilesToFolder(folderSel.value, files);
+            toast(added.length + " image(s) importée(s)");
+            await renderPool();
+          } catch (e) {
+            toast(e.message);
+          }
+        };
+        input.click();
+      });
+
+      // ══════════════════════════════════════════════════════════════
+      // Projects panel — feeds the archive (archive.html), which
+      // groups these by year then by location. One project = one
+      // location's photos from one shoot; several projects can share a
+      // location within the same year, the archive merges them.
+      // ══════════════════════════════════════════════════════════════
+      const projList = document.getElementById("projList");
+      let openProj = null; // id of the currently expanded project, or null
+      let projDragSrc = null; // {kind:'photo'|'pool', ...}
+
+      function slugify(s) {
+        const stripped = (s || "")
+          .normalize("NFD")
+          .split("")
+          .filter((ch) => {
+            const c = ch.charCodeAt(0);
+            return c < 0x0300 || c > 0x036f;
+          })
+          .join("");
+        return (
+          stripped
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "") || "projet"
+        );
+      }
+
+      function uniqueProjSlug(base) {
+        let slug = base,
+          n = 2;
+        while (cfg.projects[slug]) {
+          slug = base + "-" + n;
+          n++;
+        }
+        return slug;
+      }
+
+      function renderProj() {
+        projList.innerHTML = "";
+        Object.keys(cfg.projects).forEach((id) => {
+          const p = cfg.projects[id];
+          projList.appendChild(buildProjRow(id, p));
+          if (openProj === id) projList.appendChild(buildProjDrawer(id, p));
+        });
+      }
+
+      function buildProjRow(id, p) {
+        const row = document.createElement("div");
+        row.className = "row";
+
+        const tw = document.createElement("div");
+        tw.className = "thumbs";
+        (p.photos || []).slice(0, 4).forEach((src) => {
+          const im = document.createElement("img");
+          setThumb(im, src);
+          tw.appendChild(im);
+        });
+        row.appendChild(tw);
+
+        const title = document.createElement("input");
+        title.className = "projfld title";
+        title.value = p.title || "";
+        title.placeholder = "Titre";
+        title.addEventListener("input", () => {
+          p.title = title.value;
+          markDirty();
+        });
+        row.appendChild(title);
+
+        const date = document.createElement("input");
+        date.className = "projfld";
+        date.value = p.date || "";
+        date.placeholder = "Date (ex. Mars 2026)";
+        date.addEventListener("input", () => {
+          p.date = date.value;
+          p.dateLong = date.value;
+          markDirty();
+        });
+        row.appendChild(date);
+
+        const year = document.createElement("input");
+        year.className = "projfld year";
+        year.value = p.year || "";
+        year.placeholder = "Année";
+        year.addEventListener("input", () => {
+          p.year = year.value;
+          markDirty();
+        });
+        row.appendChild(year);
+
+        const loc = document.createElement("input");
+        loc.className = "projfld";
+        loc.value = p.location || "";
+        loc.placeholder = "Lieu";
+        loc.addEventListener("input", () => {
+          p.location = loc.value;
+          markDirty();
+        });
+        row.appendChild(loc);
+
+        const grow = document.createElement("span");
+        grow.className = "grow";
+        row.appendChild(grow);
+
+        const count = document.createElement("span");
+        count.className = "folder";
+        const n = (p.photos || []).length;
+        count.textContent = n + (n > 1 ? " photos" : " photo");
+        row.appendChild(count);
+
+        const obtn = document.createElement("button");
+        obtn.className = "mini";
+        obtn.textContent = openProj === id ? "fermer" : "ouvrir";
+        obtn.addEventListener("click", () => {
+          openProj = openProj === id ? null : id;
+          renderProj();
+        });
+        row.appendChild(obtn);
+
+        const del = document.createElement("button");
+        del.className = "mini del";
+        del.textContent = "×";
+        del.addEventListener("click", () => {
+          if (!confirm("Supprimer le projet « " + (p.title || id) + " » ?")) return;
+          delete cfg.projects[id];
+          if (openProj === id) openProj = null;
+          markDirty();
+          renderProj();
+        });
+        row.appendChild(del);
+
+        return row;
+      }
+
+      function buildProjDrawer(id, p) {
+        const d = document.createElement("div");
+        d.className = "drawer";
+        p.photos = p.photos || [];
+
+        p.photos.forEach((src, k) => {
+          const gp = document.createElement("div");
+          gp.className = "gp";
+          if (p.cover === src) gp.classList.add("is-cover");
+          gp.draggable = true;
+          gp.dataset.k = k;
+
+          const im = document.createElement("img");
+          setThumb(im, src);
+          gp.appendChild(im);
+
+          const star = document.createElement("button");
+          star.style.left = "2px";
+          star.style.right = "auto";
+          star.textContent = p.cover === src ? "★" : "☆";
+          star.title = "Utiliser comme couverture";
+          star.addEventListener("click", (e) => {
+            e.stopPropagation();
+            p.cover = src;
+            markDirty();
+            renderProj();
+          });
+          gp.appendChild(star);
+
+          const x = document.createElement("button");
+          x.textContent = "×";
+          x.addEventListener("click", () => {
+            p.photos.splice(k, 1);
+            if (p.cover === src) delete p.cover;
+            markDirty();
+            renderProj();
+          });
+          gp.appendChild(x);
+
+          gp.addEventListener("dragstart", (e) => {
+            e.stopPropagation();
+            projDragSrc = { kind: "photo", id: id, k: k };
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", "gp");
+          });
+          gp.addEventListener("dragend", () => {
+            clearIns();
+            projDragSrc = null;
+          });
+
+          d.appendChild(gp);
+        });
+
+        const hint = document.createElement("span");
+        hint.className = "folder";
+        hint.style.alignSelf = "center";
+        hint.textContent = "Glisse une vignette du pool ci-dessous pour l'ajouter à ce projet.";
+        d.appendChild(hint);
+
+        d.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          d.classList.add("ins");
+        });
+        d.addEventListener("dragleave", () => d.classList.remove("ins"));
+        d.addEventListener("drop", (e) => {
+          e.preventDefault();
+          d.classList.remove("ins");
+          if (!projDragSrc) return;
+          if (projDragSrc.kind === "pool") {
+            if (!p.photos.includes(projDragSrc.src)) p.photos.push(projDragSrc.src);
+          } else if (projDragSrc.kind === "photo" && projDragSrc.id === id) {
+            const at = insertIndexH(d, e.clientX);
+            const [m] = p.photos.splice(projDragSrc.k, 1);
+            p.photos.splice(at > projDragSrc.k ? at - 1 : at, 0, m);
+          }
+          markDirty();
+          renderProj();
+        });
+
+        return d;
+      }
+
+      document.getElementById("addProjBtn").addEventListener("click", async () => {
+        const title = (prompt("Titre du projet ? (ex. Pyrénées)") || "").trim();
+        if (!title) return;
+        const year =
+          (prompt("Année ?", String(new Date().getFullYear())) || "").trim() ||
+          String(new Date().getFullYear());
+
+        const slug = uniqueProjSlug(slugify(title + "-" + year));
+        const folder = "images/" + slug;
+
+        const dir = await resolveDir(folder, true);
+        if (!dir) {
+          toast("Impossible de créer le dossier " + folder);
+          return;
+        }
+
+        cfg.projects = {
+          [slug]: {
+            title,
+            date: "",
+            dateLong: "",
+            year,
+            location: "",
+            folder,
+            photos: [],
+          },
+          ...cfg.projects,
+        };
+
+        // make the new folder available (and selected) in the pool below,
+        // ready to receive uploads for this project right away
+        if (![...projFolderSel.options].some((o) => o.value === folder)) {
+          const o = document.createElement("option");
+          o.value = folder;
+          o.textContent = slug;
+          projFolderSel.appendChild(o);
+        }
+        projFolderSel.value = folder;
+        await renderProjPool();
+
+        openProj = slug;
+        markDirty();
+        renderProj();
+      });
+
+      // Separate folder picker / thumbnail pool, same helpers as the
+      // sequence tab's — dragged into an open project's drawer above.
+      const projFolderSel = document.getElementById("projFolderSel");
+      const projPoolGrid = document.getElementById("projPoolGrid");
+
+      async function renderProjPool() {
+        projPoolGrid.innerHTML = "";
+        if (!projFolderSel.value) return;
+        const files = await scanDir(projFolderSel.value);
+        files.forEach((src) => {
+          const im = document.createElement("img");
+          im.draggable = true;
+          im.title = src.split("/").pop();
+          setThumb(im, src);
+          im.addEventListener("dragstart", (e) => {
+            projDragSrc = { kind: "pool", src: src };
+            e.dataTransfer.effectAllowed = "copy";
+            e.dataTransfer.setData("text/plain", src);
+          });
+          im.addEventListener("dragend", () => {
+            clearIns();
+            projDragSrc = null;
+          });
+          projPoolGrid.appendChild(im);
+        });
+      }
+
+      projFolderSel.addEventListener("change", renderProjPool);
+
+      document.getElementById("projUploadBtn").addEventListener("click", () => {
+        const input = document.getElementById("sharedFileInput");
+        input.onchange = async () => {
+          const files = [...input.files];
+          input.value = "";
+          if (!files.length || !projFolderSel.value) return;
+          try {
+            const added = await uploadFilesToFolder(projFolderSel.value, files);
+            toast(added.length + " image(s) importée(s)");
+            await renderProjPool();
+          } catch (e) {
+            toast(e.message);
+          }
+        };
+        input.click();
+      });
+
+      // ══════════════════════════════════════════════════════════════
+      // Content panel
+      // ══════════════════════════════════════════════════════════════
+      function field(parent, label, value, onChange, multiline) {
+        const w = document.createElement("div");
+        w.className = "fld";
+        const l = document.createElement("label");
+        l.textContent = label;
+        w.appendChild(l);
+        const inp = document.createElement(multiline ? "textarea" : "input");
+        inp.value = value || "";
+        inp.addEventListener("input", () => {
+          onChange(inp.value);
+          markDirty();
+        });
+        w.appendChild(inp);
+        parent.appendChild(w);
+        return inp;
+      }
+
+      function block(title) {
+        const b = document.createElement("div");
+        b.className = "block";
+        const h = document.createElement("h2");
+        h.textContent = title;
+        b.appendChild(h);
+        return b;
+      }
+
+      function renderContent() {
+        const p = document.getElementById("panel-content");
+        p.innerHTML = "";
+        cfg.content = cfg.content || {};
+        const about = (cfg.content.about = cfg.content.about || {});
+        const contact = (cfg.content.contact = cfg.content.contact || {});
+
+        // quote
+        const b1 = block("Citation");
+        field(b1, "Citation", about.quote, (v) => (about.quote = v), true);
+        field(b1, "Auteur de la citation", about.quoteAuthor, (v) => (about.quoteAuthor = v));
+        p.appendChild(b1);
+
+        // approche
+        const b2 = block("Approche");
+        about.approche = about.approche || [];
+        about.approche.forEach((par, i) => {
+          const r = document.createElement("div");
+          r.className = "listrow";
+          const ta = document.createElement("textarea");
+          ta.value = par;
+          ta.addEventListener("input", () => {
+            about.approche[i] = ta.value;
+            markDirty();
+          });
+          r.appendChild(ta);
+          const x = document.createElement("button");
+          x.className = "mini del";
+          x.textContent = "×";
+          x.addEventListener("click", () => {
+            about.approche.splice(i, 1);
+            markDirty();
+            renderContent();
+          });
+          r.appendChild(x);
+          b2.appendChild(r);
+        });
+        const addP = document.createElement("button");
+        addP.className = "mini";
+        addP.textContent = "+ paragraphe";
+        addP.addEventListener("click", () => {
+          about.approche.push("");
+          markDirty();
+          renderContent();
+        });
+        b2.appendChild(addP);
+        p.appendChild(b2);
+
+        // gear — label and model only, no commentary (not shown on the page)
+        const b3 = block("Équipement");
+        about.gear = about.gear || [];
+        about.gear.forEach((g, gi) => {
+          const gw = document.createElement("div");
+          gw.className = "gearitem";
+          field(gw, "Label", g.label, (v) => (g.label = v));
+          field(gw, "Titre", g.title, (v) => (g.title = v));
+          const rm = document.createElement("button");
+          rm.className = "mini del";
+          rm.textContent = "supprimer cet élément";
+          rm.addEventListener("click", () => {
+            about.gear.splice(gi, 1);
+            markDirty();
+            renderContent();
+          });
+          gw.appendChild(rm);
+          b3.appendChild(gw);
+        });
+        const addG = document.createElement("button");
+        addG.className = "mini";
+        addG.textContent = "+ élément";
+        addG.addEventListener("click", () => {
+          about.gear.push({ label: "", title: "" });
+          markDirty();
+          renderContent();
+        });
+        b3.appendChild(addG);
+        p.appendChild(b3);
+
+        // contact
+        const b4 = block("Contact");
+        field(b4, "Email", contact.email, (v) => (contact.email = v));
+        field(b4, "Instagram (handle)", contact.instagramHandle, (v) => (contact.instagramHandle = v));
+        field(b4, "Instagram (URL)", contact.instagramUrl, (v) => (contact.instagramUrl = v));
+        field(b4, "Basé à", contact.location, (v) => (contact.location = v));
+        field(b4, "Note", contact.note, (v) => (contact.note = v), true);
+        p.appendChild(b4);
+      }
+
+      // ══════════════════════════════════════════════════════════════
+      // Tabs / actions
+      // ══════════════════════════════════════════════════════════════
+      document.querySelectorAll(".tab").forEach((t) => {
+        t.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach((x) => x.classList.remove("on"));
+          document.querySelectorAll(".panel").forEach((x) => x.classList.remove("on"));
+          t.classList.add("on");
+          document.getElementById("panel-" + t.dataset.panel).classList.add("on");
         });
       });
-      card.appendChild(btn);
 
-      card.addEventListener('dragover', e => {
-        if (isFileDrag(e)) return;
-        if (!drag || !drag.src) return;
+      document.getElementById("saveBtn").addEventListener("click", async () => {
+        try {
+          await writeCfg();
+          clearDirty();
+          toast("Enregistré ✓");
+        } catch (e) {
+          toast(e.message);
+        }
+      });
+
+      document.getElementById("reloadBtn").addEventListener("click", async () => {
+        if (dirty && !confirm("Des modifications ne sont pas enregistrées. Recharger quand même ?")) return;
+        cfg = await readCfg();
+        cfg.sequence = cfg.sequence || [];
+        cfg.projects = cfg.projects || {};
+        openGroup = -1;
+        openProj = null;
+        clearDirty();
+        renderSeq();
+        renderProj();
+        renderContent();
+        toast("Rechargé");
+      });
+
+      document.getElementById("previewBtn").addEventListener("click", () => {
+        window.open("index.html", "_blank");
+      });
+
+      window.addEventListener("beforeunload", (e) => {
+        if (!dirty) return;
         e.preventDefault();
-        card.classList.add('drop-over');
-      });
-      card.addEventListener('dragleave', () => card.classList.remove('drop-over'));
-      card.addEventListener('drop', e => {
-        if (isFileDrag(e)) return;
-        e.preventDefault();
-        card.classList.remove('drop-over');
-        if (!drag || !drag.src) return;
-        about[key] = drag.src;
-        renderSlots();
-        toast('Photo mise à jour');
+        e.returnValue = "";
       });
 
-      body.appendChild(card);
-    });
-  }
-  renderSlots();
-  block.appendChild(body);
+      // ══════════════════════════════════════════════════════════════
+      // Boot
+      // ══════════════════════════════════════════════════════════════
+      async function init() {
+        cfg = await readCfg();
+        cfg.sequence = cfg.sequence || [];
+        cfg.projects = cfg.projects || {};
+        document.getElementById("folderName").textContent = root.name || "";
 
-  // Pool of photos already in the about-page folder — drag any of them
-  // onto a slot above, same interaction as the homepage pool.
-  const poolBlock = document.createElement('div');
-  poolBlock.className = 'pool';
-  poolBlock.style.borderTop = 'none';
+        const folders = await listImageFolders();
+        [folderSel, projFolderSel].forEach((sel) => {
+          sel.innerHTML = "";
+          folders.forEach((f) => {
+            const o = document.createElement("option");
+            o.value = f;
+            o.textContent = decodeURIComponent(f.replace("images/", ""));
+            sel.appendChild(o);
+          });
+        });
+        const showcase = folders.find((f) => /showcase/i.test(f));
+        if (showcase) folderSel.value = showcase;
 
-  const poolHead = document.createElement('div');
-  poolHead.className = 'pool-head';
-  const poolCount = document.createElement('span');
-  poolCount.className = 'pool-count';
-  poolHead.append(`Pool — ${ABOUT_MEDIA_FOLDER}`, poolCount);
-  const poolSpacer = document.createElement('span');
-  poolSpacer.className = 'spacer';
-  poolHead.appendChild(poolSpacer);
-  const importBtn = document.createElement('button');
-  importBtn.className = 'btn-ghost small';
-  importBtn.textContent = '+ Importer des photos';
-  importBtn.addEventListener('click', () => {
-    triggerUpload(ABOUT_MEDIA_FOLDER, async () => {
-      aboutFiles = await scanDir(ABOUT_MEDIA_FOLDER);
-      renderAboutPool();
-    });
-  });
-  poolHead.appendChild(importBtn);
-  poolBlock.appendChild(poolHead);
+        renderSeq();
+        renderProj();
+        renderContent();
+        await renderPool();
+        await renderProjPool();
+        clearDirty();
+      }
 
-  const poolStrip = document.createElement('div');
-  poolStrip.className = 'pool-strip';
-  poolBlock.appendChild(poolStrip);
+      async function enterApp() {
+        await init();
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("app").classList.add("on");
+      }
 
-  function renderAboutPool() {
-    poolCount.textContent = `(${aboutFiles.length})`;
-    poolStrip.innerHTML = '';
-    if (!aboutFiles.length) {
-      poolStrip.innerHTML = '<span class="empty">Aucune photo — importe ou dépose ici</span>';
-      return;
-    }
-    for (const src of aboutFiles) {
-      const pcard = document.createElement('div');
-      pcard.className = 'pcard';
-      pcard.draggable = true;
-      const img = document.createElement('img');
-      img.draggable = false;
-      const name = document.createElement('div');
-      name.className = 'pcard-name';
-      name.textContent = src.split('/').pop();
-      pcard.append(img, name);
-      thumb(src).then(u => { if (u) img.src = u; });
-      pcard.addEventListener('dragstart', e => {
-        drag = { from: 'about-pool', src };
-        e.dataTransfer.effectAllowed = 'copy';
-        e.dataTransfer.setData('text/plain', src);
+      async function tryReconnect(handle) {
+        let p = await handle.queryPermission({ mode: "readwrite" });
+        if (p !== "granted") p = await handle.requestPermission({ mode: "readwrite" });
+        return p === "granted";
+      }
+
+      document.getElementById("openBtn").addEventListener("click", async () => {
+        const err = document.getElementById("errMsg");
+        err.style.display = "none";
+        try {
+          if (storedHandle) {
+            if (!(await tryReconnect(storedHandle))) throw new Error("Permission refusée pour ce dossier.");
+            root = storedHandle;
+          } else {
+            root = await window.showDirectoryPicker({ mode: "readwrite" });
+            await idbSaveHandle(root);
+            storedHandle = root;
+          }
+          await enterApp();
+        } catch (e) {
+          if (e.name !== "AbortError") {
+            err.textContent = e.message;
+            err.style.display = "block";
+          }
+        }
       });
-      poolStrip.appendChild(pcard);
-    }
-  }
-  renderAboutPool();
-  attachUploadDropzone(poolStrip, () => ABOUT_MEDIA_FOLDER, async () => {
-    aboutFiles = await scanDir(ABOUT_MEDIA_FOLDER);
-    renderAboutPool();
-  });
 
-  block.appendChild(poolBlock);
-  return block;
-}
+      document.getElementById("switchBtn").addEventListener("click", async () => {
+        const err = document.getElementById("errMsg");
+        err.style.display = "none";
+        try {
+          root = await window.showDirectoryPicker({ mode: "readwrite" });
+          await idbSaveHandle(root);
+          storedHandle = root;
+          await enterApp();
+        } catch (e) {
+          if (e.name !== "AbortError") {
+            err.textContent = e.message;
+            err.style.display = "block";
+          }
+        }
+      });
 
-function buildAboutQuoteBlock(about) {
-  const block = document.createElement('div');
-  block.className = 'sblock';
-  const head = document.createElement('div');
-  head.className = 'sblock-head';
-  head.textContent = 'Citation';
-  block.appendChild(head);
+      (async () => {
+        if (!window.showDirectoryPicker) {
+          document.getElementById("errMsg").textContent =
+            "Ce navigateur ne supporte pas l'accès aux fichiers. Utilise Chrome ou Edge.";
+          document.getElementById("errMsg").style.display = "block";
+          return;
+        }
+        try {
+          storedHandle = await idbLoadHandle();
+        } catch (e) {
+          storedHandle = null;
+        }
+        if (!storedHandle) return;
 
-  const body = document.createElement('div');
-  body.style.paddingTop = '4px';
+        const f = document.getElementById("overlayFolder");
+        f.textContent = storedHandle.name || "";
+        f.style.display = "inline-block";
 
-  const quoteRow = document.createElement('div');
-  quoteRow.className = 'field-row';
-  const quoteLbl = document.createElement('label');
-  quoteLbl.textContent = 'Citation';
-  const quoteTa = document.createElement('textarea');
-  quoteTa.value = about.quote || '';
-  quoteTa.addEventListener('change', () => { about.quote = quoteTa.value; });
-  quoteRow.appendChild(quoteLbl);
-  quoteRow.appendChild(quoteTa);
-  body.appendChild(quoteRow);
+        try {
+          if ((await storedHandle.queryPermission({ mode: "readwrite" })) === "granted") {
+            root = storedHandle;
+            await enterApp();
+            return;
+          }
+        } catch (e) {
+          /* fall through to manual reconnect */
+        }
 
-  const authorRow = document.createElement('div');
-  authorRow.className = 'field-row';
-  const authorLbl = document.createElement('label');
-  authorLbl.textContent = 'Auteur';
-  const authorInp = document.createElement('input');
-  authorInp.value = about.quoteAuthor || '';
-  authorInp.addEventListener('change', () => { about.quoteAuthor = authorInp.value; });
-  authorRow.appendChild(authorLbl);
-  authorRow.appendChild(authorInp);
-  body.appendChild(authorRow);
-
-  block.appendChild(body);
-  return block;
-}
-
-function buildContactBlock(contact) {
-  const block = document.createElement('div');
-  block.className = 'sblock';
-  const head = document.createElement('div');
-  head.className = 'sblock-head';
-  head.textContent = 'Contact';
-  block.appendChild(head);
-
-  const body = document.createElement('div');
-  body.style.paddingTop = '4px';
-
-  const fields = [
-    ['titleLine1',      'Titre (ligne 1)'],
-    ['titleLine2',      'Titre (ligne 2, en italique)'],
-    ['email',           'Email'],
-    ['instagramHandle', 'Instagram affiché (ex. @pseudo)'],
-    ['instagramUrl',    'Instagram — lien'],
-    ['location',        'Basé à'],
-  ];
-  fields.forEach(([key, label]) => {
-    const row = document.createElement('div');
-    row.className = 'field-row';
-    const lbl = document.createElement('label');
-    lbl.textContent = label;
-    const inp = document.createElement('input');
-    inp.value = contact[key] || '';
-    inp.addEventListener('change', () => { contact[key] = inp.value; });
-    row.appendChild(lbl);
-    row.appendChild(inp);
-    body.appendChild(row);
-  });
-
-  const noteRow = document.createElement('div');
-  noteRow.className = 'field-row';
-  const noteLbl = document.createElement('label');
-  noteLbl.textContent = 'Note';
-  const noteTa = document.createElement('textarea');
-  noteTa.value = contact.note || '';
-  noteTa.addEventListener('change', () => { contact.note = noteTa.value; });
-  noteRow.appendChild(noteLbl);
-  noteRow.appendChild(noteTa);
-  body.appendChild(noteRow);
-
-  block.appendChild(body);
-  return block;
-}
-
-function renderContent() {
-  const body = document.getElementById('contentBody');
-  body.innerHTML = '';
-  const about   = cfg.content.about;
-  const contact = cfg.content.contact;
-
-  body.appendChild(buildAboutMediaBlock(about));
-  body.appendChild(buildAboutQuoteBlock(about));
-  body.appendChild(buildTextListBlock('Approche', '', about.approche, () => {}));
-  body.appendChild(buildGearBlock(about.gear));
-  body.appendChild(buildContactBlock(contact));
-}
-
-// ─── TABS ─────────────────────────────────────────────────────────────────
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
-    document.querySelectorAll('.panel').forEach(x => x.classList.remove('on'));
-    t.classList.add('on');
-    document.getElementById(`panel-${t.dataset.panel}`).classList.add('on');
-  });
-});
-
-document.getElementById('projSel').addEventListener('change', e => {
-  const id = e.target.value;
-  if (id) renderProject(id);
-  else document.getElementById('projBody').innerHTML = '<span class="empty">Sélectionne un projet</span>';
-});
-
-// ─── SAVE ─────────────────────────────────────────────────────────────────
-document.getElementById('saveBtn').addEventListener('click', async () => {
-  try {
-    await writeCfg();
-    toast('Enregistré ✓');
-  } catch (e) {
-    toast('Erreur : ' + e.message, true);
-  }
-});
-
-// ─── OPEN / RECONNECT ─────────────────────────────────────────────────────
-async function enterApp() {
-  await init();
-  document.getElementById('overlay').style.display = 'none';
-  document.getElementById('app').classList.add('on');
-}
-
-async function tryReconnect(handle) {
-  let perm = await handle.queryPermission({ mode: 'readwrite' });
-  if (perm !== 'granted') perm = await handle.requestPermission({ mode: 'readwrite' });
-  return perm === 'granted';
-}
-
-document.getElementById('openBtn').addEventListener('click', async () => {
-  const errEl = document.getElementById('errMsg');
-  errEl.style.display = 'none';
-  try {
-    if (storedHandle) {
-      const ok = await tryReconnect(storedHandle);
-      if (!ok) throw new Error('Permission refusée pour ce dossier.');
-      root = storedHandle;
-    } else {
-      root = await window.showDirectoryPicker({ mode: 'readwrite' });
-      await idbSaveHandle(root);
-      storedHandle = root;
-    }
-    await enterApp();
-  } catch (e) {
-    if (e.name !== 'AbortError') {
-      errEl.textContent = e.message;
-      errEl.style.display = 'block';
-    }
-  }
-});
-
-document.getElementById('switchBtn').addEventListener('click', async () => {
-  const errEl = document.getElementById('errMsg');
-  errEl.style.display = 'none';
-  try {
-    root = await window.showDirectoryPicker({ mode: 'readwrite' });
-    await idbSaveHandle(root);
-    storedHandle = root;
-    await enterApp();
-  } catch (e) {
-    if (e.name !== 'AbortError') {
-      errEl.textContent = e.message;
-      errEl.style.display = 'block';
-    }
-  }
-});
-
-// ─── BOOT: try to silently reconnect to a remembered folder ────────────────
-(async () => {
-  try {
-    storedHandle = await idbLoadHandle();
-  } catch (e) {
-    storedHandle = null;
-  }
-  if (!storedHandle) return;
-
-  document.getElementById('overlayFolder').textContent = storedHandle.name || '';
-  document.getElementById('overlayFolder').style.display = 'inline-block';
-
-  try {
-    const perm = await storedHandle.queryPermission({ mode: 'readwrite' });
-    if (perm === 'granted') {
-      root = storedHandle;
-      await enterApp();
-      return;
-    }
-  } catch (e) { /* fall through to manual reconnect */ }
-
-  document.getElementById('overlayTitle').textContent = 'Bon retour';
-  document.getElementById('overlaySubtitle').innerHTML = 'Reconnecte-toi au dossier déjà utilisé.<br>Un seul clic, pas besoin de le rechercher.';
-  document.getElementById('openBtn').textContent = 'Continuer';
-  document.getElementById('switchBtn').style.display = 'inline-block';
-})();
-</script>
-</body>
+        document.getElementById("overlayTitle").textContent = "Bon retour";
+        document.getElementById("overlaySubtitle").innerHTML =
+          "Reconnecte-toi au dossier déjà utilisé.<br>Un seul clic, pas besoin de le rechercher.";
+        document.getElementById("openBtn").textContent = "Continuer";
+        document.getElementById("switchBtn").style.display = "inline-block";
+      })();
+    </script>
+  </body>
 </html>

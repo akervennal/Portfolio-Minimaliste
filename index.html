@@ -1,38 +1,34 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Armel Kervennal — Photographe</title>
+    <title>Armel Kervennal</title>
     <meta
       name="description"
-      content="Portfolio d'Armel Kervennal, photographe basé à Nantes. Photo automobile, paysage et documentaire."
+      content="Portfolio d'Armel Kervennal, photographe basé à Nantes."
     />
-
     <link rel="icon" type="image/png" href="Favicon/favicon.png" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <script src="photos-config.js"></script>
+
+    <!-- set synchronously so the pre-paint state matches what JS will draw -->
+    <script>
+      document.documentElement.className = "js";
+    </script>
 
     <style>
       :root {
-        --bg: #0a0a0a;
-        --bg-elev: #141414;
-        --text: #f0ede4;
-        --text-muted: #8a857c;
-        --text-faint: #4a4842;
-        --line: rgba(240, 237, 228, 0.08);
-        --line-strong: rgba(240, 237, 228, 0.2);
-        --serif: "EB Garamond", Georgia, "Times New Roman", serif;
-        --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-        --mono: "JetBrains Mono", "Courier New", monospace;
-        --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+        --sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+        --ink: #111;
+        --fg: #111;
+        --sliver: 48px;
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       *,
@@ -44,16 +40,14 @@
       }
 
       html {
-        scroll-behavior: smooth;
+        background: #fff;
       }
 
       body {
         font-family: var(--sans);
-        font-size: 15px;
-        font-weight: 300;
-        color: var(--text);
-        background: var(--bg);
-        line-height: 1.6;
+        font-weight: 400;
+        color: var(--ink);
+        background: #fff;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         overflow-x: hidden;
@@ -64,2328 +58,622 @@
         text-decoration: none;
       }
 
-      button {
-        font-family: inherit;
-        background: none;
-        border: none;
-        color: inherit;
-        cursor: pointer;
-      }
-
       /* ============================================================
-           CUSTOM CURSOR
-        ============================================================ */
-      body {
-        cursor: none;
-      }
-      a,
-      button,
-      [data-page],
-      [data-project],
-      img {
-        cursor: none;
-      }
-      .cursor {
+         HEADER
+         ============================================================ */
+      .hdr {
         position: fixed;
         top: 0;
         left: 0;
-        width: 8px;
-        height: 8px;
-        background: var(--text);
-        border-radius: 50%;
-        pointer-events: none;
-        transform: translate(-50%, -50%);
+        right: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 26px 32px;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        color: var(--fg);
         transition:
-          width 0.4s var(--ease-out),
-          height 0.4s var(--ease-out),
-          background 0.3s,
-          opacity 0.2s;
-        z-index: 9999;
-        mix-blend-mode: difference;
+          transform 0.5s var(--ease),
+          color 0.25s linear;
       }
-      .cursor.cursor-link {
-        width: 32px;
-        height: 32px;
-        background: transparent;
-        border: 1px solid var(--text);
+      .hdr.is-hidden {
+        transform: translateY(-140%);
       }
-      .cursor.cursor-photo {
-        width: 64px;
-        height: 64px;
-        background: transparent;
-        border: 1px solid var(--text);
+      .hdr-nav {
+        display: flex;
+        align-items: baseline;
+        gap: 22px;
       }
-      .cursor-label {
+      .hdr-link:hover {
+        opacity: 0.55;
+      }
+      .hdr-link.is-current {
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      /* ============================================================
+         SEQUENCE
+         ============================================================ */
+      .slot {
+        height: 78svh;
+        position: relative;
+        overflow: hidden;
+      }
+      /* Extra scroll distance between photos, added only between slots
+         (never before the first or after the last) so it doesn't disturb
+         the first/last centering trick below. */
+      .slot + .slot {
+        margin-top: 25svh;
+      }
+      /* Slots are shorter than the viewport on purpose, so photos come
+         close together — but that means the first/last slot's own centre
+         can't be scrolled into line with the viewport's centre (you can't
+         scroll past the top/bottom to compensate). Padding the sequence
+         by exactly the missing half — (100vh - slot height) / 2 — closes
+         that gap, so the first and last photo centre exactly like every
+         one in between. */
+      #seq {
+        padding-top: 11svh;
+        padding-bottom: 11svh;
+      }
+      .slot-inner {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* Without JS every photo simply stays visible; the fade is applied
+         only once the script is driving opacity itself. */
+      .js .slot-inner {
+        opacity: 0;
+      }
+
+      .shot {
+        display: block;
+        max-height: 72vh;
+        max-width: 92vw;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+      }
+
+      /* ============================================================
+         GROUP CAROUSEL
+         ============================================================ */
+      .group {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        /* horizontal gestures belong to the carousel, vertical ones to
+           the page — never steal the user's scroll */
+        touch-action: pan-y;
+      }
+      .g-item {
         position: absolute;
         top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-family: var(--mono);
-        font-size: 9px;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        white-space: nowrap;
-        opacity: 0;
-        transition: opacity 0.2s;
-      }
-      .cursor.cursor-photo .cursor-label {
-        opacity: 0.9;
-      }
-
-      /* ============================================================
-           HEADER
-        ============================================================ */
-      .header {
-        position: fixed;
-        top: 0;
         left: 0;
-        right: 0;
-        padding: 22px 40px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        z-index: 100;
-        transition: padding 0.4s ease;
-      }
-      .header::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 160px;
-        background: linear-gradient(to bottom, rgba(8, 8, 8, 0.85) 0%, rgba(8, 8, 8, 0.5) 45%, transparent 100%);
-        opacity: 0;
-        transition: opacity 0.45s ease;
-        pointer-events: none;
-        z-index: 0;
-      }
-      .header.scrolled {
-        padding-top: 14px;
-        padding-bottom: 14px;
-      }
-      .header.scrolled::before {
-        opacity: 1;
-      }
-      .header-blur {
-        position: absolute;
-        top: 0;
-        bottom: -120px;
-        background: rgba(10, 10, 10, 0.12);
-        z-index: -1;
-        pointer-events: none;
-      }
-      .header-blur-left {
-        left: 0;
-        width: 340px;
-        -webkit-mask-image:
-          linear-gradient(to right, black 55%, transparent 100%),
-          linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 28%, rgba(0,0,0,0.95) 38%, rgba(0,0,0,0.82) 48%, rgba(0,0,0,0.62) 60%, rgba(0,0,0,0.38) 73%, rgba(0,0,0,0.16) 86%, rgba(0,0,0,0.04) 94%, rgba(0,0,0,0) 100%);
-        -webkit-mask-composite: source-in;
-        mask-image:
-          linear-gradient(to right, black 55%, transparent 100%),
-          linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 28%, rgba(0,0,0,0.95) 38%, rgba(0,0,0,0.82) 48%, rgba(0,0,0,0.62) 60%, rgba(0,0,0,0.38) 73%, rgba(0,0,0,0.16) 86%, rgba(0,0,0,0.04) 94%, rgba(0,0,0,0) 100%);
-        mask-composite: intersect;
-      }
-      .header-blur-right {
-        right: 0;
-        width: 540px;
-        -webkit-mask-image:
-          linear-gradient(to left, black 55%, transparent 100%),
-          linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 28%, rgba(0,0,0,0.95) 38%, rgba(0,0,0,0.82) 48%, rgba(0,0,0,0.62) 60%, rgba(0,0,0,0.38) 73%, rgba(0,0,0,0.16) 86%, rgba(0,0,0,0.04) 94%, rgba(0,0,0,0) 100%);
-        -webkit-mask-composite: source-in;
-        mask-image:
-          linear-gradient(to left, black 55%, transparent 100%),
-          linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 28%, rgba(0,0,0,0.95) 38%, rgba(0,0,0,0.82) 48%, rgba(0,0,0,0.62) 60%, rgba(0,0,0,0.38) 73%, rgba(0,0,0,0.16) 86%, rgba(0,0,0,0.04) 94%, rgba(0,0,0,0) 100%);
-        mask-composite: intersect;
-      }
-      .logo {
-        font-family: var(--serif);
-        font-size: 22px;
-        font-weight: 400;
-        letter-spacing: 0.04em;
-        color: #fff;
-        position: relative;
-        z-index: 1;
-        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
-      }
-      .logo em {
-        font-style: italic;
-        opacity: 0.7;
-      }
-
-      .nav {
-        display: flex;
-        gap: 36px;
-        align-items: center;
-        position: relative;
-        z-index: 2;
-      }
-
-      .nav a {
-        font-size: 11px;
-        font-weight: 400;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: #fff;
-        position: relative;
-        padding: 4px 0;
-        font-family: var(--mono);
-        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
-      }
-      .nav a::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: -2px;
-        height: 1px;
-        background: #fff;
-        transform: scaleX(0);
-        transform-origin: right center;
-        transition: transform 0.5s var(--ease-out);
-      }
-      .nav a:hover::after,
-      .nav a.active::after {
-        transform: scaleX(1);
-        transform-origin: left center;
-      }
-
-      /* ============================================================
-           PAGE SYSTEM
-        ============================================================ */
-      .page {
-        display: none;
-        opacity: 0;
-        transform: translateY(18px);
-        transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
-      }
-      .page.active {
         display: block;
-      }
-      .page.fade-in {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      /* ============================================================
-           HOMEPAGE — HERO SLIDESHOW
-        ============================================================ */
-      .hero {
-        position: relative;
-        height: 100vh;
-        width: 100%;
-        overflow: hidden;
-        background: #000;
-      }
-      .hero-slide {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        transition: opacity 2s var(--ease);
-      }
-      .hero-slide.active {
-        opacity: 1;
-      }
-      .hero-slide img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      .hero-slide::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-          to bottom,
-          rgba(0, 0, 0, 0.75) 0%,
-          rgba(0, 0, 0, 0.5) 22%,
-          rgba(0, 0, 0, 0) 52%,
-          rgba(0, 0, 0, 0.45) 78%,
-          rgba(0, 0, 0, 0.85) 100%
-        );
-        pointer-events: none;
-      }
-
-      .hero-caption {
-        position: absolute;
-        bottom: 36px;
-        left: 40px;
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.18em;
-        color: #fff;
-        text-transform: uppercase;
-        opacity: 1;
-        z-index: 10;
-        text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6);
-      }
-      .hero-progress {
-        position: absolute;
-        bottom: 40px;
-        right: 40px;
-        display: flex;
-        gap: 8px;
-        z-index: 10;
-      }
-      .hero-progress span {
-        position: relative;
-        width: 28px;
-        height: 2px;
-        background: rgba(255, 255, 255, 0.3);
-        cursor: none;
-        transition: background 0.3s, height 0.3s, transform 0.3s;
-      }
-      .hero-progress span::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: -9px;
-        bottom: -9px;
-      }
-      .hero-progress span:hover {
-        height: 3px;
-        background: rgba(255, 255, 255, 0.7);
-        transform: translateY(-0.5px);
-      }
-      .hero-progress span.active {
-        background: var(--text);
-      }
-      .hero-progress span.active:hover {
-        background: var(--text);
-      }
-
-      .scroll-hint {
-        position: absolute;
-        bottom: 34px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 15px;
-        height: 26px;
-        color: var(--text);
-        opacity: 0.85;
-        z-index: 10;
-        animation: bob 2.5s ease-in-out infinite;
-        pointer-events: none;
-      }
-      .scroll-hint svg {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-      @keyframes bob {
-        0%,
-        100% {
-          transform: translateX(-50%) translateY(0);
-        }
-        50% {
-          transform: translateX(-50%) translateY(4px);
-        }
-      }
-
-      /* ============================================================
-           SHOWCASE — INTRO + GRID
-        ============================================================ */
-      .showcase {
-        padding: 100px 40px 100px;
-      }
-
-      .section-header {
-        max-width: 720px;
-        margin-bottom: 100px;
-      }
-
-      .section-eyebrow {
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin-bottom: 24px;
-      }
-      .section-title {
-        font-family: var(--serif);
-        font-size: 44px;
-        font-weight: 400;
-        line-height: 1.15;
-        letter-spacing: -0.01em;
-        margin-bottom: 28px;
-      }
-      .section-title em {
-        font-style: italic;
-        color: var(--text-muted);
-      }
-      .section-intro {
-        font-size: 15px;
-        color: var(--text-muted);
-        line-height: 1.8;
-        max-width: 540px;
-        font-weight: 300;
-      }
-
-      .grid-3 {
-        display: flex;
-        gap: 24px;
-        align-items: flex-start;
-      }
-      .grid-col {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-      }
-      .grid-col img {
-        width: 100%;
-        height: auto;
-        display: block;
-      }
-
-      .see-more {
-        margin-top: 100px;
-        text-align: center;
-      }
-      .see-more a {
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        padding: 14px 28px;
-        border: 1px solid var(--line-strong);
-        color: var(--text);
-        transition: all 0.4s var(--ease);
-        display: inline-block;
-      }
-      .see-more a:hover {
-        background: var(--text);
-        color: var(--bg);
-        border-color: var(--text);
-      }
-
-      /* ============================================================
-           PROJECTS INDEX
-        ============================================================ */
-      .projects-page {
-        padding: 160px 40px 100px;
-      }
-
-      .projects-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 64px 32px;
-      }
-      .project-card {
-        display: block;
-        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      .projects-grid:has(.project-card:hover) .project-card {
-        transform: scale(0.98);
-        filter: brightness(0.75);
-      }
-      .projects-grid:has(.project-card:hover) .project-card:hover {
-        transform: scale(1.01);
-        filter: brightness(1);
-      }
-      .project-cover {
-        aspect-ratio: 4 / 5;
-        background: var(--bg-elev);
-        position: relative;
-        overflow: hidden;
-      }
-      .project-cover img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      .project-cover::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.75) 100%);
-        pointer-events: none;
-      }
-      .project-card-name {
-        font-family: var(--serif);
-        font-size: 20px;
-        font-weight: 400;
-        color: #fff;
-        margin-bottom: 4px;
-      }
-      .project-card:hover .project-card-name {
-        transform: translateY(-4px);
-      }
-      .project-card-meta {
-        font-family: var(--mono);
-        font-size: 10px;
-        color: rgba(255,255,255,0.6);
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        display: flex;
-        justify-content: space-between;
-        transition: transform 0.9s var(--ease-out), opacity 0.8s var(--ease);
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      .project-card:hover .project-card-meta {
-        opacity: 1;
-        transform: translateY(-4px);
-      }
-      .project-card-info {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 16px 18px;
-        z-index: 1;
-      }
-
-      /* ============================================================
-           PROJECT VIEW
-        ============================================================ */
-      .project-view {
-        padding: 140px 40px 100px;
-      }
-      .project-back {
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        transition: color 0.3s;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 80px;
-      }
-      .project-back:hover {
-        color: var(--text);
-      }
-      .project-back .arrow {
-        transition: transform 0.4s var(--ease-out);
-        display: inline-block;
-      }
-      .project-back:hover .arrow {
-        transform: translateX(-4px);
-      }
-
-      .project-view-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 60px;
-        padding-bottom: 28px;
-        border-bottom: 1px solid var(--line);
-        flex-wrap: wrap;
-        gap: 24px;
-      }
-      .project-view-title {
-        font-family: var(--serif);
-        font-size: 56px;
-        font-weight: 400;
-        line-height: 1;
-        letter-spacing: -0.015em;
-      }
-      .project-view-meta {
-        font-family: var(--mono);
-        font-size: 11px;
-        color: var(--text-muted);
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        text-align: right;
-      }
-      .project-view-meta div + div {
-        margin-top: 8px;
-      }
-
-      .play-button {
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        padding: 12px 22px;
-        border: 1px solid var(--line-strong);
-        color: var(--text);
-        transition: all 0.4s var(--ease);
-        margin-bottom: 60px;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .play-button:hover {
-        background: var(--text);
-        color: var(--bg);
-        border-color: var(--text);
-      }
-      .play-icon {
-        width: 0;
-        height: 0;
-        border-style: solid;
-        border-width: 4px 0 4px 6px;
-        border-color: transparent transparent transparent currentColor;
-      }
-
-      .grid-2 {
-        display: flex;
-        gap: 32px;
-        align-items: flex-start;
-      }
-
-
-      /* ============================================================
-           ABOUT
-        ============================================================ */
-      .about-hero {
-        position: relative;
-        height: 100vh;
-        width: 100%;
-        overflow: hidden;
-        background: #000;
-      }
-      .about-hero:empty {
-        display: none;
-      }
-      .about-hero img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        transform: scale(1.15);
-        will-change: transform;
-      }
-      .about-hero::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: 1;
-        background: linear-gradient(
-          to bottom,
-          rgba(0, 0, 0, 0.75) 0%,
-          rgba(0, 0, 0, 0.45) 22%,
-          rgba(0, 0, 0, 0) 45%,
-          rgba(0, 0, 0, 0.4) 78%,
-          rgba(0, 0, 0, 0.78) 100%
-        );
-        pointer-events: none;
-      }
-      .about-hero-quote {
-        position: absolute;
-        left: 40px;
-        right: 40px;
-        bottom: 80px;
-        z-index: 2;
-      }
-      .about-hero-quote .about-quote {
-        color: var(--text);
-        text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
-        margin-bottom: 14px;
-      }
-      .about-hero-quote .about-quote-author {
-        margin-bottom: 0;
-        text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
-      }
-      .about-page {
-        padding: 100px 40px 100px;
-        max-width: 1100px;
-        margin: 0 auto;
-      }
-      .about-hero:empty + .about-page {
-        padding-top: 160px;
-      }
-      .about-quote {
-        font-family: var(--serif);
-        font-size: 40px;
-        font-weight: 400;
-        font-style: italic;
-        line-height: 1.35;
-        max-width: 820px;
-        margin-bottom: 24px;
-      }
-      .about-quote-author {
-        font-family: var(--mono);
-        font-size: 11px;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        margin-bottom: 100px;
-      }
-      .about-quote-author::before {
-        content: "— ";
-      }
-      .about-bio {
-        margin-bottom: 120px;
-      }
-      .about-section {
-        margin-bottom: 100px;
-        padding-top: 60px;
-        border-top: 1px solid var(--line);
-      }
-      .about-section:first-child {
-        padding-top: 0;
-        border-top: none;
-      }
-      .about-section-title {
-        font-family: var(--serif);
-        font-size: 32px;
-        font-weight: 400;
-        font-style: italic;
-        margin-bottom: 40px;
-      }
-      .about-approche {
-        display: flex;
-        gap: 60px;
-        align-items: flex-start;
-      }
-      .about-portrait {
-        flex-shrink: 0;
-        width: 300px;
-      }
-      .about-portrait img {
-        width: 100%;
-        height: auto;
-        display: block;
-      }
-      .about-text {
-        max-width: 620px;
-      }
-      .about-text p {
-        font-size: 15px;
-        line-height: 1.9;
-        margin-bottom: 18px;
-        color: var(--text);
-      }
-      .about-text p + p {
-        color: var(--text-muted);
-      }
-      .gear-list {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 40px;
-      }
-      .gear-item h3 {
-        font-family: var(--serif);
-        font-size: 22px;
-        font-weight: 400;
-        margin-bottom: 8px;
-      }
-      .gear-item .gear-label {
-        font-family: var(--mono);
-        font-size: 10px;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        margin-bottom: 20px;
-      }
-      .gear-item p {
-        font-size: 14px;
-        color: var(--text-muted);
-        line-height: 1.8;
-        margin-bottom: 14px;
-      }
-
-      /* ============================================================
-           CONTACT
-        ============================================================ */
-      .contact-page {
-        min-height: 100vh;
-        padding: 160px 40px 100px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        background:
-          linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.56) 45%, rgba(10, 10, 10, 0.8)),
-          url("images/24h-du-mans-2026/6-MEL_3648.jpg") center / cover no-repeat;
-      }
-      .contact-title {
-        font-family: var(--serif);
-        font-size: 96px;
-        font-weight: 400;
-        line-height: 1;
-        margin-bottom: 80px;
-        letter-spacing: -0.02em;
-      }
-      .contact-title em {
-        font-style: italic;
-        color: var(--text-muted);
-      }
-      .contact-info {
-        display: grid;
-        grid-template-columns: 120px 1fr;
-        gap: 24px 40px;
-        font-size: 18px;
-      }
-      .contact-info dt {
-        font-family: var(--mono);
-        font-size: 10px;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        padding-top: 8px;
-      }
-      .contact-info dd {
-        font-family: var(--serif);
-        font-size: 22px;
-      }
-      .contact-info dd a {
-        border-bottom: 1px solid var(--line);
-        padding-bottom: 2px;
-        transition: border-color 0.3s;
-      }
-      .contact-info dd a:hover {
-        border-color: var(--text);
-      }
-      .contact-note {
-        margin-top: 80px;
-        font-size: 14px;
-        color: var(--text-muted);
-        line-height: 1.8;
-        max-width: 500px;
-        font-style: italic;
-        font-family: var(--serif);
-      }
-
-      /* ============================================================
-           LIGHTBOX
-        ============================================================ */
-      .lb {
-        display: none;
-        position: fixed;
-        inset: 0;
-        z-index: 1000;
-      }
-      .lb.open { display: block; }
-
-      .lb-backdrop {
-        position: absolute;
-        inset: 0;
-        background: #000;
-        opacity: 0;
-        transition: opacity 0.45s ease;
-      }
-      .lb.open .lb-backdrop { opacity: 0.96; }
-
-      .lb-img-wrap {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 60px;
-      }
-      .lb-img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        display: block;
-        opacity: 0;
-        transform: scale(0.96);
-        transition: opacity 0.5s ease, transform 0.55s cubic-bezier(0.17, 0.84, 0.44, 1);
-      }
-      .lb-img.shown {
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      .lb-counter {
-        position: absolute;
-        bottom: 32px;
-        left: 40px;
-        z-index: 2;
-        font-family: var(--mono);
-        font-size: 10px;
-        letter-spacing: 0.18em;
-        color: rgba(255, 255, 255, 0.25);
-        opacity: 0;
-        transition: opacity 0.4s ease 0.2s;
-      }
-      .lb.open .lb-counter { opacity: 1; }
-
-      .lb-close {
-        position: absolute;
-        top: 28px;
-        right: 32px;
-        z-index: 10;
-        font-family: var(--mono);
-        font-size: 9px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.3);
+        border: 0;
+        padding: 0;
         background: none;
-        border: none;
+        font: inherit;
+        opacity: 0;
+        transform: translate3d(0, -50%, 0);
+        transition:
+          transform 0.7s var(--ease),
+          opacity 0.5s var(--ease);
         cursor: pointer;
-        padding: 6px;
-        opacity: 0;
-        transition: opacity 0.4s ease 0.15s, color 0.2s;
       }
-      .lb.open .lb-close { opacity: 1; }
-      .lb-close:hover { color: rgba(255, 255, 255, 0.9); }
-
-      .lb-nav {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 50%;
-        z-index: 5;
+      .g-item.is-centre {
+        cursor: default;
+        pointer-events: none;
       }
-      .lb-nav.prev { left: 0; }
-      .lb-nav.next { right: 0; }
-
-      /* ============================================================
-           LAZY FADE-IN
-        ============================================================ */
-      .grid-col img,
-      .grid-2 img,
-      .about-portrait img {
-        opacity: 0;
-        transform: translateY(10px);
-        transition: opacity 1.2s var(--ease), transform 1s var(--ease);
+      .g-item .shot {
+        max-width: 82vw;
       }
-      .about-hero img {
-        opacity: 0;
-        transition: opacity 1.2s var(--ease);
+      .g-item:focus-visible {
+        outline: 1px solid var(--ink);
+        outline-offset: 6px;
       }
-      .about-hero img.loaded {
-        opacity: 1;
-      }
-      .hero-slide img {
-        opacity: 0;
-        transition: opacity 1.2s var(--ease);
-      }
-      .project-cover img {
-        opacity: 0;
-        transition: opacity 1.2s var(--ease);
-      }
-      .grid-col img.loaded,
-      .grid-2 img.loaded,
-      .about-portrait img.loaded {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      .project-cover img.loaded,
-      .hero-slide.active img.loaded {
-        opacity: 1;
-      }
-      .hero-slide.active img {
-        opacity: 1;
-      }
-
-      /* ============================================================
-           FOOTER
-        ============================================================ */
-      .footer {
-        padding: 60px 40px 30px;
-        font-family: var(--mono);
-        font-size: 9px;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: var(--text-faint);
-        display: flex;
-        justify-content: space-between;
-        border-top: 1px solid var(--line);
-        margin-top: 100px;
-      }
-
-      /* ============================================================
-           RESPONSIVE
-        ============================================================ */
-      @media (max-width: 1100px) {
-        .projects-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-        .section-title {
-          font-size: 36px;
-        }
-        .project-view-title {
-          font-size: 44px;
-        }
-        .contact-title {
-          font-size: 64px;
-        }
-        .about-quote {
-          font-size: 30px;
-        }
+      .no-anim .g-item {
+        transition: none;
       }
 
       @media (max-width: 700px) {
-        .project-card-meta {
-          opacity: 1;
-          transform: none;
+        :root {
+          --sliver: 28px;
         }
-        .projects-grid:has(.project-card:hover) .project-card {
-          transform: none;
-          filter: none;
-        }
-        body {
-          cursor: auto;
-        }
-        a,
-        button,
-        [data-page],
-        [data-project],
-        img {
-          cursor: auto;
-        }
-        .cursor {
-          display: none;
-        }
-        .header {
+        .hdr {
           padding: 20px 20px;
+          font-size: 15px;
         }
-        .header-blur {
-          bottom: -40px;
+        /* On mobile the fixed header eats most of the top padding's
+           buffer, so the first photo reads as sitting too high / behind
+           it. Nudge just the top down to clear the header, independent
+           of the bottom (which has no such obstruction). */
+        #seq {
+          padding-top: calc(11svh + 56px);
         }
-        .logo {
-          font-size: 19px;
+        .shot {
+          max-width: 90vw;
         }
-        .nav {
-          gap: 18px;
+        .g-item .shot {
+          max-width: 66vw;
         }
-        .nav a {
-          font-size: 10px;
+      }
+
+      /* ============================================================
+         PAGE TRANSITIONS (index <-> about)
+
+         A cross-document view transition — the browser crossfades the
+         old and new page in place instead of hard-cutting between them.
+         Pure progressive enhancement: unsupported browsers just navigate
+         as before, nothing to feature-detect or fall back manually.
+         ============================================================ */
+      @view-transition {
+        navigation: auto;
+      }
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 0.5s;
+        animation-timing-function: var(--ease);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .g-item,
+        .hdr {
+          transition: none;
         }
-        .hero-caption {
-          left: 20px;
-          bottom: 24px;
-          font-size: 9px;
+        ::view-transition-group(*),
+        ::view-transition-old(*),
+        ::view-transition-new(*) {
+          animation: none !important;
         }
-        .hero-progress {
-          right: unset;
-          left: 50%;
-          transform: translateX(-50%);
-          bottom: 42px;
-        }
-        .scroll-hint {
-          display: none;
-        }
-        .about-hero .scroll-hint {
-          display: block;
-          bottom: 26px;
-        }
-        .about-hero-quote {
-          left: 20px;
-          right: 20px;
-          bottom: 60px;
-        }
-        .showcase {
-          padding: 80px 20px 60px;
-        }
-        .section-header {
-          margin-bottom: 60px;
-        }
-        .section-title {
-          font-size: 28px;
-        }
-        .grid-3 {
-          flex-direction: column;
-          gap: 12px;
-        }
-        .grid-col {
-          gap: 12px;
-        }
-        .projects-page {
-          padding: 100px 20px 60px;
-        }
-        .projects-grid {
-          grid-template-columns: 1fr;
-          gap: 40px;
-        }
-        .project-view {
-          padding: 100px 20px 60px;
-        }
-        .project-back {
-          margin-bottom: 40px;
-        }
-        .project-view-header {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-        .project-view-meta {
-          text-align: left;
-        }
-        .project-view-title {
-          font-size: 32px;
-        }
-        .grid-2 {
-          flex-direction: column;
-          gap: 12px;
-        }
-        .about-page {
-          padding: 100px 20px 60px;
-        }
-        .about-quote {
-          font-size: 24px;
-        }
-        .about-quote-author {
-          margin-bottom: 60px;
-        }
-        .about-section-title {
-          font-size: 24px;
-        }
-        .about-approche {
-          flex-direction: column;
-          gap: 32px;
-        }
-        .about-portrait {
-          order: -1;
-          width: 55%;
-          max-width: 220px;
-          margin: 0 auto;
-        }
-        .about-portrait img {
-          aspect-ratio: 3 / 4;
-          object-fit: cover;
-        }
-        .gear-list {
-          grid-template-columns: 1fr;
-          gap: 50px;
-        }
-        .contact-page {
-          padding: 100px 20px 60px;
-          background:
-            linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.56) 45%, rgba(10, 10, 10, 0.8)),
-            url("images/24h-du-mans-2026/8-MEL_3292.jpg") center / cover no-repeat;
-        }
-        .contact-title {
-          font-size: 44px;
-        }
-        .contact-info {
-          grid-template-columns: 1fr;
-          gap: 8px 0;
-        }
-        .contact-info dt {
-          padding-top: 16px;
-        }
-        .footer {
-          flex-direction: column;
-          gap: 8px;
-          padding: 40px 20px 20px;
-        }
-        .lb-img-wrap { padding: 48px 16px 200px; }
-        .lb-counter { bottom: auto; top: 20px; left: 20px; }
-        .lb-close { top: 18px; right: 18px; }
       }
     </style>
   </head>
 
   <body>
-    <!-- Custom cursor -->
-    <div class="cursor" id="cursor">
-      <span class="cursor-label" id="cursorLabel"></span>
-    </div>
-
-    <!-- Header -->
-    <header class="header">
-      <div class="header-blur header-blur-left" aria-hidden="true"></div>
-      <div class="header-blur header-blur-right" aria-hidden="true"></div>
-      <a href="#" class="logo" data-page="home"
-        >Armel <em>Kervennal</em></a
-      >
-      <nav class="nav">
-        <a href="#" data-page="projects">projets</a>
-        <a href="#" data-page="about">à propos</a>
-        <a href="#" data-page="contact">contact</a>
+    <header class="hdr" id="hdr">
+      <a class="hdr-name" href="index.html">Armel Kervennal</a>
+      <nav class="hdr-nav">
+        <a class="hdr-link" href="archive.html">archive</a>
+        <a class="hdr-link" href="about.html">about</a>
       </nav>
     </header>
 
-    <!-- Photo caption on hover -->
+    <main id="seq"></main>
 
-    <main>
-      <!-- ========================================================
-             HOMEPAGE
-        ======================================================== -->
-      <div class="page active fade-in" id="page-home">
-        <section class="hero" id="hero">
-          <!-- slides injected by JS -->
-          <div class="hero-caption" id="heroCaption"></div>
-          <div class="hero-progress" id="heroProgress"></div>
-          <div class="scroll-hint" aria-hidden="true">
-            <svg viewBox="0 0 15 26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M7.5 1 L7.5 16.5 M1.5 11 L7.5 18 L13.5 11" />
-            </svg>
-          </div>
-        </section>
-
-        <section class="showcase">
-          <div class="grid-3" id="showcaseGrid">
-            <!-- columns injected by JS -->
-          </div>
-
-          <div class="see-more">
-            <a href="#" data-page="projects">voir tous les projets →</a>
-          </div>
-        </section>
-
-        <footer class="footer">
-          <span>Armel Kervennal · 2026</span>
-          <span>Nantes — France</span>
-        </footer>
-      </div>
-
-      <!-- ========================================================
-             PROJECTS INDEX
-        ======================================================== -->
-      <div class="page" id="page-projects">
-        <div class="projects-page">
-          <div id="projectsContainer">
-            <!-- grid injected by JS -->
-          </div>
-        </div>
-
-        <footer class="footer">
-          <span>Armel Kervennal · 2026</span>
-          <span>Nantes — France</span>
-        </footer>
-      </div>
-
-      <!-- ========================================================
-             PROJECT VIEW
-        ======================================================== -->
-      <div class="page" id="page-project">
-        <div class="project-view">
-
-          <div class="project-view-header">
-            <h1 class="project-view-title" id="projectTitle"></h1>
-            <div class="project-view-meta" id="projectMeta"></div>
-          </div>
-
-
-          <div class="grid-2" id="projectPhotos">
-            <!-- columns injected by JS -->
-          </div>
-        </div>
-
-        <footer class="footer">
-          <span>Armel Kervennal · 2026</span>
-          <span>Nantes — France</span>
-        </footer>
-      </div>
-
-      <!-- ========================================================
-             ABOUT
-        ======================================================== -->
-      <div class="page" id="page-about">
-        <div class="about-hero" id="aboutHero">
-          <!-- injected by JS from PORTFOLIO_CONFIG.content.about.hero -->
-        </div>
-        <div class="about-page" id="aboutContainer">
-          <!-- injected by JS from PORTFOLIO_CONFIG.content.about -->
-        </div>
-
-        <footer class="footer">
-          <span>Armel Kervennal · 2026</span>
-          <span>Nantes — France</span>
-        </footer>
-      </div>
-
-      <!-- ========================================================
-             CONTACT
-        ======================================================== -->
-      <div class="page" id="page-contact">
-        <div class="contact-page" id="contactContainer">
-          <!-- injected by JS from PORTFOLIO_CONFIG.content.contact -->
-        </div>
-      </div>
-    </main>
-
-    <!-- ========================================================
-           LIGHTBOX
-      ======================================================== -->
-    <div class="lb" id="lightbox">
-      <div class="lb-backdrop"></div>
-      <div class="lb-img-wrap">
-        <img class="lb-img" id="lightboxImg" src="" alt="" />
-      </div>
-
-      <div class="lb-counter" id="lbCounter"></div>
-      <button class="lb-close" id="lightboxClose">fermer · esc</button>
-      <div class="lb-nav prev" id="lightboxPrev"></div>
-      <div class="lb-nav next" id="lightboxNext"></div>
-    </div>
-
+    <script src="site-config.js"></script>
     <script>
       // ============================================================
-      // PROJECT DATA  (edit via admin.html or photos-config.js)
+      // Root-relative paths in the config, resolved from inside /v3
       // ============================================================
-      const projects = PORTFOLIO_CONFIG.projects;
-      if (false) { const projects = {
-        "la-bozage-2026": {
-          title: "La Bozage",
-          date: "2026",
-          dateLong: "2026",
-          year: "2026",
-          location: "France",
-          photos: [
-            "images/La%20Bozage/1-MEL_1536.jpg",
-            "images/La%20Bozage/2-MEL_1467.jpg",
-            "images/La%20Bozage/3-MEL_1397.jpg",
-            "images/La%20Bozage/4-MEL_1385.jpg",
-            "images/La%20Bozage/5-MEL_1356.jpg",
-            "images/La%20Bozage/6-MEL_1325.jpg",
-            "images/La%20Bozage/7-MEL_1320.jpg",
-            "images/La%20Bozage/8-MEL_1307.jpg",
-            "images/La%20Bozage/9-MEL_1292.jpg",
-            "images/La%20Bozage/10-MEL_1282.jpg",
-            "images/La%20Bozage/11-MEL_1199.jpg",
-            "images/La%20Bozage/12-MEL_1188.jpg",
-            "images/La%20Bozage/13-MEL_1163.jpg",
-            "images/La%20Bozage/14-MEL_1158.jpg",
-            "images/La%20Bozage/15-MEL_1154.jpg",
-            "images/La%20Bozage/16-MEL_1141.jpg",
-            "images/La%20Bozage/17-MEL_1113.jpg",
-            "images/La%20Bozage/18-MEL_1093.jpg",
-            "images/La%20Bozage/19-MEL_1073.jpg",
-            "images/La%20Bozage/20-MEL_1060.jpg",
-            "images/La%20Bozage/21-MEL_1058.jpg",
-            "images/La%20Bozage/22-MEL_1031.jpg",
-            "images/La%20Bozage/23-MEL_1026.jpg",
-          ],
-        },
-        "moelan-sur-mer-2026": {
-          title: "Moëlan-sur-Mer",
-          date: "2026",
-          dateLong: "2026",
-          year: "2026",
-          location: "Bretagne",
-          photos: [
-            "images/Mo%C3%ABlan-sur-Mer/1-MEL_0903.jpg",
-            "images/Mo%C3%ABlan-sur-Mer/2-MEL_0899.jpg",
-            "images/Mo%C3%ABlan-sur-Mer/3-MEL_0851.jpg",
-            "images/Mo%C3%ABlan-sur-Mer/4-MEL_0835.jpg",
-            "images/Mo%C3%ABlan-sur-Mer/5-MEL_0829.jpg",
-            "images/Mo%C3%ABlan-sur-Mer/6-MEL_0794.jpg",
-            "images/Mo%C3%ABlan-sur-Mer/7-MEL_0792.jpg",
-            "images/Mo%C3%ABlan-sur-Mer/8-MEL_0788.jpg",
-            "images/Mo%C3%ABlan-sur-Mer/9-MEL_0764.jpg",
-            "images/Mo%C3%ABlan-sur-Mer/10-MEL_0749.jpg",
-            "images/Mo%C3%ABlan-sur-Mer/11-MEL_0734.jpg",
-          ],
-        },
-        "viking-cup-2026": {
-          title: "Viking Cup",
-          date: "Mars 2026",
-          dateLong: "Mars 2026",
-          year: "2026",
-          location: "Normandie",
-          photos: [
-            "images/viking-cup-2026/MEL_8998.jpg",
-            "images/viking-cup-2026/MEL_9003.jpg",
-            "images/viking-cup-2026/MEL_9092.jpg",
-            "images/viking-cup-2026/MEL_9127.jpg",
-            "images/viking-cup-2026/MEL_9148.jpg",
-            "images/viking-cup-2026/MEL_9264.jpg",
-            "images/viking-cup-2026/MEL_9328.jpg",
-            "images/viking-cup-2026/MEL_9336.jpg",
-            "images/viking-cup-2026/MEL_9343.jpg",
-            "images/viking-cup-2026/MEL_9453.jpg",
-            "images/viking-cup-2026/MEL_9492.jpg",
-            "images/viking-cup-2026/MEL_9528.jpg",
-            "images/viking-cup-2026/MEL_9539.jpg",
-            "images/viking-cup-2026/1-MEL_9738.jpg",
-            "images/viking-cup-2026/MEL_9768.jpg",
-            "images/viking-cup-2026/MEL_9773.jpg",
-            "images/viking-cup-2026/MEL_9797.jpg",
-            "images/viking-cup-2026/MEL_9811.jpg",
-            "images/viking-cup-2026/MEL_9816.jpg",
-            "images/viking-cup-2026/MEL_9826.jpg",
-          ],
-        },
-        "mezillac-2026": {
-          title: "Campagne de Mézillac",
-          date: "Mars 2026",
-          dateLong: "Mars 2026",
-          year: "2026",
-          location: "Ardèche",
-          photos: [
-            "images/mezillac-2026/4-MEL_8715.jpg",
-            "images/mezillac-2026/3-MEL_8717.jpg",
-            "images/mezillac-2026/2-MEL_8835.jpg",
-          ],
-        },
-        "nantes-2026": {
-          title: "Nantes",
-          date: "Février 2026",
-          dateLong: "Février 2026",
-          year: "2026",
-          location: "Loire-Atlantique",
-          photos: [
-            "images/nantes-2026/7-MEL_8433.jpg",
-            "images/nantes-2026/6-MEL_8446.jpg",
-            "images/nantes-2026/5-MEL_8460.jpg",
-          ],
-        },
-        "saint-nazaire-2026": {
-          title: "Saint-Nazaire",
-          date: "Février 2026",
-          dateLong: "Février 2026",
-          year: "2026",
-          location: "Loire-Atlantique",
-          photos: [
-            "images/saint-nazaire-2026/10-MEL_7964.jpg",
-            "images/saint-nazaire-2026/9-MEL_7970.jpg",
-            "images/saint-nazaire-2026/8-MEL_7998.jpg",
-          ],
-        },
-        "fete-foraine-rennes-2025": {
-          title: "Fête Foraine de Rennes",
-          date: "Décembre 2025",
-          dateLong: "Décembre 2025",
-          year: "2025",
-          location: "Bretagne",
-          photos: [
-            "images/fete-foraine-rennes-2025/1-MEL_7779.jpg",
-            "images/fete-foraine-rennes-2025/2-MEL_7748.jpg",
-            "images/fete-foraine-rennes-2025/3-MEL_7745.jpg",
-            "images/fete-foraine-rennes-2025/4-MEL_7722.jpg",
-            "images/fete-foraine-rennes-2025/5-MEL_7699.jpg",
-            "images/fete-foraine-rennes-2025/6-MEL_7681.jpg",
-          ],
-        },
-        "mad-paris-2025": {
-          title: "M.A.D. Paris",
-          date: "Décembre 2025",
-          dateLong: "Décembre 2025",
-          year: "2025",
-          location: "Paris",
-          photos: [
-            "images/mad-paris-2025/MEL_7126.jpg",
-            "images/mad-paris-2025/MEL_7130.jpg",
-            "images/mad-paris-2025/MEL_7135.jpg",
-            "images/mad-paris-2025/MEL_7141.jpg",
-            "images/mad-paris-2025/MEL_7146.jpg",
-            "images/mad-paris-2025/MEL_7149.jpg",
-          ],
-        },
-        "angleterre-2025": {
-          title: "Angleterre",
-          date: "Décembre 2025",
-          dateLong: "Décembre 2025",
-          year: "2025",
-          location: "Royaume-Uni",
-          photos: [
-            "images/angleterre-2025/1-MEL_6436.jpg",
-            "images/angleterre-2025/2-MEL_6214.jpg",
-            "images/angleterre-2025/3-MEL_6210.jpg",
-            "images/angleterre-2025/4-MEL_6207.jpg",
-            "images/angleterre-2025/5-MEL_6198.jpg",
-            "images/angleterre-2025/6-MEL_6186.jpg",
-            "images/angleterre-2025/7-MEL_6184.jpg",
-            "images/angleterre-2025/8-MEL_6182.jpg",
-            "images/angleterre-2025/IMG_4776_TIF.jpg",
-            "images/angleterre-2025/MEL_6428.jpg",
-            "images/angleterre-2025/MEL_6432.jpg",
-            "images/angleterre-2025/MEL_6468.jpg",
-            "images/angleterre-2025/MEL_6471.jpg",
-            "images/angleterre-2025/MEL_6501.jpg",
-          ],
-        },
-        "maison-radieuse-2025": {
-          title: "Maison Radieuse",
-          date: "Décembre 2025",
-          dateLong: "Décembre 2025",
-          year: "2025",
-          location: "Rezé",
-          photos: [
-            "images/maison-radieuse-2025/1-MEL_5634.jpg",
-            "images/maison-radieuse-2025/2-MEL_5597.jpg",
-            "images/maison-radieuse-2025/3-MEL_5594.jpg",
-            "images/maison-radieuse-2025/4-IMG_4736_TIF.jpg",
-            "images/maison-radieuse-2025/5-IMG_4734_TIF.jpg",
-            "images/maison-radieuse-2025/6-MEL_5554.jpg",
-          ],
-        },
-        "pyrenees-2025": {
-          title: "Pyrénées",
-          date: "Août 2025",
-          dateLong: "Août 2025",
-          year: "2025",
-          location: "Pyrénées",
-          photos: [
-            "images/pyrenees-2025/10-MEL_2233.jpg",
-            "images/pyrenees-2025/9-MEL_2240.jpg",
-            "images/pyrenees-2025/8-MEL_2421.jpg",
-            "images/pyrenees-2025/7-MEL_2521.jpg",
-            "images/pyrenees-2025/6-MEL_2545.jpg",
-            "images/pyrenees-2025/5-MEL_2729.jpg",
-            "images/pyrenees-2025/4-MEL_3033.jpg",
-            "images/pyrenees-2025/3-MEL_3066.jpg",
-            "images/pyrenees-2025/2-MEL_3069.jpg",
-            "images/pyrenees-2025/1-MEL_3166.jpg",
-            "images/pyrenees-2025/14-MEL_3530.jpg",
-            "images/pyrenees-2025/13-MEL_3579.jpg",
-            "images/pyrenees-2025/12-MEL_3605.jpg",
-            "images/pyrenees-2025/11-MEL_3611.jpg",
-            "images/pyrenees-2025/10-MEL_3624.jpg",
-            "images/pyrenees-2025/9-MEL_3695.jpg",
-            "images/pyrenees-2025/8-MEL_3748.jpg",
-            "images/pyrenees-2025/7-MEL_3816.jpg",
-            "images/pyrenees-2025/6-MEL_3951.jpg",
-            "images/pyrenees-2025/5-MEL_3958.jpg",
-            "images/pyrenees-2025/4-MEL_3966.jpg",
-            "images/pyrenees-2025/3-MEL_3983.jpg",
-            "images/pyrenees-2025/2-MEL_3986.jpg",
-            "images/pyrenees-2025/1-MEL_3991.jpg",
-          ],
-        },
-        "24h-du-mans-2025": {
-          title: "24h du Mans",
-          date: "Juin 2025",
-          dateLong: "Juin 2025",
-          year: "2025",
-          location: "Sarthe",
-          photos: [
-            "images/24h-du-mans-2025/1-MEL_1455.jpg",
-            "images/24h-du-mans-2025/2-MEL_1452.jpg",
-            "images/24h-du-mans-2025/3-MEL_1451.jpg",
-            "images/24h-du-mans-2025/4-MEL_1429.jpg",
-            "images/24h-du-mans-2025/5-MEL_1111.jpg",
-            "images/24h-du-mans-2025/6-MEL_1101.jpg",
-            "images/24h-du-mans-2025/7-MEL_1095.jpg",
-          ],
-        },
-        "florence-2024": {
-          title: "Florence",
-          date: "Avril 2024",
-          dateLong: "Avril 2024",
-          year: "2024",
-          location: "Italie",
-          photos: ["images/florence-2024/MEL_0388.jpg"],
-        },
-        "rennes-2024": {
-          title: "Rennes",
-          date: "Avril 2024",
-          dateLong: "Avril 2024",
-          year: "2024",
-          location: "Bretagne",
-          photos: ["images/rennes-2024/MEL_0078.jpg"],
-        },
-        "grenoble-2024": {
-          title: "Grenoble",
-          date: "Mars 2024",
-          dateLong: "Mars 2024",
-          year: "2024",
-          location: "Isère",
-          photos: [
-            "images/grenoble-2024/1-MEL_9885.jpg",
-            "images/grenoble-2024/2-MEL_9883.jpg",
-            "images/grenoble-2024/3-MEL_9879.jpg",
-            "images/grenoble-2024/4-MEL_9866.jpg",
-          ],
-        },
-        "nice-2024": {
-          title: "Nice",
-          date: "Février 2024",
-          dateLong: "Février 2024",
-          year: "2024",
-          location: "Côte d'Azur",
-          photos: [
-            "images/nice-2024/5-MEL_9420.jpg",
-            "images/nice-2024/4-MEL_9422.jpg",
-            "images/nice-2024/3-MEL_9426.jpg",
-            "images/nice-2024/2-MEL_9432.jpg",
-            "images/nice-2024/1-MEL_9439.jpg",
-            "images/nice-2024/3-MEL_9563.jpg",
-            "images/nice-2024/2-MEL_9575.jpg",
-            "images/nice-2024/1-MEL_9606.jpg",
-          ],
-        },
-        "marseille-2024": {
-          title: "Marseille",
-          date: "Février 2024",
-          dateLong: "Février 2024",
-          year: "2024",
-          location: "Provence",
-          photos: [
-            "images/marseille-2024/1-MEL_9414.jpg",
-            "images/marseille-2024/2-MEL_9402.jpg",
-            "images/marseille-2024/3-MEL_9395.jpg",
-            "images/marseille-2024/4-MEL_9344.jpg",
-            "images/marseille-2024/5-MEL_9340.jpg",
-          ],
-        },
-        "lozere-foret-2024": {
-          title: "Lozère, forêt",
-          date: "Février 2024",
-          dateLong: "Février 2024",
-          year: "2024",
-          location: "Lozère",
-          photos: [
-            "images/lozere-foret-2024/1-MEL_9217.jpg",
-            "images/lozere-foret-2024/2-MEL_9206.jpg",
-            "images/lozere-foret-2024/3-MEL_9180.jpg",
-            "images/lozere-foret-2024/4-MEL_9166.jpg",
-            "images/lozere-foret-2024/5-MEL_9163.jpg",
-            "images/lozere-foret-2024/6-MEL_9135.jpg",
-            "images/lozere-foret-2024/7-MEL_9122.jpg",
-            "images/lozere-foret-2024/8-MEL_9119.jpg",
-            "images/lozere-foret-2024/9-MEL_9112.jpg",
-            "images/lozere-foret-2024/10-MEL_9110.jpg",
-          ],
-        },
-        "lozere-village-2024": {
-          title: "Lozère, village",
-          date: "Février 2024",
-          dateLong: "Février 2024",
-          year: "2024",
-          location: "Lozère",
-          photos: [
-            "images/lozere-village-2024/3-MEL_8837.jpg",
-            "images/lozere-village-2024/2-MEL_8841.jpg",
-            "images/lozere-village-2024/1-MEL_8843.jpg",
-            "images/lozere-village-2024/3-MEL_8915.jpg",
-            "images/lozere-village-2024/2-MEL_8930.jpg",
-            "images/lozere-village-2024/1-MEL_9013.jpg",
-          ],
-        },
-        "aubrac-2024": {
-          title: "Aubrac",
-          date: "Janvier 2024",
-          dateLong: "Janvier 2024",
-          year: "2024",
-          location: "Aubrac",
-          photos: [
-            "images/aubrac-2024/1-MEL_8728.jpg",
-            "images/aubrac-2024/2-MEL_8725.jpg",
-            "images/aubrac-2024/3-MEL_8724.jpg",
-            "images/aubrac-2024/4-MEL_8720.jpg",
-            "images/aubrac-2024/5-MEL_8702.jpg",
-            "images/aubrac-2024/6-MEL_8697.jpg",
-          ],
-        },
-        "viaduc-garabit-2024": {
-          title: "Viaduc de Garabit",
-          date: "Janvier 2024",
-          dateLong: "Janvier 2024",
-          year: "2024",
-          location: "Cantal",
-          photos: [
-            "images/viaduc-garabit-2024/1-MEL_8475.jpg",
-            "images/viaduc-garabit-2024/2-MEL_8467.jpg",
-            "images/viaduc-garabit-2024/3-MEL_8454.jpg",
-            "images/viaduc-garabit-2024/4-MEL_8449.jpg",
-            "images/viaduc-garabit-2024/5-MEL_8446.jpg",
-            "images/viaduc-garabit-2024/6-MEL_8431.jpg",
-          ],
-        },
-        "nantes-2024": {
-          title: "Nantes",
-          date: "Janvier 2024",
-          dateLong: "Janvier 2024",
-          year: "2024",
-          location: "Loire-Atlantique",
-          photos: [
-            "images/nantes-2024/1-MEL_8349.jpg",
-            "images/nantes-2024/2-MEL_8345.jpg",
-            "images/nantes-2024/3-MEL_8312.jpg",
-            "images/nantes-2024/4-MEL_8307.jpg",
-            "images/nantes-2024/5-MEL_8306.jpg",
-            "images/nantes-2024/6-MEL_8230.jpg",
-            "images/nantes-2024/7-MEL_8228.jpg",
-            "images/nantes-2024/8-MEL_8227.jpg",
-          ],
-        },
-        "thabor-rennes-2024": {
-          title: "Thabor — Rennes",
-          date: "Janvier 2024",
-          dateLong: "Janvier 2024",
-          year: "2024",
-          location: "Bretagne",
-          photos: [
-            "images/thabor-rennes-2024/1-MEL_8176.jpg",
-            "images/thabor-rennes-2024/2-MEL_8159.jpg",
-            "images/thabor-rennes-2024/3-MEL_8150.jpg",
-            "images/thabor-rennes-2024/4-MEL_8103.jpg",
-            "images/thabor-rennes-2024/5-MEL_8097.jpg",
-            "images/thabor-rennes-2024/6-MEL_8082.jpg",
-          ],
-        },
-        "port-nantes-2024": {
-          title: "Port de Nantes",
-          date: "Janvier 2024",
-          dateLong: "Janvier 2024",
-          year: "2024",
-          location: "Loire-Atlantique",
-          photos: [
-            "images/port-nantes-2024/1-MEL_7745.jpg",
-            "images/port-nantes-2024/2-MEL_7702.jpg",
-            "images/port-nantes-2024/3-MEL_7692.jpg",
-            "images/port-nantes-2024/4-MEL_7683.jpg",
-            "images/port-nantes-2024/5-MEL_7681.jpg",
-            "images/port-nantes-2024/6-MEL_7655.jpg",
-            "images/port-nantes-2024/7-MEL_7650.jpg",
-            "images/port-nantes-2024/8-MEL_7649.jpg",
-          ],
-        },
-      }; }
-
-      // ============================================================
-      // HERO SLIDESHOW PHOTOS
-      // ============================================================
-      let activeHeroPhotos = [];
-
-      const heroPhotos = PORTFOLIO_CONFIG.heroPhotos;
-
-      // ============================================================
-      // SHOWCASE GRID PHOTOS (homepage)
-      // ============================================================
-      const showcasePhotos = PORTFOLIO_CONFIG.showcasePhotos;
-
-      // ============================================================
-      // PAGE NAVIGATION
-      // ============================================================
-      const pages = {
-        home: document.getElementById("page-home"),
-        projects: document.getElementById("page-projects"),
-        project: document.getElementById("page-project"),
-        about: document.getElementById("page-about"),
-        contact: document.getElementById("page-contact"),
-      };
-
-      let currentPage = "home";
-      let projectsScrollY = 0;
-
-      function showPage(name) {
-        if (currentPage === name) return;
-        const current = pages[currentPage];
-        const next = pages[name];
-
-        if (currentPage === "projects") {
-          projectsScrollY = window.scrollY;
-        }
-
-        // fade out current
-        current.classList.remove("fade-in");
-        setTimeout(() => {
-          current.classList.remove("active");
-          // reset so images fade back in next time this page is shown,
-          // instead of snapping straight to their loaded state
-          current.querySelectorAll("img.loaded").forEach((img) => {
-            img.classList.remove("loaded");
-          });
-          next.classList.add("active");
-          window.scrollTo(0, name === "projects" ? projectsScrollY : 0);
-          requestAnimationFrame(() => {
-            next.classList.add("fade-in");
-            observeImages();
-          });
-          currentPage = name;
-        }, 400);
-
-        // update nav active state
-        document.querySelectorAll(".nav a").forEach((a) => {
-          a.classList.toggle("active", a.dataset.page === name);
-        });
-      }
-
-      // Bind nav links + any [data-page] element
-      function bindPageLinks() {
-        document.querySelectorAll("[data-page]").forEach((el) => {
-          el.addEventListener("click", (e) => {
-            e.preventDefault();
-            showPage(el.dataset.page);
-          });
-        });
+      function resolveSrc(p) {
+        return p;
       }
 
       // ============================================================
-      // HERO SLIDESHOW
+      // OKLab colour interpolation
+      //
+      // Blending two hex values channel-by-channel in sRGB sends the
+      // midpoint through mud (white -> blue detours via grey). OKLab is
+      // perceptually uniform, so the midpoint looks like the midpoint.
       // ============================================================
-      function buildHero() {
-        const hero = document.getElementById("hero");
-        const progress = document.getElementById("heroProgress");
-        const caption = document.getElementById("heroCaption");
-
-        const heroPhotosMobile = PORTFOLIO_CONFIG.heroPhotosMobile;
-
-        const isMobile = window.matchMedia("(max-width: 700px)").matches;
-        activeHeroPhotos = isMobile ? heroPhotosMobile : heroPhotos;
-
-        activeHeroPhotos.forEach((p, i) => {
-          const slide = document.createElement("div");
-          slide.className = "hero-slide";
-          if (i === 0) slide.classList.add("active");
-          const img = document.createElement("img");
-          img.src = p.src;
-          img.alt = p.caption;
-          if (i === 0) {
-            img.setAttribute("fetchpriority", "high");
-            img.classList.add("loaded");
-          } else {
-            img.loading = "lazy";
-          }
-          img.decoding = "async";
-          slide.appendChild(img);
-          hero.insertBefore(slide, caption);
-
-          const dot = document.createElement("span");
-          if (i === 0) dot.classList.add("active");
-          dot.addEventListener("click", () => {
-            goToHero(i);
-            restartHeroTimer();
-          });
-          progress.appendChild(dot);
-        });
-        caption.textContent = activeHeroPhotos[0].caption;
+      function srgbToLinear(c) {
+        return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
       }
-
-      let heroIndex = 0;
-      let heroTimer = null;
-
-      function goToHero(index) {
-        const slides = document.querySelectorAll(".hero-slide");
-        const dots = document.querySelectorAll("#heroProgress span");
-        if (!slides.length) return;
-        index = (index + slides.length) % slides.length;
-        slides[heroIndex].classList.remove("active");
-        dots[heroIndex].classList.remove("active");
-        heroIndex = index;
-        slides[heroIndex].classList.add("active");
-        dots[heroIndex].classList.add("active");
-        document.getElementById("heroCaption").textContent =
-          activeHeroPhotos[heroIndex].caption;
+      function linearToSrgb(c) {
+        return c <= 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
       }
-
-      function cycleHero() {
-        goToHero(heroIndex + 1);
-      }
-
-      function restartHeroTimer() {
-        if (heroTimer) clearInterval(heroTimer);
-        heroTimer = setInterval(cycleHero, 6500);
-      }
-
-      // ============================================================
-      // SHOWCASE GRID (homepage)
-      // ============================================================
-      function buildShowcase() {
-        const grid = document.getElementById("showcaseGrid");
-        const cols = [
-          document.createElement("div"),
-          document.createElement("div"),
-          document.createElement("div"),
+      function hexToOklab(hex) {
+        const h = hex.replace("#", "");
+        const r = srgbToLinear(parseInt(h.slice(0, 2), 16) / 255);
+        const g = srgbToLinear(parseInt(h.slice(2, 4), 16) / 255);
+        const b = srgbToLinear(parseInt(h.slice(4, 6), 16) / 255);
+        const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+        const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+        const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+        return [
+          0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+          1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+          0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
         ];
-        cols.forEach((c) => {
-          c.className = "grid-col";
-          grid.appendChild(c);
-        });
-        showcasePhotos.forEach((src, i) => {
-          const img = document.createElement("img");
-          img.src = src;
-          img.alt = "";
-          img.loading = "lazy";
-          img.decoding = "async";
-          img.dataset.caption = "Sélection";
-          img.addEventListener("click", () => {
-            openLightbox(showcasePhotos, i, "Sélection", "", false);
-          });
-          cols[i % 3].appendChild(img);
-        });
+      }
+      function oklabToCss(lab) {
+        const l_ = lab[0] + 0.3963377774 * lab[1] + 0.2158037573 * lab[2];
+        const m_ = lab[0] - 0.1055613458 * lab[1] - 0.0638541728 * lab[2];
+        const s_ = lab[0] - 0.0894841775 * lab[1] - 1.291485548 * lab[2];
+        const l = l_ * l_ * l_,
+          m = m_ * m_ * m_,
+          s = s_ * s_ * s_;
+        const ch = (v) =>
+          Math.max(0, Math.min(255, Math.round(linearToSrgb(v) * 255)));
+        return (
+          "rgb(" +
+          ch(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s) +
+          "," +
+          ch(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s) +
+          "," +
+          ch(-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s) +
+          ")"
+        );
       }
 
       // ============================================================
-      // PROJECTS INDEX
+      // BUILD
       // ============================================================
-      function buildProjects() {
-        const container = document.getElementById("projectsContainer");
+      const seqEl = document.getElementById("seq");
+      const entries = (window.SITE_CONFIG && SITE_CONFIG.sequence) || [];
 
-        const allProjects = Object.entries(projects)
-          .map(([id, p]) => ({ id, ...p }))
-          .sort((a, b) => b.year.localeCompare(a.year));
+      // Per-slot runtime state
+      const slots = [];
 
-        const grid = document.createElement("div");
-        grid.className = "projects-grid";
+      // Loading is driven by the scroll engine rather than loading="lazy".
+      // The browser's lazy heuristic only looks ~1 viewport ahead, and here
+      // every photo is exactly 1 viewport apart — so a fast flick can land
+      // on a slot that hasn't started fetching and show nothing at all.
+      const PRELOAD = 2; // slots either side of the active one
 
-        allProjects.forEach((proj) => {
-            const card = document.createElement("a");
-            card.href = "#";
-            card.className = "project-card";
-            card.dataset.project = proj.id;
-
-            const cover = document.createElement("div");
-            cover.className = "project-cover";
-            const img = document.createElement("img");
-            img.src = proj.cover || proj.photos[0];
-            img.alt = proj.title;
-            img.loading = "lazy";
-            img.decoding = "async";
-            cover.appendChild(img);
-
-            const name = document.createElement("div");
-            name.className = "project-card-name";
-            name.textContent = proj.title;
-
-            const meta = document.createElement("div");
-            meta.className = "project-card-meta";
-            meta.innerHTML = `<span>${proj.date}</span><span>${proj.photos.length} photos</span>`;
-
-            const info = document.createElement("div");
-            info.className = "project-card-info";
-            info.appendChild(name);
-            info.appendChild(meta);
-            cover.appendChild(info);
-            card.appendChild(cover);
-            card.addEventListener("click", (e) => {
-              e.preventDefault();
-              openProject(proj.id);
-            });
-            grid.appendChild(card);
-          });
-
-        container.appendChild(grid);
-      }
-
-      // ============================================================
-      // ABOUT / CONTACT (from PORTFOLIO_CONFIG.content)
-      // ============================================================
-      function buildAbout() {
-        const content = PORTFOLIO_CONFIG.content && PORTFOLIO_CONFIG.content.about;
-        if (!content) return;
-        const container = document.getElementById("aboutContainer");
-        container.innerHTML = "";
-
-        const aboutHero = document.getElementById("aboutHero");
-        aboutHero.innerHTML = "";
-        const isMobileHero = window.matchMedia("(max-width: 700px)").matches;
-        const heroSrc = (isMobileHero && content.heroMobile) || content.hero;
-        if (heroSrc) {
-          const heroImg = document.createElement("img");
-          heroImg.src = heroSrc;
-          heroImg.alt = "";
-          aboutHero.appendChild(heroImg);
-
-          const scrollHint = document.createElement("div");
-          scrollHint.className = "scroll-hint";
-          scrollHint.setAttribute("aria-hidden", "true");
-          scrollHint.innerHTML =
-            '<svg viewBox="0 0 15 26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
-            '<path d="M7.5 1 L7.5 16.5 M1.5 11 L7.5 18 L13.5 11" />' +
-            "</svg>";
-          aboutHero.appendChild(scrollHint);
-        }
-
-        if (content.quote) {
-          const quote = document.createElement("p");
-          quote.className = "about-quote";
-          quote.textContent = `“${content.quote}”`;
-
-          let author = null;
-          if (content.quoteAuthor) {
-            author = document.createElement("div");
-            author.className = "about-quote-author";
-            author.textContent = content.quoteAuthor;
-          }
-
-          // On the hero photo when there is one, to invite scrolling;
-          // otherwise inline like the rest of the content.
-          const quoteParent = heroSrc ? document.createElement("div") : container;
-          if (heroSrc) {
-            quoteParent.className = "about-hero-quote";
-            aboutHero.appendChild(quoteParent);
-          }
-          quoteParent.appendChild(quote);
-          if (author) quoteParent.appendChild(author);
-        }
-
-        const approcheSection = document.createElement("section");
-        approcheSection.className = "about-section";
-        const approcheTitle = document.createElement("h2");
-        approcheTitle.className = "about-section-title";
-        approcheTitle.textContent = "Approche";
-        const approcheText = document.createElement("div");
-        approcheText.className = "about-text";
-        (content.approche || []).forEach((paragraph) => {
-          const p = document.createElement("p");
-          p.textContent = paragraph;
-          approcheText.appendChild(p);
-        });
-        approcheSection.appendChild(approcheTitle);
-
-        if (content.portrait) {
-          const approcheRow = document.createElement("div");
-          approcheRow.className = "about-approche";
-          const portrait = document.createElement("div");
-          portrait.className = "about-portrait";
-          const img = document.createElement("img");
-          img.src = content.portrait;
-          img.alt = "Armel Kervennal";
-          portrait.appendChild(img);
-          approcheRow.appendChild(approcheText);
-          approcheRow.appendChild(portrait);
-          approcheSection.appendChild(approcheRow);
+      function makeImg(src, alt, eager) {
+        const img = document.createElement("img");
+        img.className = "shot";
+        img.alt = alt;
+        img.decoding = "async";
+        if (eager) {
+          img.src = resolveSrc(src);
+          img.setAttribute("fetchpriority", "high");
         } else {
-          approcheSection.appendChild(approcheText);
+          img.dataset.src = resolveSrc(src);
         }
-        container.appendChild(approcheSection);
-
-        if ((content.gear || []).length) {
-          const gearSection = document.createElement("section");
-          gearSection.className = "about-section";
-          const gearTitle = document.createElement("h2");
-          gearTitle.className = "about-section-title";
-          gearTitle.textContent = "Équipement";
-          const gearList = document.createElement("div");
-          gearList.className = "gear-list";
-          content.gear.forEach((item) => {
-            const gearItem = document.createElement("div");
-            gearItem.className = "gear-item";
-            const label = document.createElement("div");
-            label.className = "gear-label";
-            label.textContent = item.label;
-            const h3 = document.createElement("h3");
-            h3.textContent = item.title;
-            gearItem.appendChild(label);
-            gearItem.appendChild(h3);
-            (item.paragraphs || []).forEach((paragraph) => {
-              const p = document.createElement("p");
-              p.textContent = paragraph;
-              gearItem.appendChild(p);
-            });
-            gearList.appendChild(gearItem);
-          });
-          gearSection.appendChild(gearTitle);
-          gearSection.appendChild(gearList);
-          container.appendChild(gearSection);
-        }
+        img.addEventListener("load", scheduleMeasure, { once: true });
+        return img;
       }
 
-      function buildContact() {
-        const content = PORTFOLIO_CONFIG.content && PORTFOLIO_CONFIG.content.contact;
-        if (!content) return;
-        const container = document.getElementById("contactContainer");
-        container.innerHTML = "";
-
-        const title = document.createElement("h1");
-        title.className = "contact-title";
-        title.innerHTML = `${content.titleLine1}<br /><em>${content.titleLine2}</em>`;
-        container.appendChild(title);
-
-        const dl = document.createElement("dl");
-        dl.className = "contact-info";
-
-        const dtEmail = document.createElement("dt");
-        dtEmail.textContent = "Email";
-        const ddEmail = document.createElement("dd");
-        const emailLink = document.createElement("a");
-        emailLink.href = `mailto:${content.email}`;
-        emailLink.textContent = content.email;
-        ddEmail.appendChild(emailLink);
-
-        const dtInsta = document.createElement("dt");
-        dtInsta.textContent = "Instagram";
-        const ddInsta = document.createElement("dd");
-        const instaLink = document.createElement("a");
-        instaLink.href = content.instagramUrl;
-        instaLink.target = "_blank";
-        instaLink.textContent = content.instagramHandle;
-        ddInsta.appendChild(instaLink);
-
-        const dtLoc = document.createElement("dt");
-        dtLoc.textContent = "Basé à";
-        const ddLoc = document.createElement("dd");
-        ddLoc.textContent = content.location;
-
-        dl.appendChild(dtEmail);
-        dl.appendChild(ddEmail);
-        dl.appendChild(dtInsta);
-        dl.appendChild(ddInsta);
-        dl.appendChild(dtLoc);
-        dl.appendChild(ddLoc);
-        container.appendChild(dl);
-
-        const note = document.createElement("p");
-        note.className = "contact-note";
-        note.textContent = content.note;
-        container.appendChild(note);
-      }
-
-      // ============================================================
-      // OPEN PROJECT VIEW
-      // ============================================================
-      let currentProject = null;
-
-      function openProject(id) {
-        const p = projects[id];
-        if (!p) return;
-        currentProject = { id, ...p };
-
-        document.getElementById("projectTitle").textContent = p.title;
-        document.getElementById("projectMeta").innerHTML = `
-          <div>${p.dateLong}</div>
-          <div>${p.photos.length} photographies</div>
-        `;
-
-        const photosEl = document.getElementById("projectPhotos");
-        photosEl.innerHTML = "";
-        const col1 = document.createElement("div");
-        const col2 = document.createElement("div");
-        col1.className = "grid-col";
-        col2.className = "grid-col";
-        p.photos.forEach((src, i) => {
-          const img = document.createElement("img");
-          img.src = src;
-          img.alt = p.title;
-          img.loading = "lazy";
-          img.decoding = "async";
-          img.dataset.caption = `${p.title} · ${p.dateLong}`;
-          img.dataset.photoIndex = i;
-          img.style.transitionDelay = `${Math.min(i * 60, 600)}ms`;
-          img.addEventListener("click", () => {
-            openLightbox(p.photos, i, p.title, p.dateLong, false);
-          });
-          (i % 2 === 0 ? col1 : col2).appendChild(img);
+      function promote(state) {
+        if (state.loaded) return;
+        state.loaded = true;
+        state.inner.querySelectorAll("img[data-src]").forEach((img) => {
+          img.src = img.dataset.src;
+          img.removeAttribute("data-src");
         });
-        photosEl.appendChild(col1);
-        photosEl.appendChild(col2);
-
-        showPage("project");
       }
 
-      // ============================================================
-      // LIGHTBOX
-      // ============================================================
-      const lightbox = document.getElementById("lightbox");
-      const lbImg    = document.getElementById("lightboxImg");
-      const lbClose  = document.getElementById("lightboxClose");
-      const lbPrev   = document.getElementById("lightboxPrev");
-      const lbNext   = document.getElementById("lightboxNext");
+      entries.forEach((entry, i) => {
+        const section = document.createElement("section");
+        section.className = "slot";
 
-      let lbPhotos  = [];
-      let lbIndex   = 0;
-      let lbProject = "";
-      let lbDate    = "";
-      let lbAuto    = false;
-      let lbInterval = null;
+        const inner = document.createElement("div");
+        inner.className = "slot-inner";
 
-      function openLightbox(photos, index, title, date, autoplay) {
-        lbPhotos  = photos;
-        lbIndex   = index;
-        lbProject = title;
-        lbDate    = date;
-        lbAuto    = autoplay;
-        lightbox.classList.add("open");
-        document.body.style.overflow = "hidden";
-        showLightboxPhoto(true);
-        if (autoplay) startAutoplay();
-      }
-
-      function showLightboxPhoto(isOpen) {
-        const src = lbPhotos[lbIndex];
-
-        lbImg.classList.remove("shown");
-
-        // Counter
-        document.getElementById("lbCounter").textContent =
-          `${String(lbIndex + 1).padStart(2, "0")} / ${String(lbPhotos.length).padStart(2, "0")}`;
-
-        // Load image then reveal
-        const preload = new Image();
-        preload.onload = preload.onerror = () => {
-          lbImg.src = src;
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              lbImg.classList.add("shown");
-            });
-          });
+        const state = {
+          section: section,
+          inner: inner,
+          lab: hexToOklab(entry.bg || "#ffffff"),
+          centre: 0,
+          opacity: -1,
+          type: entry.type === "group" ? "group" : "single",
+          items: [],
+          active: 0,
+          loaded: false,
         };
-        preload.src = src;
-      }
 
-      function lbNextPhoto() {
-        lbIndex = (lbIndex + 1) % lbPhotos.length;
-        showLightboxPhoto(false);
-      }
-      function lbPrevPhoto() {
-        lbIndex = (lbIndex - 1 + lbPhotos.length) % lbPhotos.length;
-        showLightboxPhoto(false);
-      }
+        if (state.type === "group") {
+          const wrap = document.createElement("div");
+          wrap.className = "group";
 
-      function startAutoplay() {
-        if (lbInterval) clearInterval(lbInterval);
-        lbInterval = setInterval(lbNextPhoto, 5000);
-      }
-      function stopAutoplay() {
-        if (lbInterval) { clearInterval(lbInterval); lbInterval = null; }
-      }
+          (entry.photos || []).forEach((src, k) => {
+            const btn = document.createElement("button");
+            btn.className = "g-item";
+            btn.type = "button";
+            btn.dataset.i = k;
 
-      function closeLightbox() {
-        lightbox.classList.remove("open");
-        lbImg.classList.remove("shown");
-        document.body.style.overflow = "";
-        stopAutoplay();
-      }
+            btn.appendChild(
+              makeImg(src, "Photographie " + (i + 1) + "." + (k + 1), i < 2),
+            );
+            wrap.appendChild(btn);
+            state.items.push(btn);
+          });
 
-      lbClose.addEventListener("click", closeLightbox);
-      lbPrev.addEventListener("click", () => { lbPrevPhoto(); if (lbAuto) startAutoplay(); });
-      lbNext.addEventListener("click", () => { lbNextPhoto(); if (lbAuto) startAutoplay(); });
+          wrap.addEventListener("click", (e) => {
+            const hit = e.target.closest(".g-item");
+            if (!hit) return;
+            const target = parseInt(hit.dataset.i, 10);
+            if (target !== state.active) setActive(state, target);
+          });
 
-      document.addEventListener("keydown", (e) => {
-        if (!lightbox.classList.contains("open")) return;
-        if (e.key === "Escape") closeLightbox();
-        if (e.key === "ArrowLeft")  { lbPrevPhoto(); if (lbAuto) startAutoplay(); }
-        if (e.key === "ArrowRight") { lbNextPhoto(); if (lbAuto) startAutoplay(); }
+          wrap.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowRight") {
+              e.preventDefault();
+              setActive(state, state.active + 1);
+            } else if (e.key === "ArrowLeft") {
+              e.preventDefault();
+              setActive(state, state.active - 1);
+            }
+          });
+
+          let tx = 0;
+          wrap.addEventListener(
+            "touchstart",
+            (e) => {
+              tx = e.touches[0].clientX;
+            },
+            { passive: true },
+          );
+          wrap.addEventListener(
+            "touchend",
+            (e) => {
+              const dx = e.changedTouches[0].clientX - tx;
+              if (Math.abs(dx) < 40) return;
+              setActive(state, state.active + (dx < 0 ? 1 : -1));
+            },
+            { passive: true },
+          );
+
+          inner.appendChild(wrap);
+        } else {
+          inner.appendChild(makeImg(entry.src, "Photographie " + (i + 1), i < 2));
+        }
+        if (i < 2) state.loaded = true;
+
+        section.appendChild(inner);
+        seqEl.appendChild(section);
+        slots.push(state);
       });
 
-      let lbTouchX = 0;
-      lightbox.addEventListener("touchstart", (e) => {
-        lbTouchX = e.touches[0].clientX;
-      }, { passive: true });
-      lightbox.addEventListener("touchend", (e) => {
-        const dx = e.changedTouches[0].clientX - lbTouchX;
-        if (Math.abs(dx) < 50) return;
-        if (dx < 0) lbNextPhoto(); else lbPrevPhoto();
-        if (lbAuto) startAutoplay();
-      }, { passive: true });
+      // ============================================================
+      // GROUP LAYOUT
+      //
+      // Positions are computed in pixels rather than with CSS percentages
+      // so that exactly --sliver of a neighbour shows regardless of that
+      // photo's aspect ratio.
+      // ============================================================
+      function sliverWidth() {
+        return window.innerWidth < 700 ? 28 : 48;
+      }
 
-      // Swipe between pages on mobile
-      const pageOrder = ["home", "projects", "about", "contact"];
-      let pageTouchX = 0;
-      let pageTouchY = 0;
-      document.addEventListener("touchstart", (e) => {
-        if (lightbox.classList.contains("open")) return;
-        pageTouchX = e.touches[0].clientX;
-        pageTouchY = e.touches[0].clientY;
-      }, { passive: true });
-      document.addEventListener("touchend", (e) => {
-        if (lightbox.classList.contains("open")) return;
-        const dx = e.changedTouches[0].clientX - pageTouchX;
-        const dy = e.changedTouches[0].clientY - pageTouchY;
-        if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-        const base = currentPage === "project" ? "projects" : currentPage;
-        const idx = pageOrder.indexOf(base);
-        if (idx === -1) return;
-        if (dx < 0 && idx < pageOrder.length - 1) showPage(pageOrder[idx + 1]);
-        if (dx > 0 && idx > 0) showPage(pageOrder[idx - 1]);
-      }, { passive: true });
+      function layoutGroup(state) {
+        if (state.type !== "group") return;
+        const W = state.section.clientWidth;
+        const S = sliverWidth();
 
+        state.items.forEach((item, k) => {
+          const offset = k - state.active;
+          const w = item.offsetWidth;
+          let tx, op;
+
+          if (offset === 0) {
+            tx = (W - w) / 2;
+            op = 1;
+          } else if (offset === 1) {
+            tx = W - S;
+            op = 1;
+          } else if (offset === -1) {
+            tx = S - w;
+            op = 1;
+          } else if (offset > 1) {
+            tx = W + 40;
+            op = 0;
+          } else {
+            tx = -w - 40;
+            op = 0;
+          }
+
+          item.style.transform = "translate3d(" + tx + "px, -50%, 0)";
+          item.style.opacity = op;
+          item.classList.toggle("is-centre", offset === 0);
+          const reachable = Math.abs(offset) === 1;
+          item.tabIndex = reachable ? 0 : -1;
+          item.setAttribute("aria-hidden", reachable || offset === 0 ? "false" : "true");
+        });
+      }
+
+      function setActive(state, next) {
+        const max = state.items.length - 1;
+        if (next < 0 || next > max) return;
+        state.active = next;
+        layoutGroup(state);
+      }
 
       // ============================================================
-      // LAZY FADE-IN
+      // MEASUREMENT CACHE
+      //
+      // Every geometry read happens here, never inside the rAF loop,
+      // so the loop only ever writes.
       // ============================================================
-      const imgObserver = new IntersectionObserver(
-        (entries, obs) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            const img = entry.target;
-            const reveal = () =>
-              requestAnimationFrame(() => img.classList.add("loaded"));
-            if (img.complete) reveal();
-            else {
-              img.addEventListener("load", reveal, { once: true });
-              img.addEventListener("error", reveal, { once: true });
-            }
-            obs.unobserve(img);
-          });
-        },
-        { rootMargin: "0px 0px 200px 0px" },
-      );
+      let spacing = window.innerHeight;
 
-      function observeImages() {
-        document.querySelectorAll("img:not(.loaded)").forEach((img) => {
-          imgObserver.observe(img);
+      function measure() {
+        const scrollY = window.pageYOffset;
+        slots.forEach((s) => {
+          const r = s.section.getBoundingClientRect();
+          s.centre = r.top + scrollY + r.height / 2;
+        });
+        spacing =
+          slots.length > 1
+            ? slots[1].centre - slots[0].centre
+            : window.innerHeight;
+        if (!spacing) spacing = window.innerHeight;
+
+        document.body.classList.add("no-anim");
+        slots.forEach(layoutGroup);
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => document.body.classList.remove("no-anim")),
+        );
+
+        dirty = true;
+      }
+
+      let measureQueued = false;
+      function scheduleMeasure() {
+        if (measureQueued) return;
+        measureQueued = true;
+        requestAnimationFrame(() => {
+          measureQueued = false;
+          measure();
         });
       }
 
       // ============================================================
-      // CUSTOM CURSOR
+      // SCROLL LOOP
+      //
+      // This is a triggered animation, not a scroll-scrubbed one. Only
+      // one slot is ever "active" — the one nearest the viewport centre
+      // — and everything else sits at a flat, motionless opacity of 0.
+      // Scrolling through the middle of a slot's zone changes nothing;
+      // there's no picture "underneath" as far as the eye can tell.
+      //
+      // The active slot flips only at the exact halfway point between
+      // two slot centres (nearest-slot switches there by construction),
+      // and that flip is the one-shot trigger: the old active's target
+      // drops to 0, the new active's target jumps to 1, and a fixed-
+      // duration ease (~600ms, independent of scroll speed) carries the
+      // crossfade — a reveal, not a readout of scroll position. The same
+      // triggered-target/eased-toward-it shape drives the background
+      // colour, so it swaps in lockstep with the image.
+      //
+      // Because the trigger is a single index (not a blended fraction),
+      // a fast flick that skips straight past several slots just swaps
+      // directly from the old active to the new one — one clean
+      // crossfade, no flicker, nothing built up in between.
       // ============================================================
-      const cursor = document.getElementById("cursor");
-      const cursorLabel = document.getElementById("cursorLabel");
-      let cursorX = 0;
-      let cursorY = 0;
-      let cursorRX = 0;
-      let cursorRY = 0;
+      const EASE = 0.085; // per-frame lerp factor — ~600ms to settle at 60fps
+      const SETTLED = 0.0015; // below this distance-to-target, snap and stop
 
-      document.addEventListener("mousemove", (e) => {
-        cursorX = e.clientX;
-        cursorY = e.clientY;
-      });
+      const hdr = document.getElementById("hdr");
+      let dirty = true;
+      let settling = true; // true while opacity/colour are still easing in
+      let lastY = window.pageYOffset;
+      let hdrHidden = false;
+      let lastBg = "";
+      let lastFg = "";
+      let curLab = null; // displayed (eased) background colour
 
-      function animateCursor() {
-        cursorRX += (cursorX - cursorRX) * 0.7;
-        cursorRY += (cursorY - cursorRY) * 0.7;
-        cursor.style.transform = `translate(${cursorRX}px, ${cursorRY}px) translate(-50%, -50%)`;
-        requestAnimationFrame(animateCursor);
+      function frame() {
+        if (dirty || settling) {
+          dirty = false;
+          settling = false;
+          const y = window.pageYOffset;
+          const vc = y + window.innerHeight / 2;
+
+          const activeIndex = slots.length
+            ? Math.min(
+                slots.length - 1,
+                Math.max(0, Math.round((vc - slots[0].centre) / spacing)),
+              )
+            : -1;
+
+          // --- per-slot opacity: binary target, eased toward it -----
+          for (let i = 0; i < slots.length; i++) {
+            const s = slots[i];
+            const target = i === activeIndex ? 1 : 0;
+
+            let op;
+            if (s.opacity < 0) {
+              op = target; // first paint for this slot: snap, don't fade in
+            } else {
+              op = s.opacity + (target - s.opacity) * EASE;
+              if (Math.abs(target - op) < SETTLED) op = target;
+              else settling = true;
+            }
+
+            // NB: opacity only — never visibility/display. Hidden elements
+            // are skipped by the lazy-loader, which would leave blanks.
+            if (op !== s.opacity) {
+              s.opacity = op;
+              s.inner.style.opacity = op;
+            }
+          }
+
+          // --- fetch the slots we're about to need ----------------
+          if (activeIndex >= 0) {
+            const lo = Math.max(0, activeIndex - PRELOAD);
+            const hi = Math.min(slots.length - 1, activeIndex + PRELOAD);
+            for (let k = lo; k <= hi; k++) promote(slots[k]);
+          }
+
+          // --- background colour: same triggered-target treatment -----
+          if (activeIndex >= 0) {
+            const target = slots[activeIndex].lab;
+
+            if (!curLab) {
+              curLab = target; // first paint: snap, don't fade in
+            } else {
+              let rest = 0;
+              curLab = curLab.map((v, k) => {
+                const nv = v + (target[k] - v) * EASE;
+                rest = Math.max(rest, Math.abs(target[k] - nv));
+                return nv;
+              });
+              if (rest < SETTLED) curLab = target;
+              else settling = true;
+            }
+
+            const css = oklabToCss(curLab);
+            if (css !== lastBg) {
+              lastBg = css;
+              document.body.style.backgroundColor = css;
+              document.documentElement.style.backgroundColor = css;
+              // Flip the header ink off the interpolated lightness, so it
+              // stays legible whatever colours get chosen in the admin.
+              const fg = curLab[0] < 0.62 ? "#f2f2f2" : "#111111";
+              if (fg !== lastFg) {
+                lastFg = fg;
+                document.documentElement.style.setProperty("--fg", fg);
+              }
+            }
+          }
+
+          // --- header hide / show ---------------------------------
+          const dy = y - lastY;
+          if (Math.abs(dy) > 6) {
+            if (dy > 0 && y > 80 && !hdrHidden) {
+              hdrHidden = true;
+              hdr.classList.add("is-hidden");
+            } else if (dy < 0 && hdrHidden) {
+              hdrHidden = false;
+              hdr.classList.remove("is-hidden");
+            }
+            lastY = y;
+          }
+        }
+        requestAnimationFrame(frame);
       }
-      animateCursor();
 
-      // Cursor state based on hover
-      document.addEventListener(
-        "mouseover",
-        (e) => {
-          const t = e.target;
-          if (t.tagName === "IMG" && !t.closest(".lightbox") && !t.closest(".hero-slide")) {
-            cursor.classList.add("cursor-photo");
-            cursorLabel.textContent = "voir";
-          } else if (
-            t.tagName === "A" ||
-            t.tagName === "BUTTON" ||
-            t.closest("[data-page]") ||
-            t.closest("[data-project]") ||
-            t.closest(".hero-progress span")
-          ) {
-            cursor.classList.add("cursor-link");
-            cursorLabel.textContent = "";
-          }
+      window.addEventListener(
+        "scroll",
+        () => {
+          dirty = true;
         },
-        true,
+        { passive: true },
       );
 
-      document.addEventListener(
-        "mouseout",
-        (e) => {
-          const t = e.target;
-          if (t.tagName === "IMG") {
-            cursor.classList.remove("cursor-photo");
-            cursorLabel.textContent = "";
-          } else if (
-            t.tagName === "A" ||
-            t.tagName === "BUTTON" ||
-            t.closest("[data-page]") ||
-            t.closest("[data-project]") ||
-            t.closest(".hero-progress span")
-          ) {
-            cursor.classList.remove("cursor-link");
-          }
-        },
-        true,
-      );
+      // Ignore the small height changes iOS fires as the URL bar collapses
+      // mid-scroll — remeasuring on those makes every opacity jitter.
+      let resizeT;
+      let lastW = window.innerWidth;
+      let lastH = window.innerHeight;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeT);
+        resizeT = setTimeout(() => {
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          if (w === lastW && Math.abs(h - lastH) < 120) return;
+          lastW = w;
+          lastH = h;
+          measure();
+        }, 150);
+      });
+      window.addEventListener("orientationchange", () => setTimeout(measure, 250));
 
-      const header = document.querySelector(".header");
-      window.addEventListener("scroll", () => {
-        header.classList.toggle("scrolled", window.pageYOffset > 40);
-
-        if (currentPage === "home") {
-          const scrollY = window.pageYOffset;
-          const vh = window.innerHeight;
-          const progress = Math.min(scrollY / vh, 1);
-          const hero = document.getElementById("hero");
-          hero.style.opacity = 1 - progress * 1.4;
-          document.querySelectorAll(".hero-slide img").forEach((img) => {
-            img.style.transform = `translateY(${scrollY * 0.25}px)`;
-          });
-        }
-
-        if (currentPage === "about") {
-          const scrollY = window.pageYOffset;
-          const aboutHeroImg = document.querySelector("#aboutHero img");
-          if (aboutHeroImg) {
-            aboutHeroImg.style.transform = `scale(1.15) translateY(${scrollY * 0.15}px)`;
-          }
-        }
-      }, { passive: true });
-
-      // ============================================================
-      // INIT
-      // ============================================================
-      buildHero();
-      buildShowcase();
-      buildProjects();
-      buildAbout();
-      buildContact();
-      bindPageLinks();
-      observeImages();
-
-      // Start hero cycle after first frame
-      restartHeroTimer();
+      window.addEventListener("load", measure);
+      measure();
+      requestAnimationFrame(frame);
     </script>
   </body>
 </html>
-

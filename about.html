@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Armel Kervennal — à propos</title>
+    <meta
+      name="description"
+      content="À propos d'Armel Kervennal, photographe basé à Nantes."
+    />
+    <link rel="icon" type="image/png" href="Favicon/favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- set synchronously so the pre-paint state matches what JS will draw -->
+    <script>
+      document.documentElement.className = "js";
+    </script>
+
+    <style>
+      :root {
+        --sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+        --ink: #111;
+        --muted: rgba(17, 17, 17, 0.55);
+        --line: rgba(17, 17, 17, 0.12);
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        background: #fff;
+      }
+
+      body {
+        font-family: var(--sans);
+        font-weight: 400;
+        font-size: 15px;
+        line-height: 1.7;
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .hdr {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 26px 32px;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        background: #fff;
+        transition: transform 0.5s var(--ease);
+      }
+      .hdr.is-hidden {
+        transform: translateY(-140%);
+      }
+      .hdr a {
+        text-decoration: none;
+      }
+      .hdr a:hover {
+        opacity: 0.55;
+      }
+      .hdr-nav {
+        display: flex;
+        align-items: baseline;
+        gap: 22px;
+      }
+      .hdr-nav .is-current {
+        opacity: 0.55;
+      }
+
+      .page {
+        max-width: 62ch;
+        margin: 0 auto;
+        padding: 18vh 32px 14vh;
+      }
+
+      /* Text blocks fade + rise in on load, staggered via an inline
+         transition-delay set per element in JS. Without JS (no .js class
+         on <html>) content just renders visible — no FOUC. */
+      .reveal {
+        transition:
+          opacity 0.7s var(--ease),
+          transform 0.7s var(--ease);
+      }
+      .js .reveal {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      .quote {
+        margin: 0 0 4em;
+      }
+      .quote p {
+        font-size: 19px;
+        line-height: 1.5;
+        margin-bottom: 0.9em;
+      }
+      .quote cite {
+        font-style: normal;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .prose p {
+        margin-bottom: 1.5em;
+      }
+      .prose p:last-child {
+        margin-bottom: 0;
+      }
+
+      .gear {
+        margin-top: 6em;
+      }
+      .gear-item {
+        margin-bottom: 2.2em;
+      }
+      .gear-item:last-child {
+        margin-bottom: 0;
+      }
+      .gear-label {
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.5em;
+      }
+      .gear-title {
+        font-size: 17px;
+        font-weight: 400;
+      }
+      .gear-title + .gear-title {
+        margin-top: 0.35em;
+      }
+
+      .rule {
+        border: 0;
+        border-top: 1px solid var(--line);
+        margin: 5em 0 3.5em;
+      }
+
+      .contact dl {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        gap: 14px 24px;
+        margin-bottom: 3em;
+      }
+      .contact dt {
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+        padding-top: 5px;
+      }
+      .contact dd a {
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 2px;
+        transition: border-color 0.3s;
+      }
+      .contact dd a:hover {
+        border-color: var(--ink);
+      }
+      .contact-note {
+        color: var(--muted);
+        max-width: 46ch;
+      }
+
+      /* Desktop gets the whole thing on one screen, no scroll: a
+         two-column layout (words on the left, equipment + contact on
+         the right), vertically centred in the viewport. Mobile keeps
+         the single, more spacious scrolling column above. */
+      @media (min-width: 900px) {
+        .page {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          column-gap: 64px;
+          align-content: center;
+          min-height: 100svh;
+          max-width: 1040px;
+          padding: 84px 48px 36px;
+          line-height: 1.55;
+        }
+        .quote {
+          margin: 0 0 1.6em;
+        }
+        .quote p {
+          font-size: 20px;
+        }
+        .prose p {
+          margin-bottom: 1.05em;
+        }
+        .gear {
+          margin-top: 0;
+        }
+        .gear-item {
+          margin-bottom: 1.1em;
+        }
+        .rule {
+          margin: 1.8em 0 1.4em;
+        }
+        .contact dl {
+          margin-bottom: 1.2em;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .hdr {
+          padding: 20px 20px;
+          font-size: 15px;
+        }
+        .page {
+          padding: 22vh 20px 16vh;
+        }
+        .quote p {
+          font-size: 17px;
+        }
+        .contact dl {
+          grid-template-columns: 1fr;
+          gap: 4px 0;
+        }
+        .contact dt {
+          padding-top: 14px;
+        }
+      }
+
+      /* ============================================================
+         PAGE TRANSITIONS (index <-> about)
+
+         A cross-document view transition — the browser crossfades the
+         old and new page in place instead of hard-cutting between them.
+         Pure progressive enhancement: unsupported browsers just navigate
+         as before, nothing to feature-detect or fall back manually.
+         ============================================================ */
+      @view-transition {
+        navigation: auto;
+      }
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 0.5s;
+        animation-timing-function: var(--ease);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .hdr,
+        .reveal {
+          transition: none;
+        }
+        ::view-transition-group(*),
+        ::view-transition-old(*),
+        ::view-transition-new(*) {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="hdr" id="hdr">
+      <a href="index.html">Armel Kervennal</a>
+      <nav class="hdr-nav">
+        <a href="archive.html">archive</a>
+        <span class="is-current">about</span>
+      </nav>
+    </header>
+
+    <main class="page" id="about"></main>
+
+    <script src="site-config.js"></script>
+    <script>
+      const cfg = (window.SITE_CONFIG && SITE_CONFIG.content) || {};
+      const about = cfg.about || {};
+      const contact = cfg.contact || {};
+      const root = document.getElementById("about");
+
+      function el(tag, cls, text) {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text != null) n.textContent = text;
+        return n;
+      }
+
+      // Stagger each top-level text block's entrance by its order on
+      // the page, so they read as one cascade rather than popping in
+      // together.
+      let revealIndex = 0;
+      function reveal(node) {
+        node.classList.add("reveal");
+        node.style.transitionDelay = revealIndex++ * 90 + "ms";
+        return node;
+      }
+
+      // Two columns on desktop (words on the left, equipment + contact on
+      // the right) so everything fits on one screen; on mobile these are
+      // plain divs with no layout of their own, so content just stacks
+      // in this same order.
+      const colWords = el("div", "col-words");
+      const colInfo = el("div", "col-info");
+
+      // --- quote ------------------------------------------------------
+      if (about.quote) {
+        const fig = el("figure", "quote");
+        const bq = document.createElement("blockquote");
+        bq.appendChild(el("p", null, "« " + about.quote + " »"));
+        fig.appendChild(bq);
+        if (about.quoteAuthor) {
+          const cap = document.createElement("figcaption");
+          cap.appendChild(el("cite", null, about.quoteAuthor));
+          fig.appendChild(cap);
+        }
+        colWords.appendChild(reveal(fig));
+      }
+
+      // --- approche ---------------------------------------------------
+      if ((about.approche || []).length) {
+        const sec = el("section", "prose");
+        about.approche.forEach((p) => sec.appendChild(el("p", null, p)));
+        colWords.appendChild(reveal(sec));
+      }
+
+      // --- équipement — label and model only, no commentary -----------
+      // Consecutive entries sharing a label (eg. the two lenses, both
+      // "Objectifs") render as one block: the label once, then each
+      // model underneath it.
+      if ((about.gear || []).length) {
+        const sec = el("section", "gear");
+        let item = null;
+        let lastLabel = null;
+        about.gear.forEach((g) => {
+          if (!item || g.label !== lastLabel) {
+            item = el("div", "gear-item");
+            if (g.label) item.appendChild(el("div", "gear-label", g.label));
+            sec.appendChild(item);
+            lastLabel = g.label;
+          }
+          if (g.title) item.appendChild(el("h2", "gear-title", g.title));
+        });
+        colInfo.appendChild(reveal(sec));
+      }
+
+      // --- contact ----------------------------------------------------
+      colInfo.appendChild(el("hr", "rule"));
+
+      const cs = el("section", "contact");
+      const dl = document.createElement("dl");
+
+      function row(label, node) {
+        dl.appendChild(el("dt", null, label));
+        const dd = document.createElement("dd");
+        dd.appendChild(node);
+        dl.appendChild(dd);
+      }
+
+      if (contact.email) {
+        const a = el("a", null, contact.email);
+        a.href = "mailto:" + contact.email;
+        row("Email", a);
+      }
+      if (contact.instagramHandle) {
+        const a = el("a", null, contact.instagramHandle);
+        a.href = contact.instagramUrl || "#";
+        a.target = "_blank";
+        a.rel = "noopener";
+        row("Instagram", a);
+      }
+      if (contact.location) {
+        row("Basé à", document.createTextNode(contact.location));
+      }
+      cs.appendChild(dl);
+
+      if (contact.note) cs.appendChild(el("p", "contact-note", contact.note));
+      colInfo.appendChild(reveal(cs));
+
+      root.appendChild(colWords);
+      root.appendChild(colInfo);
+
+      // Two frames: one for layout/paint to settle, one for the browser
+      // to register the pre-transition styles before we flip them —
+      // otherwise the transition can get skipped and the text just snaps in.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          root.querySelectorAll(".reveal").forEach((n) => n.classList.add("in"));
+        });
+      });
+
+      // --- header hide on scroll down ---------------------------------
+      const hdr = document.getElementById("hdr");
+      let lastY = window.pageYOffset;
+      let hidden = false;
+      window.addEventListener(
+        "scroll",
+        () => {
+          const y = window.pageYOffset;
+          const dy = y - lastY;
+          if (Math.abs(dy) <= 6) return;
+          if (dy > 0 && y > 80 && !hidden) {
+            hidden = true;
+            hdr.classList.add("is-hidden");
+          } else if (dy < 0 && hidden) {
+            hidden = false;
+            hdr.classList.remove("is-hidden");
+          }
+          lastY = y;
+        },
+        { passive: true },
+      );
+    </script>
+  </body>
+</html>

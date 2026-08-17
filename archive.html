@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Armel Kervennal — archive</title>
+    <meta
+      name="description"
+      content="Archive complète des photographies d'Armel Kervennal, classée par année et par lieu."
+    />
+    <link rel="icon" type="image/png" href="Favicon/favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- set synchronously so the pre-paint state matches what JS will draw -->
+    <script>
+      document.documentElement.className = "js";
+    </script>
+
+    <style>
+      :root {
+        --sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+        --ink: #111;
+        --muted: rgba(17, 17, 17, 0.55);
+        --line: rgba(17, 17, 17, 0.12);
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        --hdr-h: 72px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        background: #fff;
+      }
+
+      body {
+        font-family: var(--sans);
+        font-weight: 400;
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        /* the cover grid breaks out to full viewport width (below); this
+           keeps that trick from opening a horizontal scrollbar */
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      /* ============================================================
+         HEADER
+         ============================================================ */
+      .hdr {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 26px 32px;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        background: #fff;
+        transition: transform 0.5s var(--ease);
+      }
+      .hdr.is-hidden {
+        transform: translateY(-140%);
+      }
+      .hdr a {
+        text-decoration: none;
+      }
+      .hdr a:hover {
+        opacity: 0.55;
+      }
+      .hdr-nav {
+        display: flex;
+        align-items: baseline;
+        gap: 22px;
+      }
+      .hdr-nav .is-current {
+        opacity: 0.55;
+      }
+
+      /* Persistent minimal reminder of where you are (year / location),
+         sticky just under the fixed header so it stays visible while
+         scrolling a long grid. */
+      .crumb {
+        position: sticky;
+        top: var(--hdr-h);
+        z-index: 40;
+        display: none;
+        align-items: baseline;
+        gap: 10px;
+        padding: 14px 32px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .crumb.on {
+        display: flex;
+      }
+      .crumb a {
+        text-decoration: none;
+        color: var(--muted);
+      }
+      .crumb a:hover {
+        color: var(--ink);
+      }
+      .crumb .sep {
+        opacity: 0.5;
+      }
+      .crumb .here {
+        color: var(--ink);
+      }
+
+      .page {
+        --locs-gap: 13px;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: calc(var(--hdr-h) + 6vh) 32px 14vh;
+      }
+
+      /* ============================================================
+         REVEAL — fade the active view in on load / on navigation
+         ============================================================ */
+      .reveal {
+        transition:
+          opacity 0.5s var(--ease),
+          transform 0.5s var(--ease);
+      }
+      .js .reveal {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* Same-document navigation (year → location → grid) crossfades
+         via the View Transitions API, matching the cross-document
+         crossfade already used between index/about/archive. */
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 0.4s;
+        animation-timing-function: var(--ease);
+      }
+
+      /* ============================================================
+         YEARS — level 1
+         ============================================================ */
+
+      /* ============================================================
+         ARCHIVE HOME — every year, each with its own cover grid
+         ============================================================ */
+      .yr-section {
+        margin-bottom: 88px;
+      }
+      .yr-section:last-child {
+        margin-bottom: 0;
+      }
+      .yr-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        text-decoration: none;
+        margin-bottom: 24px;
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        padding: 0 var(--locs-gap);
+      }
+      a.yr-head:hover .yr-y,
+      a.yr-head:hover .yr-meta {
+        opacity: 0.55;
+      }
+      .yr-y,
+      .yr-meta {
+        font-size: 72px;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        transition: opacity 0.3s;
+      }
+      .yr-meta {
+        color: var(--muted);
+      }
+
+      /* ============================================================
+         LOCATIONS — cover grid, six across, edge to edge of the
+         viewport (breaks out of .page's max-width/padding on purpose)
+         ============================================================ */
+      .locs {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: var(--locs-gap);
+        width: 100vw;
+        padding: 0 var(--locs-gap);
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+      }
+      .loc {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+      }
+      .loc-cover {
+        aspect-ratio: 3 / 2;
+        overflow: hidden;
+        background: #f2f2f2;
+      }
+      .loc-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition:
+          clip-path 0.7s var(--ease),
+          opacity 0.5s var(--ease);
+      }
+      .loc-meta {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 10px 12px;
+      }
+      .loc-name {
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .loc-count {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      /* ============================================================
+         GRID — level 3. A strict 6-column grid (2 on mobile): six
+         evenly-spaced vertical tracks, one photo per track per row.
+         Every thumbnail shares one fixed height (--row-h) and keeps
+         its own natural aspect ratio — never stretched to fill its
+         column — and is centered horizontally within that column, so
+         a portrait photo reads narrow and a landscape one reads wide,
+         but their centers stay on the same six axes. The index number
+         is pinned to the column's own position, not the image's.
+         ============================================================ */
+      .grid {
+        --grid-gap: 20px;
+        --row-gap: 56px;
+        --row-h: 115px;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: var(--row-gap) var(--grid-gap);
+        width: 100vw;
+        padding: 26px var(--grid-gap) 0;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+      }
+      .grid-cell {
+        position: relative;
+        display: flex;
+        justify-content: center;
+      }
+      .grid-idx {
+        position: absolute;
+        top: -20px;
+        left: 0;
+        font-size: 11px;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+      .grid button {
+        display: block;
+        border: 0;
+        padding: 0;
+        background: none;
+        font: inherit;
+        cursor: pointer;
+        overflow: hidden;
+      }
+      .grid-thumb {
+        height: var(--row-h);
+        background: #f2f2f2;
+      }
+      .grid-thumb img {
+        height: 100%;
+        width: auto;
+        display: block;
+        transition:
+          clip-path 0.7s var(--ease),
+          opacity 0.4s var(--ease);
+      }
+      .grid button:focus-visible .grid-thumb {
+        outline: 2px solid var(--ink);
+        outline-offset: -3px;
+      }
+
+      /* Images wipe in bottom-to-top as they finish loading: the clip
+         rectangle's top edge starts pinned to the bottom (nothing
+         visible) and eases up to 0, so the reveal grows upward. */
+      .js .loc-cover img,
+      .js .grid-thumb img {
+        clip-path: inset(100% 0 0 0);
+        opacity: 0;
+      }
+      .loc-cover img.loaded,
+      .grid-thumb img.loaded {
+        clip-path: inset(0 0 0 0);
+        opacity: 1;
+      }
+
+      .empty {
+        color: var(--muted);
+        padding: 40px 0;
+      }
+
+      /* ============================================================
+         LIGHTBOX
+         ============================================================ */
+      .lb {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s var(--ease);
+      }
+      .lb.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .lb-img {
+        max-width: 88vw;
+        max-height: 86vh;
+        object-fit: contain;
+        display: block;
+        opacity: 0;
+        transform: scale(0.985);
+        transition:
+          opacity 0.35s var(--ease),
+          transform 0.45s var(--ease);
+      }
+      .lb-img.shown {
+        opacity: 1;
+        transform: none;
+      }
+      .lb-close,
+      .lb-nav {
+        position: absolute;
+        border: 0;
+        background: none;
+        font: inherit;
+        color: var(--ink);
+        cursor: pointer;
+      }
+      .lb-close {
+        top: 22px;
+        right: 26px;
+        font-size: 13px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        opacity: 0.5;
+        transition: opacity 0.2s;
+        z-index: 2;
+      }
+      .lb-close:hover {
+        opacity: 1;
+      }
+      .lb-nav {
+        top: 0;
+        bottom: 0;
+        width: 15%;
+        font-size: 0;
+        z-index: 1;
+      }
+      .lb-nav.prev {
+        left: 0;
+      }
+      .lb-nav.next {
+        right: 0;
+      }
+      .lb-counter {
+        position: absolute;
+        bottom: 24px;
+        left: 26px;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      @media (max-width: 700px) {
+        :root {
+          --hdr-h: 58px;
+        }
+        .hdr {
+          padding: 20px 20px;
+          font-size: 15px;
+        }
+        .crumb {
+          padding: 12px 20px;
+        }
+        .page {
+          padding: calc(var(--hdr-h) + 5vh) 20px 12vh;
+        }
+        .yr-y,
+        .yr-meta {
+          font-size: 46px;
+        }
+        .locs {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .grid {
+          grid-template-columns: repeat(2, 1fr);
+          --grid-gap: 12px;
+          --row-gap: 34px;
+          --row-h: 90px;
+        }
+        .grid-idx {
+          top: -16px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .hdr,
+        .reveal,
+        .loc,
+        .loc-cover img,
+        .grid button,
+        .grid-thumb img,
+        .lb,
+        .lb-img {
+          transition: none;
+        }
+        ::view-transition-group(*),
+        ::view-transition-old(*),
+        ::view-transition-new(*) {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="hdr" id="hdr">
+      <a href="index.html">Armel Kervennal</a>
+      <nav class="hdr-nav">
+        <a href="archive.html" class="is-current" id="archiveHome">archive</a>
+        <a href="about.html">about</a>
+      </nav>
+    </header>
+
+    <div class="crumb" id="crumb"></div>
+
+    <main class="page">
+      <div id="view"></div>
+    </main>
+
+    <div class="lb" id="lb">
+      <button class="lb-close" id="lbClose">fermer · esc</button>
+      <button class="lb-nav prev" id="lbPrev" aria-label="Photo précédente"></button>
+      <img class="lb-img" id="lbImg" alt="" />
+      <button class="lb-nav next" id="lbNext" aria-label="Photo suivante"></button>
+      <div class="lb-counter" id="lbCounter"></div>
+    </div>
+
+    <script src="site-config.js"></script>
+    <script>
+      function resolveSrc(p) {
+        return p;
+      }
+
+      const projects = (window.SITE_CONFIG && SITE_CONFIG.projects) || {};
+
+      // ============================================================
+      // Group projects by year only — each project stays its own tile
+      // (by title), never merged with another project even when they
+      // share a location. Order within a year keeps the config's own
+      // order (roughly newest-shoot-first) rather than re-deriving one
+      // from the free-text date field.
+      // ============================================================
+      function buildIndex() {
+        const years = {};
+        const yearOrder = [];
+
+        Object.keys(projects).forEach((id) => {
+          const p = projects[id];
+          const y = p.year || "—";
+
+          if (!years[y]) {
+            years[y] = { order: [] };
+            yearOrder.push(y);
+          }
+          years[y].order.push(id);
+        });
+
+        yearOrder.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+        return { years, yearOrder };
+      }
+
+      const INDEX = buildIndex();
+
+      function el(tag, cls, text) {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text != null) n.textContent = text;
+        return n;
+      }
+
+      // ============================================================
+      // ROUTING — ?y=<year>&p=<project id>, back/forward friendly
+      // ============================================================
+      function paramsFromURL() {
+        const sp = new URLSearchParams(location.search);
+        return { y: sp.get("y"), p: sp.get("p") };
+      }
+
+      // Same-document crossfade between archive states, when the
+      // browser supports it; falls straight back to a plain render.
+      function renderTransitioned() {
+        if (document.startViewTransition) document.startViewTransition(render);
+        else render();
+      }
+
+      function navigate(y, pid) {
+        const sp = new URLSearchParams();
+        if (y) sp.set("y", y);
+        if (y && pid) sp.set("p", pid);
+        const qs = sp.toString();
+        history.pushState({}, "", qs ? "archive.html?" + qs : "archive.html");
+        renderTransitioned();
+      }
+
+      window.addEventListener("popstate", renderTransitioned);
+
+      // ============================================================
+      // CRUMB — the persistent "where you are" reminder
+      // ============================================================
+      const crumbEl = document.getElementById("crumb");
+
+      function renderCrumb(y, pid) {
+        crumbEl.innerHTML = "";
+        // The picture grid (y + p) gets its own big in-flow heading
+        // instead (built in gridView, styled like the year on the
+        // cover grid) — this small sticky bar is only for the
+        // year-only view.
+        if (!y || pid) {
+          crumbEl.classList.remove("on");
+          return;
+        }
+        crumbEl.classList.add("on");
+        const yLink = el("a", null, y);
+        yLink.href = "archive.html?y=" + encodeURIComponent(y);
+        yLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          navigate(y, null);
+        });
+        crumbEl.appendChild(yLink);
+      }
+
+      // ============================================================
+      // VIEWS
+      // ============================================================
+      const viewEl = document.getElementById("view");
+
+      function mountReveal(node) {
+        viewEl.innerHTML = "";
+        node.classList.add("reveal");
+        viewEl.appendChild(node);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => node.classList.add("in"));
+        });
+      }
+
+      // Individual grid tiles/thumbnails fade + rise in as they scroll
+      // into view, instead of the whole grid popping in at once —
+      // each item is observed once and released as soon as it fires.
+      const itemRevealObserver =
+        "IntersectionObserver" in window
+          ? new IntersectionObserver(
+              (entries) => {
+                entries.forEach((entry) => {
+                  if (!entry.isIntersecting) return;
+                  entry.target.classList.add("in");
+                  itemRevealObserver.unobserve(entry.target);
+                });
+              },
+              { rootMargin: "0px 0px -6% 0px", threshold: 0.05 },
+            )
+          : null;
+
+      function revealItem(node) {
+        node.classList.add("reveal");
+        if (itemRevealObserver) itemRevealObserver.observe(node);
+        else node.classList.add("in");
+      }
+
+      // Thumbnails wipe in bottom-to-top the moment their own bytes are
+      // in, independent of the cell's scroll-in reveal above — so a
+      // slow image doesn't just pop once the cell has already settled.
+      function revealOnLoad(img) {
+        img.addEventListener("load", () => img.classList.add("loaded"), { once: true });
+      }
+
+      // A year's cover grid — one tile per PROJECT (never merged, even
+      // when two projects share a location), used both inline on the
+      // archive home (every year at once) and on the focused
+      // single-year view reached from the breadcrumb's "back" link.
+      function buildProjectsGrid(y) {
+        const yr = INDEX.years[y];
+        const grid = el("div", "locs");
+        yr.order.forEach((pid) => {
+          const proj = projects[pid];
+          const title = proj.title || pid;
+          const photos = proj.photos || [];
+          const coverSrc = proj.cover || photos[0];
+
+          const a = el("a", "loc", null);
+          a.href = "archive.html?y=" + encodeURIComponent(y) + "&p=" + encodeURIComponent(pid);
+          const cover = el("div", "loc-cover");
+          if (coverSrc) {
+            const img = document.createElement("img");
+            revealOnLoad(img);
+            img.src = resolveSrc(coverSrc);
+            img.alt = title;
+            img.loading = "lazy";
+            img.decoding = "async";
+            cover.appendChild(img);
+          }
+          a.appendChild(cover);
+          const meta = el("div", "loc-meta");
+          meta.appendChild(el("span", "loc-name", title));
+          meta.appendChild(el("span", "loc-count", String(photos.length)));
+          a.appendChild(meta);
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            navigate(y, pid);
+          });
+          revealItem(a);
+          grid.appendChild(a);
+        });
+        return grid;
+      }
+
+      // Archive home — every year, each with its own cover grid right
+      // underneath, so the whole archive is browsable without a click.
+      function archiveHomeView() {
+        const wrap = el("div");
+        if (!INDEX.yearOrder.length) {
+          wrap.appendChild(el("p", "empty", "Aucune photo dans l'archive pour l'instant."));
+          mountReveal(wrap);
+          return;
+        }
+        INDEX.yearOrder.forEach((y) => {
+          const section = el("section", "yr-section");
+          const projCount = INDEX.years[y].order.length;
+
+          const head = el("div", "yr-head", null);
+          head.appendChild(el("span", "yr-y", y));
+          head.appendChild(el("span", "yr-meta", String(projCount)));
+          revealItem(head);
+          section.appendChild(head);
+
+          section.appendChild(buildProjectsGrid(y));
+          wrap.appendChild(section);
+        });
+        mountReveal(wrap);
+      }
+
+      function yearView(y) {
+        const yr = INDEX.years[y];
+        const wrap = el("div");
+        if (!yr) {
+          wrap.appendChild(el("p", "empty", "Année introuvable."));
+          mountReveal(wrap);
+          return;
+        }
+        wrap.appendChild(buildProjectsGrid(y));
+        mountReveal(wrap);
+      }
+
+      function gridView(y, pid) {
+        const yr = INDEX.years[y];
+        const proj = yr && projects[pid];
+        const wrap = el("div");
+        if (!proj) {
+          wrap.appendChild(el("p", "empty", "Projet introuvable."));
+          mountReveal(wrap);
+          return;
+        }
+        const title = proj.title || pid;
+        const photos = proj.photos || [];
+
+        const head = el("a", "yr-head", null);
+        head.href = "archive.html";
+        head.appendChild(el("span", "yr-y", title));
+        head.appendChild(el("span", "yr-meta", String(photos.length)));
+        head.addEventListener("click", (e) => {
+          e.preventDefault();
+          navigate(null, null);
+        });
+        wrap.appendChild(head);
+
+        const grid = el("div", "grid");
+        photos.forEach((src, i) => {
+          const cell = el("div", "grid-cell");
+          cell.appendChild(el("span", "grid-idx", String(i + 1)));
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          const thumb = el("div", "grid-thumb");
+          const img = document.createElement("img");
+          revealOnLoad(img);
+          img.src = resolveSrc(src);
+          img.alt = title + " — photo " + (i + 1);
+          img.loading = "lazy";
+          img.decoding = "async";
+          thumb.appendChild(img);
+          btn.appendChild(thumb);
+          btn.addEventListener("click", () => openLightbox(photos, i));
+          cell.appendChild(btn);
+
+          revealItem(cell);
+          grid.appendChild(cell);
+        });
+        wrap.appendChild(grid);
+        mountReveal(wrap);
+      }
+
+      function render() {
+        const { y, p } = paramsFromURL();
+        renderCrumb(y, p);
+        if (y && p) gridView(y, p);
+        else if (y) yearView(y);
+        else archiveHomeView();
+      }
+
+      // ============================================================
+      // LIGHTBOX — full-bleed single photo, arrow keys, swipe, esc
+      // ============================================================
+      const lb = document.getElementById("lb");
+      const lbImg = document.getElementById("lbImg");
+      const lbCounter = document.getElementById("lbCounter");
+      let lbPhotos = [];
+      let lbIndex = 0;
+      let lbFirstShow = true;
+
+      function showLbIndex(i) {
+        lbIndex = (i + lbPhotos.length) % lbPhotos.length;
+        lbImg.classList.remove("shown");
+        const swap = () => {
+          lbImg.src = resolveSrc(lbPhotos[lbIndex]);
+          lbImg.alt = "Photo " + (lbIndex + 1) + " sur " + lbPhotos.length;
+          requestAnimationFrame(() => lbImg.classList.add("shown"));
+        };
+        if (lbFirstShow) {
+          lbFirstShow = false;
+          swap();
+        } else {
+          setTimeout(swap, 180);
+        }
+        lbCounter.textContent = lbIndex + 1 + " / " + lbPhotos.length;
+      }
+
+      function openLightbox(photos, i) {
+        lbPhotos = photos;
+        lbFirstShow = true;
+        lb.classList.add("open");
+        document.body.style.overflow = "hidden";
+        showLbIndex(i);
+      }
+
+      function closeLightbox() {
+        lb.classList.remove("open");
+        document.body.style.overflow = "";
+      }
+
+      document.getElementById("lbClose").addEventListener("click", closeLightbox);
+      document.getElementById("lbPrev").addEventListener("click", () => showLbIndex(lbIndex - 1));
+      document.getElementById("lbNext").addEventListener("click", () => showLbIndex(lbIndex + 1));
+
+      window.addEventListener("keydown", (e) => {
+        if (!lb.classList.contains("open")) return;
+        if (e.key === "Escape") closeLightbox();
+        else if (e.key === "ArrowRight") showLbIndex(lbIndex + 1);
+        else if (e.key === "ArrowLeft") showLbIndex(lbIndex - 1);
+      });
+
+      let lbTouchX = 0;
+      lb.addEventListener(
+        "touchstart",
+        (e) => {
+          lbTouchX = e.touches[0].clientX;
+        },
+        { passive: true },
+      );
+      lb.addEventListener(
+        "touchend",
+        (e) => {
+          const dx = e.changedTouches[0].clientX - lbTouchX;
+          if (Math.abs(dx) < 40) return;
+          showLbIndex(lbIndex + (dx < 0 ? 1 : -1));
+        },
+        { passive: true },
+      );
+
+      // ============================================================
+      // HEADER HIDE ON SCROLL — same behaviour as the other pages
+      // ============================================================
+      const hdr = document.getElementById("hdr");
+      let lastY = window.pageYOffset;
+      let hidden = false;
+      window.addEventListener(
+        "scroll",
+        () => {
+          const y = window.pageYOffset;
+          const dy = y - lastY;
+          if (Math.abs(dy) <= 6) return;
+          if (dy > 0 && y > 80 && !hidden) {
+            hidden = true;
+            hdr.classList.add("is-hidden");
+          } else if (dy < 0 && hidden) {
+            hidden = false;
+            hdr.classList.remove("is-hidden");
+          }
+          lastY = y;
+        },
+        { passive: true },
+      );
+
+      document.getElementById("archiveHome").addEventListener("click", (e) => {
+        if (!paramsFromURL().y) return; // already home, let it just navigate normally
+        e.preventDefault();
+        navigate(null, null);
+      });
+
+      render();
+    </script>
+  </body>
+</html>
