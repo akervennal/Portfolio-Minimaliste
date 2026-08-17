@@ -16,15 +16,6 @@ var SITE_CONFIG = {
       "bg": "#ffffff"
     },
     {
-      "type": "group",
-      "bg": "#97371f",
-      "photos": [
-        "images/showcase/3-MEL_8150.jpg",
-        "images/thabor-rennes-2024/1-MEL_8176.jpg",
-        "images/thabor-rennes-2024/2-MEL_8159.jpg"
-      ]
-    },
-    {
       "type": "single",
       "src": "images/showcase/7-MEL_8433.jpg",
       "bg": "#ffffff"
@@ -80,11 +71,6 @@ var SITE_CONFIG = {
     },
     {
       "type": "single",
-      "src": "images/showcase/9-MEL_3695.jpg",
-      "bg": "#e2e2e2"
-    },
-    {
-      "type": "single",
       "src": "images/showcase/2-MEL_8725.jpg",
       "bg": "#ff4000"
     },
@@ -92,6 +78,11 @@ var SITE_CONFIG = {
       "type": "single",
       "src": "images/showcase/6-MEL_7681.jpg",
       "bg": "#ffffff"
+    },
+    {
+      "type": "single",
+      "src": "images/showcase/9-MEL_3695.jpg",
+      "bg": "#e2e2e2"
     },
     {
       "type": "single",
@@ -117,6 +108,15 @@ var SITE_CONFIG = {
       "type": "single",
       "src": "images/showcase/3-MEL_7745.jpg",
       "bg": "#ffffff"
+    },
+    {
+      "type": "group",
+      "bg": "#97371f",
+      "photos": [
+        "images/showcase/3-MEL_8150.jpg",
+        "images/thabor-rennes-2024/1-MEL_8176.jpg",
+        "images/thabor-rennes-2024/2-MEL_8159.jpg"
+      ]
     },
     {
       "type": "single",
