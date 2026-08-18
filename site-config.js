@@ -8,16 +8,6 @@ var SITE_CONFIG = {
     {
       "type": "single",
       "src": "images/showcase/6-MEL_3648.jpg",
-      "bg": "#a4918b"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/MEL_9768.jpg",
-      "bg": "#ffffff"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/7-MEL_8433.jpg",
       "bg": "#ffffff"
     },
     {
@@ -53,8 +43,8 @@ var SITE_CONFIG = {
     },
     {
       "type": "single",
-      "src": "images/showcase/4-MEL_8103.jpg",
-      "bg": "#fa9e61"
+      "src": "images/showcase/MEL_9003.jpg",
+      "bg": "#ffffff"
     },
     {
       "type": "single",
@@ -71,12 +61,30 @@ var SITE_CONFIG = {
     },
     {
       "type": "single",
-      "src": "images/showcase/2-MEL_8725.jpg",
-      "bg": "#ff4000"
+      "src": "images/showcase/4-MEL_8103.jpg",
+      "bg": "#fa9e61"
     },
     {
       "type": "single",
       "src": "images/showcase/6-MEL_7681.jpg",
+      "bg": "#ffffff"
+    },
+    {
+      "type": "single",
+      "src": "images/showcase/2-MEL_8725.jpg",
+      "bg": "#ff4000"
+    },
+    {
+      "type": "group",
+      "bg": "#ffffff",
+      "photos": [
+        "images/showcase/MEL_9768.jpg",
+        "images/showcase/hero/MEL_9528.jpg"
+      ]
+    },
+    {
+      "type": "single",
+      "src": "images/showcase/7-MEL_8433.jpg",
       "bg": "#ffffff"
     },
     {
@@ -122,11 +130,6 @@ var SITE_CONFIG = {
       "type": "single",
       "src": "images/showcase/8-MEL_8227.jpg",
       "bg": "#ff5a4b"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/MEL_9003.jpg",
-      "bg": "#ae9577"
     },
     {
       "type": "single",
