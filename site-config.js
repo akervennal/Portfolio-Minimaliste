@@ -26,11 +26,6 @@ var SITE_CONFIG = {
       "bg": "#ffffff"
     },
     {
-      "type": "single",
-      "src": "images/showcase/5-IMG_4734_TIF.jpg",
-      "bg": "#7a7a7a"
-    },
-    {
       "type": "group",
       "bg": "#b7d2e4",
       "photos": [
@@ -43,8 +38,22 @@ var SITE_CONFIG = {
     },
     {
       "type": "single",
+      "src": "images/showcase/5-IMG_4734_TIF.jpg",
+      "bg": "#7a7a7a"
+    },
+    {
+      "type": "single",
       "src": "images/showcase/MEL_9003.jpg",
       "bg": "#ffffff"
+    },
+    {
+      "type": "group",
+      "bg": "#f3e1d3",
+      "photos": [
+        "images/Guilvinec%202026/5-MEL_2967.jpg",
+        "images/Guilvinec%202026/4-MEL_2975.jpg",
+        "images/Guilvinec%202026/2-MEL_3004.jpg"
+      ]
     },
     {
       "type": "single",
@@ -52,22 +61,9 @@ var SITE_CONFIG = {
       "bg": "#ffffff"
     },
     {
-      "type": "group",
-      "bg": "#ffffff",
-      "photos": [
-        "images/pyrenees-2026/12-MEL_5171.jpg",
-        "images/pyrenees-2026/39-MEL_5501.jpg"
-      ]
-    },
-    {
       "type": "single",
-      "src": "images/showcase/4-MEL_8103.jpg",
-      "bg": "#fa9e61"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/6-MEL_7681.jpg",
-      "bg": "#ffffff"
+      "src": "images/showcase/1-MEL_3166.jpg",
+      "bg": "#3d4322"
     },
     {
       "type": "single",
@@ -89,6 +85,11 @@ var SITE_CONFIG = {
     },
     {
       "type": "single",
+      "src": "images/showcase/4-MEL_8103.jpg",
+      "bg": "#fa9e61"
+    },
+    {
+      "type": "single",
       "src": "images/showcase/9-MEL_3695.jpg",
       "bg": "#e2e2e2"
     },
@@ -96,11 +97,6 @@ var SITE_CONFIG = {
       "type": "single",
       "src": "images/showcase/IMG_4776_TIF.jpg",
       "bg": "#ffffff"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/1-MEL_3166.jpg",
-      "bg": "#3d4322"
     },
     {
       "type": "single",
@@ -378,12 +374,16 @@ var SITE_CONFIG = {
       "photos": [
         "images/Guilvinec%202026/2-MEL_3014.jpg",
         "images/Guilvinec%202026/3-MEL_2994.jpg",
-        "images/Guilvinec%202026/4-MEL_2976.jpg",
         "images/Guilvinec%202026/5-MEL_2967.jpg",
+        "images/Guilvinec%202026/4-MEL_2976.jpg",
         "images/Guilvinec%202026/6-MEL_2956.jpg",
-        "images/Guilvinec%202026/7-MEL_2952.jpg"
+        "images/Guilvinec%202026/7-MEL_2952.jpg",
+        "images/Guilvinec%202026/3-MEL_2992.jpg",
+        "images/Guilvinec%202026/1-MEL_3018.jpg",
+        "images/Guilvinec%202026/2-MEL_3004.jpg",
+        "images/Guilvinec%202026/4-MEL_2975.jpg"
       ],
-      "cover": "images/Guilvinec%202026/2-MEL_3014.jpg"
+      "cover": "images/Guilvinec%202026/5-MEL_2967.jpg"
     },
     "la-bozage-2026": {
       "title": "La Bozage",
