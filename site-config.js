@@ -289,7 +289,8 @@ var SITE_CONFIG = {
         "images/R%C3%A9publique%20Czech%202026/56-MEL_6808.jpg",
         "images/R%C3%A9publique%20Czech%202026/57-MEL_6812.jpg",
         "images/R%C3%A9publique%20Czech%202026/58-MEL_6814.jpg"
-      ]
+      ],
+      "cover": "images/R%C3%A9publique%20Czech%202026/28-MEL_6609.jpg"
     },
     "pyrenees-2026": {
       "title": "Pyrénées",
