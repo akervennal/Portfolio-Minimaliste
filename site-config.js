@@ -12,6 +12,16 @@ var SITE_CONFIG = {
     },
     {
       "type": "group",
+      "bg": "#ffffff",
+      "photos": [
+        "images/R%C3%A9publique%20Czech%202026/28-MEL_6609.jpg",
+        "images/R%C3%A9publique%20Czech%202026/45-MEL_6749.jpg",
+        "images/R%C3%A9publique%20Czech%202026/48-MEL_6757.jpg",
+        "images/R%C3%A9publique%20Czech%202026/4-MEL_6357.jpg"
+      ]
+    },
+    {
+      "type": "group",
       "bg": "#c01909",
       "photos": [
         "images/pyrenees-2026/22-MEL_5247.jpg",
@@ -40,6 +50,15 @@ var SITE_CONFIG = {
       "type": "single",
       "src": "images/showcase/5-IMG_4734_TIF.jpg",
       "bg": "#7a7a7a"
+    },
+    {
+      "type": "group",
+      "bg": "#ffffff",
+      "photos": [
+        "images/R%C3%A9publique%20Czech%202026/30-MEL_6638.jpg",
+        "images/R%C3%A9publique%20Czech%202026/31-MEL_6642.jpg",
+        "images/R%C3%A9publique%20Czech%202026/32-MEL_6647.jpg"
+      ]
     },
     {
       "type": "single",
@@ -205,6 +224,73 @@ var SITE_CONFIG = {
     }
   },
   "projects": {
+    "republique-tcheque-2026": {
+      "title": "République tchèque",
+      "date": "Septembre 2026",
+      "dateLong": "Septembre 2026",
+      "year": "2026",
+      "location": "République tchèque",
+      "photos": [
+        "images/R%C3%A9publique%20Czech%202026/1-MEL_6345.jpg",
+        "images/R%C3%A9publique%20Czech%202026/2-MEL_6346.jpg",
+        "images/R%C3%A9publique%20Czech%202026/3-MEL_6356.jpg",
+        "images/R%C3%A9publique%20Czech%202026/4-MEL_6357.jpg",
+        "images/R%C3%A9publique%20Czech%202026/5-MEL_6401.jpg",
+        "images/R%C3%A9publique%20Czech%202026/6-MEL_6410.jpg",
+        "images/R%C3%A9publique%20Czech%202026/7-MEL_6447.jpg",
+        "images/R%C3%A9publique%20Czech%202026/8-MEL_6453.jpg",
+        "images/R%C3%A9publique%20Czech%202026/9-MEL_6461.jpg",
+        "images/R%C3%A9publique%20Czech%202026/10-MEL_6467.jpg",
+        "images/R%C3%A9publique%20Czech%202026/11-MEL_6474.jpg",
+        "images/R%C3%A9publique%20Czech%202026/12-MEL_6475.jpg",
+        "images/R%C3%A9publique%20Czech%202026/13-MEL_6479.jpg",
+        "images/R%C3%A9publique%20Czech%202026/14-MEL_6487.jpg",
+        "images/R%C3%A9publique%20Czech%202026/15-MEL_6498.jpg",
+        "images/R%C3%A9publique%20Czech%202026/16-MEL_6506.jpg",
+        "images/R%C3%A9publique%20Czech%202026/17-MEL_6512.jpg",
+        "images/R%C3%A9publique%20Czech%202026/18-MEL_6528.jpg",
+        "images/R%C3%A9publique%20Czech%202026/19-MEL_6538.jpg",
+        "images/R%C3%A9publique%20Czech%202026/20-MEL_6543.jpg",
+        "images/R%C3%A9publique%20Czech%202026/21-MEL_6544.jpg",
+        "images/R%C3%A9publique%20Czech%202026/22-MEL_6555.jpg",
+        "images/R%C3%A9publique%20Czech%202026/23-MEL_6564.jpg",
+        "images/R%C3%A9publique%20Czech%202026/24-MEL_6584.jpg",
+        "images/R%C3%A9publique%20Czech%202026/25-MEL_6595.jpg",
+        "images/R%C3%A9publique%20Czech%202026/26-MEL_6597.jpg",
+        "images/R%C3%A9publique%20Czech%202026/27-MEL_6608.jpg",
+        "images/R%C3%A9publique%20Czech%202026/28-MEL_6609.jpg",
+        "images/R%C3%A9publique%20Czech%202026/29-MEL_6613.jpg",
+        "images/R%C3%A9publique%20Czech%202026/30-MEL_6638.jpg",
+        "images/R%C3%A9publique%20Czech%202026/31-MEL_6642.jpg",
+        "images/R%C3%A9publique%20Czech%202026/32-MEL_6647.jpg",
+        "images/R%C3%A9publique%20Czech%202026/33-MEL_6655.jpg",
+        "images/R%C3%A9publique%20Czech%202026/34-MEL_6657.jpg",
+        "images/R%C3%A9publique%20Czech%202026/35-MEL_6662.jpg",
+        "images/R%C3%A9publique%20Czech%202026/36-MEL_6676.jpg",
+        "images/R%C3%A9publique%20Czech%202026/37-MEL_6685.jpg",
+        "images/R%C3%A9publique%20Czech%202026/38-MEL_6688.jpg",
+        "images/R%C3%A9publique%20Czech%202026/39-MEL_6711.jpg",
+        "images/R%C3%A9publique%20Czech%202026/40-MEL_6725.jpg",
+        "images/R%C3%A9publique%20Czech%202026/41-MEL_6728.jpg",
+        "images/R%C3%A9publique%20Czech%202026/42-MEL_6736.jpg",
+        "images/R%C3%A9publique%20Czech%202026/43-MEL_6743.jpg",
+        "images/R%C3%A9publique%20Czech%202026/44-MEL_6745.jpg",
+        "images/R%C3%A9publique%20Czech%202026/45-MEL_6749.jpg",
+        "images/R%C3%A9publique%20Czech%202026/46-MEL_6752.jpg",
+        "images/R%C3%A9publique%20Czech%202026/47-MEL_6755.jpg",
+        "images/R%C3%A9publique%20Czech%202026/48-MEL_6757.jpg",
+        "images/R%C3%A9publique%20Czech%202026/49-MEL_6758.jpg",
+        "images/R%C3%A9publique%20Czech%202026/50-MEL_6762.jpg",
+        "images/R%C3%A9publique%20Czech%202026/51-MEL_6771.jpg",
+        "images/R%C3%A9publique%20Czech%202026/52-MEL_6784.jpg",
+        "images/R%C3%A9publique%20Czech%202026/53-MEL_6786.jpg",
+        "images/R%C3%A9publique%20Czech%202026/54-MEL_6794.jpg",
+        "images/R%C3%A9publique%20Czech%202026/55-MEL_6806.jpg",
+        "images/R%C3%A9publique%20Czech%202026/56-MEL_6808.jpg",
+        "images/R%C3%A9publique%20Czech%202026/57-MEL_6812.jpg",
+        "images/R%C3%A9publique%20Czech%202026/58-MEL_6814.jpg"
+      ]
+    },
     "pyrenees-2026": {
       "title": "Pyrénées",
       "date": "Août 2026",
