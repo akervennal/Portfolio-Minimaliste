@@ -80,13 +80,18 @@
         letter-spacing: 0.01em;
         /* no background: the soft halo vanishes on white and keeps the
            header readable when a photo scrolls underneath */
-        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.85));
+        --hdr-halo: drop-shadow(0 0 5px rgba(255, 255, 255, 0.85));
         transition:
           transform 0.5s var(--ease),
           color 0.25s linear;
       }
       .hdr.is-hidden {
         transform: translateY(-140%);
+      }
+      .hdr > a,
+      .hdr > button,
+      .menu {
+        filter: var(--hdr-halo);
       }
       .hdr a {
         text-decoration: none;

@@ -3,18 +3,6 @@
   const menu = document.getElementById("menu");
   const scrim = document.getElementById("menuScrim");
 
-  // iOS 26 Safari ignores theme-color and tints the status bar from the
-  // first fixed element at the top. The header has no background, so
-  // Safari samples it once and sticks to that colour; this thin strip
-  // gives it a plain colour to read instead. Must stay first in <body>.
-  const topTint = document.createElement("div");
-  topTint.className = "top-tint";
-  topTint.style.backgroundColor = getComputedStyle(document.body).backgroundColor;
-  document.body.prepend(topTint);
-  window.setTopTint = (color) => {
-    topTint.style.backgroundColor = color;
-  };
-
   // Closed, the scrim leaves the page entirely: iOS Safari tints the area
   // around the Dynamic Island from full-screen fixed elements, and would
   // take its colour instead of the page's.

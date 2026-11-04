@@ -231,7 +231,6 @@ var SITE_CONFIG = {
   "auto": {
     "hero": "images/viking-cup-round-3-2026/7.jpg",
     "heroPhone": "images/viking-cup-round-3-2026/19.jpg",
-    "heroPhoneTint": "#483e32",
     "series": [
       {
         "model": "Nissan S14",

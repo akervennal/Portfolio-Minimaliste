@@ -75,7 +75,7 @@
         letter-spacing: 0.01em;
         /* no background: the soft halo vanishes on white and keeps the
            header readable when a photo scrolls underneath */
-        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.85));
+        --hdr-halo: drop-shadow(0 0 5px rgba(255, 255, 255, 0.85));
         transition:
           transform 0.5s var(--ease),
           color 0.25s linear;
@@ -83,11 +83,16 @@
       .hdr.is-hidden {
         transform: translateY(-140%);
       }
+      .hdr > a,
+      .hdr > button,
+      .menu {
+        filter: var(--hdr-halo);
+      }
       /* White over the hero, except with the menu open: it then sits on
          the pale blur, where black reads better. */
       .hdr.on-hero:not(:has(.menu.is-open)) {
         color: #fff;
-        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6))
+        --hdr-halo: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6))
           drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
       }
       .hdr a {
@@ -455,7 +460,6 @@
         const wrap = home.querySelector(".hero-wrap");
         const overHero = !current && wrap && y < wrap.offsetHeight - hdr.offsetHeight;
         hdr.classList.toggle("on-hero", !!overHero);
-        setTopTint(overHero && auto.heroPhoneTint ? auto.heroPhoneTint : "#fff");
       }
 
       function go(s) {

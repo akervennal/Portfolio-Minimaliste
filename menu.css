@@ -2,6 +2,17 @@
    MENU — three bars in the header. Opening blurs the page
    behind the header while the links roll out from the bars.
    ============================================================ */
+/* iOS Safari paints the status bar solid when a full-width fixed bar
+   sits at the top, unless that bar ignores taps: only the links and the
+   button take them, so the page can pass behind the clock. */
+.hdr {
+  pointer-events: none;
+}
+.hdr a,
+.hdr button {
+  pointer-events: auto;
+}
+
 .menu-btn {
   align-self: center;
   position: relative;
@@ -132,23 +143,6 @@
   opacity: 1;
   visibility: visible;
   transition-delay: 0s;
-}
-
-/* Status bar colour for iOS Safari, see menu.js. Just over 10px: Safari
-   ignores anything thinner. Under the scrim, so the menu blurs it too. */
-.top-tint {
-  display: none;
-}
-@media (max-width: 700px), (hover: none) {
-  .top-tint {
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 11px;
-    z-index: 48;
-  }
 }
 
 @media (max-width: 700px) {
