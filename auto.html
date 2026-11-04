@@ -455,6 +455,7 @@
         const wrap = home.querySelector(".hero-wrap");
         const overHero = !current && wrap && y < wrap.offsetHeight - hdr.offsetHeight;
         hdr.classList.toggle("on-hero", !!overHero);
+        setTopTint(overHero && auto.heroPhoneTint ? auto.heroPhoneTint : "#fff");
       }
 
       function go(s) {

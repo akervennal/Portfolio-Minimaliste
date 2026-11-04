@@ -134,6 +134,23 @@
   transition-delay: 0s;
 }
 
+/* Status bar colour for iOS Safari, see menu.js. Just over 10px: Safari
+   ignores anything thinner. Under the scrim, so the menu blurs it too. */
+.top-tint {
+  display: none;
+}
+@media (max-width: 700px), (hover: none) {
+  .top-tint {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 11px;
+    z-index: 48;
+  }
+}
+
 @media (max-width: 700px) {
   .menu {
     right: 20px;
