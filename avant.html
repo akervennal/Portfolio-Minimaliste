@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Armel Kervennal</title>
+    <meta
+      name="description"
+      content="Portfolio d'Armel Kervennal, photographe basé à Nantes."
+    />
+    <link rel="icon" type="image/png" href="Favicon/favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- set synchronously so the pre-paint state matches what JS will draw -->
+    <script>
+      document.documentElement.className = "js";
+    </script>
+
+    <style>
+      :root {
+        --sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+        --ink: #111;
+        --fg: #111;
+        --sliver: 48px;
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        background: #fff;
+      }
+
+      body {
+        font-family: var(--sans);
+        font-weight: 400;
+        color: var(--ink);
+        background: #fff;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      /* ============================================================
+         HEADER
+         ============================================================ */
+      .hdr {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 26px 32px;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        color: var(--fg);
+        transition:
+          transform 0.5s var(--ease),
+          color 0.25s linear;
+      }
+      .hdr.is-hidden {
+        transform: translateY(-140%);
+      }
+      .hdr-nav {
+        display: flex;
+        align-items: baseline;
+        gap: 22px;
+      }
+      .hdr-link:hover {
+        opacity: 0.55;
+      }
+      .hdr-link.is-current {
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      /* ============================================================
+         SEQUENCE
+         ============================================================ */
+      .slot {
+        height: 78svh;
+        position: relative;
+        overflow: hidden;
+      }
+      /* Extra scroll distance between photos, added only between slots
+         (never before the first or after the last) so it doesn't disturb
+         the first/last centering trick below. */
+      .slot + .slot {
+        margin-top: 25svh;
+      }
+      /* Slots are shorter than the viewport on purpose, so photos come
+         close together — but that means the first/last slot's own centre
+         can't be scrolled into line with the viewport's centre (you can't
+         scroll past the top/bottom to compensate). Padding the sequence
+         by exactly the missing half — (100vh - slot height) / 2 — closes
+         that gap, so the first and last photo centre exactly like every
+         one in between. */
+      #seq {
+        padding-top: 11svh;
+        padding-bottom: 11svh;
+      }
+      .slot-inner {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      /* Without JS every photo simply stays visible; the fade is applied
+         only once the script is driving opacity itself. */
+      .js .slot-inner {
+        opacity: 0;
+      }
+
+      .shot {
+        display: block;
+        max-height: 72vh;
+        max-width: 92vw;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+      }
+
+      /* ============================================================
+         GROUP CAROUSEL
+         ============================================================ */
+      .group {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        /* horizontal gestures belong to the carousel, vertical ones to
+           the page — never steal the user's scroll */
+        touch-action: pan-y;
+      }
+      .g-item {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        display: block;
+        border: 0;
+        padding: 0;
+        background: none;
+        font: inherit;
+        opacity: 0;
+        transform: translate3d(0, -50%, 0);
+        transition:
+          transform 0.7s var(--ease),
+          opacity 0.5s var(--ease);
+        cursor: pointer;
+      }
+      .g-item.is-centre {
+        cursor: default;
+        pointer-events: none;
+      }
+      .g-item .shot {
+        max-width: 82vw;
+      }
+      .g-item:focus-visible {
+        outline: 1px solid var(--ink);
+        outline-offset: 6px;
+      }
+      .no-anim .g-item {
+        transition: none;
+      }
+
+      @media (max-width: 700px) {
+        :root {
+          --sliver: 28px;
+        }
+        .hdr {
+          padding: 20px 20px;
+          font-size: 15px;
+        }
+        /* On mobile the fixed header eats most of the top padding's
+           buffer, so the first photo reads as sitting too high / behind
+           it. Nudge just the top down to clear the header, independent
+           of the bottom (which has no such obstruction). */
+        #seq {
+          padding-top: calc(11svh + 56px);
+        }
+        .shot {
+          max-width: 90vw;
+        }
+        .g-item .shot {
+          max-width: 78vw;
+        }
+      }
+
+      /* ============================================================
+         PAGE TRANSITIONS (index <-> about)
+
+         A cross-document view transition — the browser crossfades the
+         old and new page in place instead of hard-cutting between them.
+         Pure progressive enhancement: unsupported browsers just navigate
+         as before, nothing to feature-detect or fall back manually.
+         ============================================================ */
+      @view-transition {
+        navigation: auto;
+      }
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 0.5s;
+        animation-timing-function: var(--ease);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .g-item,
+        .hdr {
+          transition: none;
+        }
+        ::view-transition-group(*),
+        ::view-transition-old(*),
+        ::view-transition-new(*) {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="hdr" id="hdr">
+      <a class="hdr-name" href="index.html">Armel Kervennal</a>
+      <nav class="hdr-nav">
+        <a class="hdr-link" href="archive.html">archive</a>
+        <a class="hdr-link" href="about.html">about</a>
+      </nav>
+    </header>
+
+    <main id="seq"></main>
+
+    <script src="site-config.js"></script>
+    <script>
+      // ============================================================
+      // Root-relative paths in the config, resolved from inside /v3
+      // ============================================================
+      function resolveSrc(p) {
+        return p;
+      }
+
+      // ============================================================
+      // OKLab colour interpolation
+      //
+      // Blending two hex values channel-by-channel in sRGB sends the
+      // midpoint through mud (white -> blue detours via grey). OKLab is
+      // perceptually uniform, so the midpoint looks like the midpoint.
+      // ============================================================
+      function srgbToLinear(c) {
+        return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      }
+      function linearToSrgb(c) {
+        return c <= 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+      }
+      function hexToOklab(hex) {
+        const h = hex.replace("#", "");
+        const r = srgbToLinear(parseInt(h.slice(0, 2), 16) / 255);
+        const g = srgbToLinear(parseInt(h.slice(2, 4), 16) / 255);
+        const b = srgbToLinear(parseInt(h.slice(4, 6), 16) / 255);
+        const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+        const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+        const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+        return [
+          0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+          1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+          0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
+        ];
+      }
+      function oklabToCss(lab) {
+        const l_ = lab[0] + 0.3963377774 * lab[1] + 0.2158037573 * lab[2];
+        const m_ = lab[0] - 0.1055613458 * lab[1] - 0.0638541728 * lab[2];
+        const s_ = lab[0] - 0.0894841775 * lab[1] - 1.291485548 * lab[2];
+        const l = l_ * l_ * l_,
+          m = m_ * m_ * m_,
+          s = s_ * s_ * s_;
+        const ch = (v) =>
+          Math.max(0, Math.min(255, Math.round(linearToSrgb(v) * 255)));
+        return (
+          "rgb(" +
+          ch(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s) +
+          "," +
+          ch(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s) +
+          "," +
+          ch(-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s) +
+          ")"
+        );
+      }
+
+      // ============================================================
+      // BUILD
+      // ============================================================
+      const seqEl = document.getElementById("seq");
+      const entries = (window.SITE_CONFIG && SITE_CONFIG.sequence) || [];
+
+      // Per-slot runtime state
+      const slots = [];
+
+      // Loading is driven by the scroll engine rather than loading="lazy".
+      // The browser's lazy heuristic only looks ~1 viewport ahead, and here
+      // every photo is exactly 1 viewport apart — so a fast flick can land
+      // on a slot that hasn't started fetching and show nothing at all.
+      const PRELOAD = 2; // slots either side of the active one
+
+      function makeImg(src, alt, eager) {
+        const img = document.createElement("img");
+        img.className = "shot";
+        img.alt = alt;
+        img.decoding = "async";
+        if (eager) {
+          img.src = resolveSrc(src);
+          img.setAttribute("fetchpriority", "high");
+        } else {
+          img.dataset.src = resolveSrc(src);
+        }
+        img.addEventListener("load", scheduleMeasure, { once: true });
+        return img;
+      }
+
+      function promote(state) {
+        if (state.loaded) return;
+        state.loaded = true;
+        state.inner.querySelectorAll("img[data-src]").forEach((img) => {
+          img.src = img.dataset.src;
+          img.removeAttribute("data-src");
+        });
+      }
+
+      entries.forEach((entry, i) => {
+        const section = document.createElement("section");
+        section.className = "slot";
+
+        const inner = document.createElement("div");
+        inner.className = "slot-inner";
+
+        const state = {
+          section: section,
+          inner: inner,
+          lab: hexToOklab(entry.bg || "#ffffff"),
+          centre: 0,
+          opacity: -1,
+          type: entry.type === "group" ? "group" : "single",
+          items: [],
+          active: 0,
+          loaded: false,
+        };
+
+        if (state.type === "group") {
+          const wrap = document.createElement("div");
+          wrap.className = "group";
+
+          (entry.photos || []).forEach((src, k) => {
+            const btn = document.createElement("button");
+            btn.className = "g-item";
+            btn.type = "button";
+            btn.dataset.i = k;
+
+            btn.appendChild(
+              makeImg(src, "Photographie " + (i + 1) + "." + (k + 1), i < 2),
+            );
+            wrap.appendChild(btn);
+            state.items.push(btn);
+          });
+
+          wrap.addEventListener("click", (e) => {
+            const hit = e.target.closest(".g-item");
+            if (!hit) return;
+            const target = parseInt(hit.dataset.i, 10);
+            if (target !== state.active) setActive(state, target);
+          });
+
+          wrap.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowRight") {
+              e.preventDefault();
+              setActive(state, state.active + 1);
+            } else if (e.key === "ArrowLeft") {
+              e.preventDefault();
+              setActive(state, state.active - 1);
+            }
+          });
+
+          let tx = 0;
+          wrap.addEventListener(
+            "touchstart",
+            (e) => {
+              tx = e.touches[0].clientX;
+            },
+            { passive: true },
+          );
+          wrap.addEventListener(
+            "touchend",
+            (e) => {
+              const dx = e.changedTouches[0].clientX - tx;
+              if (Math.abs(dx) < 40) return;
+              setActive(state, state.active + (dx < 0 ? 1 : -1));
+            },
+            { passive: true },
+          );
+
+          inner.appendChild(wrap);
+        } else {
+          inner.appendChild(makeImg(entry.src, "Photographie " + (i + 1), i < 2));
+        }
+        if (i < 2) state.loaded = true;
+
+        section.appendChild(inner);
+        seqEl.appendChild(section);
+        slots.push(state);
+      });
+
+      // ============================================================
+      // GROUP LAYOUT
+      //
+      // Positions are computed in pixels rather than with CSS percentages
+      // so that exactly --sliver of a neighbour shows regardless of that
+      // photo's aspect ratio.
+      // ============================================================
+      function sliverWidth() {
+        return window.innerWidth < 700 ? 28 : 48;
+      }
+
+      function layoutGroup(state) {
+        if (state.type !== "group") return;
+        const W = state.section.clientWidth;
+        const S = sliverWidth();
+
+        state.items.forEach((item, k) => {
+          const offset = k - state.active;
+          const w = item.offsetWidth;
+          let tx, op;
+
+          if (offset === 0) {
+            tx = (W - w) / 2;
+            op = 1;
+          } else if (offset === 1) {
+            tx = W - S;
+            op = 1;
+          } else if (offset === -1) {
+            tx = S - w;
+            op = 1;
+          } else if (offset > 1) {
+            tx = W + 40;
+            op = 0;
+          } else {
+            tx = -w - 40;
+            op = 0;
+          }
+
+          item.style.transform = "translate3d(" + tx + "px, -50%, 0)";
+          item.style.opacity = op;
+          item.classList.toggle("is-centre", offset === 0);
+          const reachable = Math.abs(offset) === 1;
+          item.tabIndex = reachable ? 0 : -1;
+          item.setAttribute("aria-hidden", reachable || offset === 0 ? "false" : "true");
+        });
+      }
+
+      function setActive(state, next) {
+        const max = state.items.length - 1;
+        if (next < 0 || next > max) return;
+        state.active = next;
+        layoutGroup(state);
+      }
+
+      // ============================================================
+      // MEASUREMENT CACHE
+      //
+      // Every geometry read happens here, never inside the rAF loop,
+      // so the loop only ever writes.
+      // ============================================================
+      let spacing = window.innerHeight;
+
+      function measure() {
+        const scrollY = window.pageYOffset;
+        slots.forEach((s) => {
+          const r = s.section.getBoundingClientRect();
+          s.centre = r.top + scrollY + r.height / 2;
+        });
+        spacing =
+          slots.length > 1
+            ? slots[1].centre - slots[0].centre
+            : window.innerHeight;
+        if (!spacing) spacing = window.innerHeight;
+
+        document.body.classList.add("no-anim");
+        slots.forEach(layoutGroup);
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => document.body.classList.remove("no-anim")),
+        );
+
+        dirty = true;
+      }
+
+      let measureQueued = false;
+      function scheduleMeasure() {
+        if (measureQueued) return;
+        measureQueued = true;
+        requestAnimationFrame(() => {
+          measureQueued = false;
+          measure();
+        });
+      }
+
+      // ============================================================
+      // SCROLL LOOP
+      //
+      // This is a triggered animation, not a scroll-scrubbed one. Only
+      // one slot is ever "active" — the one nearest the viewport centre
+      // — and everything else sits at a flat, motionless opacity of 0.
+      // Scrolling through the middle of a slot's zone changes nothing;
+      // there's no picture "underneath" as far as the eye can tell.
+      //
+      // The active slot flips only at the exact halfway point between
+      // two slot centres (nearest-slot switches there by construction),
+      // and that flip is the one-shot trigger: the old active's target
+      // drops to 0, the new active's target jumps to 1, and a fixed-
+      // duration ease (~600ms, independent of scroll speed) carries the
+      // crossfade — a reveal, not a readout of scroll position. The same
+      // triggered-target/eased-toward-it shape drives the background
+      // colour, so it swaps in lockstep with the image.
+      //
+      // Because the trigger is a single index (not a blended fraction),
+      // a fast flick that skips straight past several slots just swaps
+      // directly from the old active to the new one — one clean
+      // crossfade, no flicker, nothing built up in between.
+      // ============================================================
+      const EASE = 0.085; // per-frame lerp factor — ~600ms to settle at 60fps
+      const SETTLED = 0.0015; // below this distance-to-target, snap and stop
+
+      const hdr = document.getElementById("hdr");
+      let dirty = true;
+      let settling = true; // true while opacity/colour are still easing in
+      let lastY = window.pageYOffset;
+      let hdrHidden = false;
+      let lastBg = "";
+      let lastFg = "";
+      let curLab = null; // displayed (eased) background colour
+
+      function frame() {
+        if (dirty || settling) {
+          dirty = false;
+          settling = false;
+          const y = window.pageYOffset;
+          const vc = y + window.innerHeight / 2;
+
+          const activeIndex = slots.length
+            ? Math.min(
+                slots.length - 1,
+                Math.max(0, Math.round((vc - slots[0].centre) / spacing)),
+              )
+            : -1;
+
+          // --- per-slot opacity: binary target, eased toward it -----
+          for (let i = 0; i < slots.length; i++) {
+            const s = slots[i];
+            const target = i === activeIndex ? 1 : 0;
+
+            let op;
+            if (s.opacity < 0) {
+              op = target; // first paint for this slot: snap, don't fade in
+            } else {
+              op = s.opacity + (target - s.opacity) * EASE;
+              if (Math.abs(target - op) < SETTLED) op = target;
+              else settling = true;
+            }
+
+            // NB: opacity only — never visibility/display. Hidden elements
+            // are skipped by the lazy-loader, which would leave blanks.
+            if (op !== s.opacity) {
+              s.opacity = op;
+              s.inner.style.opacity = op;
+            }
+          }
+
+          // --- fetch the slots we're about to need ----------------
+          if (activeIndex >= 0) {
+            const lo = Math.max(0, activeIndex - PRELOAD);
+            const hi = Math.min(slots.length - 1, activeIndex + PRELOAD);
+            for (let k = lo; k <= hi; k++) promote(slots[k]);
+          }
+
+          // --- background colour: same triggered-target treatment -----
+          if (activeIndex >= 0) {
+            const target = slots[activeIndex].lab;
+
+            if (!curLab) {
+              curLab = target; // first paint: snap, don't fade in
+            } else {
+              let rest = 0;
+              curLab = curLab.map((v, k) => {
+                const nv = v + (target[k] - v) * EASE;
+                rest = Math.max(rest, Math.abs(target[k] - nv));
+                return nv;
+              });
+              if (rest < SETTLED) curLab = target;
+              else settling = true;
+            }
+
+            const css = oklabToCss(curLab);
+            if (css !== lastBg) {
+              lastBg = css;
+              document.body.style.backgroundColor = css;
+              document.documentElement.style.backgroundColor = css;
+              // Flip the header ink off the interpolated lightness, so it
+              // stays legible whatever colours get chosen in the admin.
+              const fg = curLab[0] < 0.62 ? "#f2f2f2" : "#111111";
+              if (fg !== lastFg) {
+                lastFg = fg;
+                document.documentElement.style.setProperty("--fg", fg);
+              }
+            }
+          }
+
+          // --- header hide / show ---------------------------------
+          const dy = y - lastY;
+          if (Math.abs(dy) > 6) {
+            if (dy > 0 && y > 80 && !hdrHidden) {
+              hdrHidden = true;
+              hdr.classList.add("is-hidden");
+            } else if (dy < 0 && hdrHidden) {
+              hdrHidden = false;
+              hdr.classList.remove("is-hidden");
+            }
+            lastY = y;
+          }
+        }
+        requestAnimationFrame(frame);
+      }
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          dirty = true;
+        },
+        { passive: true },
+      );
+
+      // Ignore the small height changes iOS fires as the URL bar collapses
+      // mid-scroll — remeasuring on those makes every opacity jitter.
+      let resizeT;
+      let lastW = window.innerWidth;
+      let lastH = window.innerHeight;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeT);
+        resizeT = setTimeout(() => {
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          if (w === lastW && Math.abs(h - lastH) < 120) return;
+          lastW = w;
+          lastH = h;
+          measure();
+        }, 150);
+      });
+      window.addEventListener("orientationchange", () => setTimeout(measure, 250));
+
+      window.addEventListener("load", measure);
+      measure();
+      requestAnimationFrame(frame);
+    </script>
+  </body>
+</html>
