@@ -2,17 +2,6 @@
    MENU — three bars in the header. Opening blurs the page
    behind the header while the links roll out from the bars.
    ============================================================ */
-/* iOS Safari paints the status bar solid when a full-width fixed bar
-   sits at the top, unless that bar ignores taps: only the links and the
-   button take them, so the page can pass behind the clock. */
-.hdr {
-  pointer-events: none;
-}
-.hdr a,
-.hdr button {
-  pointer-events: auto;
-}
-
 .menu-btn {
   align-self: center;
   position: relative;
@@ -85,12 +74,11 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 10px;
-  visibility: hidden;
-  transition: visibility 0s linear 0.3s;
 }
-.menu.is-open {
-  visibility: visible;
-  transition-delay: 0s;
+/* Out of the page while closed: on iOS Safari, a header carrying these
+   parked links stops the page from passing behind the clock. */
+.menu[hidden] {
+  display: none;
 }
 /* Each link starts tucked up behind the bars: the further down the
    list, the further it travels. */
@@ -153,7 +141,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .menu-btn span,
-  .menu,
   .menu a,
   .menu-scrim {
     transition: none !important;

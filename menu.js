@@ -3,9 +3,8 @@
   const menu = document.getElementById("menu");
   const scrim = document.getElementById("menuScrim");
 
-  // Closed, the scrim leaves the page entirely: iOS Safari tints the area
-  // around the Dynamic Island from full-screen fixed elements, and would
-  // take its colour instead of the page's.
+  // Closed, the scrim and the links leave the page entirely: while they
+  // are there, iOS Safari keeps the page from passing behind the clock.
   let hideTimer;
 
   function setOpen(open) {
@@ -16,9 +15,13 @@
         getComputedStyle(document.body).backgroundColor,
       );
       scrim.hidden = false;
-      void scrim.offsetWidth; // let the fade start from its closed state
+      menu.hidden = false;
+      void scrim.offsetWidth; // let the animation start from its closed state
     } else {
-      hideTimer = setTimeout(() => (scrim.hidden = true), 350);
+      hideTimer = setTimeout(() => {
+        scrim.hidden = true;
+        menu.hidden = true;
+      }, 350);
     }
     btn.setAttribute("aria-expanded", open);
     menu.classList.toggle("is-open", open);
