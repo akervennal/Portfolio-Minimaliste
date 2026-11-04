@@ -146,6 +146,9 @@
         height: 100svh;
         overflow: hidden;
       }
+      .hero-wrap picture {
+        display: contents;
+      }
       .hero {
         display: block;
         width: 100%;
@@ -225,6 +228,10 @@
         .hdr {
           padding: 20px 20px;
           font-size: 15px;
+        }
+        /* the car on the phone photo sits left of centre */
+        .hero {
+          object-position: 38% center;
         }
         .models {
           margin: 44px 0 80px;
@@ -391,8 +398,17 @@
       if (auto.hero) {
         hero.src = auto.hero;
         hero.alt = "";
+        // A vertical photo on phones: the wide one loses too much there.
+        const picture = document.createElement("picture");
+        if (auto.heroPhone) {
+          const source = document.createElement("source");
+          source.media = "(max-width: 700px)";
+          source.srcset = auto.heroPhone;
+          picture.appendChild(source);
+        }
+        picture.appendChild(hero);
         const wrap = el("div", "hero-wrap");
-        wrap.appendChild(hero);
+        wrap.appendChild(picture);
         home.appendChild(reveal(wrap));
       }
 
@@ -492,14 +508,15 @@
       // --- hero parallax ----------------------------------------------
       // Frozen while a gallery is showing or sliding: the page scroll
       // then belongs to the gallery, and the hero has to come back
-      // exactly as it left.
+      // exactly as it left. Mouse only: on touch screens the page scrolls
+      // ahead of the script, so the photo visibly jitters.
       let parallaxQueued = false;
       function parallax() {
         parallaxQueued = false;
         if (current || finishSlide) return;
         hero.style.transform = "translate3d(0, " + window.pageYOffset * 0.35 + "px, 0)";
       }
-      if (!reduceMotion.matches) {
+      if (!reduceMotion.matches && matchMedia("(pointer: fine)").matches) {
         window.addEventListener(
           "scroll",
           () => {
