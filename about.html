@@ -83,14 +83,6 @@
       .hdr a:hover {
         opacity: 0.55;
       }
-      .hdr-nav {
-        display: flex;
-        align-items: baseline;
-        gap: 22px;
-      }
-      .hdr-nav .is-current {
-        opacity: 0.55;
-      }
 
       .page {
         max-width: 62ch;
@@ -282,20 +274,25 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="menu.css" />
   </head>
 
   <body>
     <header class="hdr" id="hdr">
       <a href="index.html">Armel Kervennal</a>
-      <nav class="hdr-nav">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
+      <nav class="menu" id="menu">
         <a href="archive.html">archive</a>
-        <span class="is-current">about</span>
+        <a href="auto.html">auto</a>
+        <a href="about.html" class="is-current">about</a>
       </nav>
     </header>
+    <div class="menu-scrim" id="menuScrim"></div>
 
     <main class="page" id="about"></main>
 
     <script src="site-config.js"></script>
+    <script src="menu.js"></script>
     <script>
       const cfg = (window.SITE_CONFIG && SITE_CONFIG.content) || {};
       const about = cfg.about || {};

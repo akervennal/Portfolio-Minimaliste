@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Armel Kervennal — auto</title>
+    <meta
+      name="description"
+      content="Photographie automobile par Armel Kervennal."
+    />
+    <link rel="icon" type="image/png" href="Favicon/favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- set synchronously so the pre-paint state matches what JS will draw -->
+    <script>
+      document.documentElement.className = "js";
+    </script>
+
+    <style>
+      :root {
+        --sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+        --ink: #111;
+        --muted: rgba(17, 17, 17, 0.55);
+        --line: rgba(17, 17, 17, 0.12);
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        --hdr-h: 72px;
+        --gap: 13px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        background: #fff;
+      }
+
+      body {
+        font-family: var(--sans);
+        font-weight: 400;
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .hdr {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 26px 32px;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        /* no background: the soft halo vanishes on white and keeps the
+           header readable when a photo scrolls underneath */
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.85));
+        transition:
+          transform 0.5s var(--ease),
+          color 0.25s linear;
+      }
+      .hdr.is-hidden {
+        transform: translateY(-140%);
+      }
+      /* White over the hero, except with the menu open: it then sits on
+         the pale blur, where black reads better. */
+      .hdr.on-hero:not(:has(.menu.is-open)) {
+        color: #fff;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6))
+          drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+      }
+      .hdr a {
+        text-decoration: none;
+      }
+      .hdr a:hover {
+        opacity: 0.55;
+      }
+
+      /* Blocks fade + rise in on load, staggered via an inline
+         transition-delay set per element in JS, same as the about page. */
+      .reveal {
+        transition:
+          opacity 0.7s var(--ease),
+          transform 0.7s var(--ease);
+      }
+      .js .reveal {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* ============================================================
+         SLIDE — the list and the gallery sit side by side; opening a
+         model shifts the whole track one screen to the left. The panel
+         at rest off-screen collapses so it adds no scroll height.
+         ============================================================ */
+      .stage {
+        overflow: hidden;
+      }
+      .track {
+        display: flex;
+        align-items: flex-start;
+        width: 200%;
+        transition: transform 0.7s var(--ease);
+      }
+      .track.is-gal {
+        transform: translateX(-50%);
+      }
+      .panel {
+        flex: none;
+        width: 50%;
+      }
+      .panel.is-off {
+        height: 0;
+        overflow: hidden;
+        visibility: hidden;
+      }
+
+      /* The frame scrolls with the page; the photo inside is pushed back
+         down by a fraction of the scroll, so it trails behind. */
+      .hero-wrap {
+        height: 100svh;
+        overflow: hidden;
+      }
+      .hero {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        will-change: transform;
+      }
+
+      /* ============================================================
+         MODEL LIST — each row slides to that model's gallery
+         ============================================================ */
+      .models {
+        margin: 64px 0 120px;
+        border-top: 1px solid var(--line);
+      }
+      .model {
+        display: block;
+        padding: 14px var(--gap);
+        border-bottom: 1px solid var(--line);
+        text-decoration: none;
+        transition: opacity 0.3s;
+      }
+      .model:hover {
+        opacity: 0.55;
+      }
+      .model-name {
+        font-size: 46px;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+
+      /* ============================================================
+         GALLERY — same page as an archive album (gallery.css); several
+         cars of one model get one grid each, with a gap between them
+         ============================================================ */
+      .ser {
+        --locs-gap: var(--gap);
+        padding: calc(var(--hdr-h) + 6vh) 0 14vh;
+      }
+      .grid + .grid {
+        margin-top: 64px;
+      }
+
+      /* Cascade version of the album grid: photos keep their own ratio
+         (--r) and stack in columns, each going to the shortest one. */
+      .grid.organic {
+        --grid-gap: 13px;
+        display: flex;
+        align-items: flex-start;
+      }
+      .organic-col {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--grid-gap);
+      }
+      .organic .grid-idx {
+        display: none;
+      }
+      .organic button {
+        width: 100%;
+      }
+      .organic .grid-thumb {
+        height: auto;
+        aspect-ratio: var(--r);
+      }
+      .organic .grid-thumb img {
+        width: 100%;
+      }
+
+      @media (max-width: 700px) {
+        :root {
+          --hdr-h: 58px;
+        }
+        .hdr {
+          padding: 20px 20px;
+          font-size: 15px;
+        }
+        .models {
+          margin: 44px 0 80px;
+        }
+        .model-name {
+          font-size: 28px;
+        }
+        .ser {
+          padding-top: calc(var(--hdr-h) + 5vh);
+        }
+        .grid + .grid {
+          margin-top: 40px;
+        }
+        .grid.organic {
+          --grid-gap: 12px;
+        }
+      }
+
+      @view-transition {
+        navigation: auto;
+      }
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 0.5s;
+        animation-timing-function: var(--ease);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .hdr,
+        .reveal,
+        .track {
+          transition: none;
+        }
+        ::view-transition-group(*),
+        ::view-transition-old(*),
+        ::view-transition-new(*) {
+          animation: none !important;
+        }
+      }
+    </style>
+    <link rel="stylesheet" href="menu.css" />
+    <link rel="stylesheet" href="gallery.css" />
+  </head>
+
+  <body>
+    <header class="hdr" id="hdr">
+      <a href="index.html">Armel Kervennal</a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
+      <nav class="menu" id="menu">
+        <a href="archive.html">archive</a>
+        <a href="auto.html" class="is-current">auto</a>
+        <a href="about.html">about</a>
+      </nav>
+    </header>
+    <div class="menu-scrim" id="menuScrim"></div>
+
+    <main class="stage">
+      <div class="track" id="track">
+        <div class="panel" id="home"></div>
+        <div class="panel is-off" id="gal"></div>
+      </div>
+    </main>
+
+    <div class="lb" id="lb">
+      <button class="lb-close" id="lbClose">fermer · esc</button>
+      <button class="lb-nav prev" id="lbPrev" aria-label="Photo précédente"></button>
+      <div class="lb-stage" id="lbStage"></div>
+      <button class="lb-nav next" id="lbNext" aria-label="Photo suivante"></button>
+      <div class="lb-counter" id="lbCounter"></div>
+    </div>
+
+    <script src="site-config.js"></script>
+    <script src="menu.js"></script>
+    <script src="gallery.js"></script>
+    <script>
+      const auto = (window.SITE_CONFIG && SITE_CONFIG.auto) || {};
+      const series = auto.series || [];
+      const hdr = document.getElementById("hdr");
+      const track = document.getElementById("track");
+      const home = document.getElementById("home");
+      const gal = document.getElementById("gal");
+
+      // We put the scroll back ourselves once a slide has finished.
+      history.scrollRestoration = "manual";
+
+      function el(tag, cls, text) {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text != null) n.textContent = text;
+        return n;
+      }
+
+      let revealIndex = 0;
+      function reveal(node) {
+        node.classList.add("reveal");
+        node.style.transitionDelay = revealIndex++ * 90 + "ms";
+        return node;
+      }
+
+      function slug(model) {
+        return model
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-");
+      }
+
+      function fromURL() {
+        const m = new URLSearchParams(location.search).get("m");
+        return series.find((s) => slug(s.model) === m) || null;
+      }
+
+      function urlFor(s) {
+        return s ? "auto.html?m=" + slug(s.model) : "auto.html";
+      }
+
+      const phone = matchMedia("(max-width: 700px)");
+      let cascades = [];
+
+      function layoutCascade({ grid, cells, ratios }) {
+        const cols = Array.from({ length: phone.matches ? 2 : 3 }, () => el("div", "organic-col"));
+        const heights = cols.map(() => 0);
+        cells.forEach((cell, i) => {
+          const k = heights.indexOf(Math.min(...heights));
+          cols[k].appendChild(cell);
+          heights[k] += 1 / ratios[i];
+        });
+        grid.replaceChildren(...cols);
+      }
+
+      phone.addEventListener("change", () => cascades.forEach(layoutCascade));
+
+      function buildGallery(s) {
+        const sec = el("section", "ser");
+        const photos = s.cars.flat().map((p) => p.src);
+
+        const head = el("a", "yr-head");
+        head.href = urlFor(null);
+        head.append(el("span", "yr-y", s.model), el("span", "yr-meta", String(photos.length)));
+        head.addEventListener("click", (e) => {
+          e.preventDefault();
+          navigate(null);
+        });
+        sec.appendChild(head);
+
+        cascades = [];
+        let offset = 0;
+        s.cars.forEach((car) => {
+          const grid = buildPhotoGrid(car.map((p) => p.src), s.model, photos, offset);
+          grid.classList.add("organic");
+          const cells = [...grid.children];
+          const ratios = car.map((p) => p.w / p.h);
+          cells.forEach((cell, i) => cell.style.setProperty("--r", ratios[i].toFixed(3)));
+          const cascade = { grid, cells, ratios };
+          cascades.push(cascade);
+          layoutCascade(cascade);
+          sec.appendChild(grid);
+          offset += car.length;
+        });
+        return sec;
+      }
+
+      const hero = el("img", "hero");
+      if (auto.hero) {
+        hero.src = auto.hero;
+        hero.alt = "";
+        const wrap = el("div", "hero-wrap");
+        wrap.appendChild(hero);
+        home.appendChild(reveal(wrap));
+      }
+
+      const models = el("nav", "models");
+      series.forEach((s) => {
+        const a = el("a", "model");
+        a.href = urlFor(s);
+        a.appendChild(el("span", "model-name", s.model));
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          navigate(s);
+        });
+        models.appendChild(a);
+      });
+      home.appendChild(reveal(models));
+
+      // ?m=... opens straight on a gallery: shared link or reload.
+      let current = fromURL();
+      if (current) {
+        gal.appendChild(reveal(buildGallery(current)));
+        gal.classList.remove("is-off");
+        home.classList.add("is-off");
+        track.classList.add("is-gal");
+      }
+
+      // Two frames: one for layout/paint to settle, one for the browser
+      // to register the pre-transition styles before we flip them.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          track.querySelectorAll(".reveal").forEach((n) => n.classList.add("in"));
+        });
+      });
+
+      // --- slide between the list and a gallery -----------------------
+      // Each panel has its own scroll position, but the page has only
+      // one. While sliding, the incoming panel is offset so the part we
+      // want sits in view; once it lands, the offset and the real scroll
+      // are swapped in the same tick, so nothing visibly jumps.
+      const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+      let homeY = 0;
+      let finishSlide = null;
+
+      function heroTone(y) {
+        const wrap = home.querySelector(".hero-wrap");
+        const overHero = !current && wrap && y < wrap.offsetHeight - hdr.offsetHeight;
+        hdr.classList.toggle("on-hero", !!overHero);
+      }
+
+      function go(s) {
+        if (s === current) return;
+        if (finishSlide) finishSlide();
+
+        const y = window.pageYOffset;
+        const leavingHome = !current;
+        if (leavingHome) homeY = y;
+        if (s) gal.replaceChildren(buildGallery(s));
+
+        const from = s ? (leavingHome ? home : gal) : gal;
+        const to = s ? gal : home;
+        const targetY = s ? 0 : homeY;
+        current = s;
+
+        // gallery to gallery can't happen by clicking, only through
+        // browser history: no slide to play, just swap.
+        if (from === to) {
+          window.scrollTo(0, 0);
+          return;
+        }
+
+        hdr.classList.remove("is-hidden");
+        hidden = false;
+        heroTone(targetY);
+
+        to.classList.remove("is-off");
+        to.style.marginTop = y - targetY + "px";
+        track.classList.toggle("is-gal", !!s);
+
+        const finish = () => {
+          finishSlide = null;
+          from.classList.add("is-off");
+          to.style.marginTop = "";
+          window.scrollTo(0, targetY);
+        };
+        finishSlide = finish;
+        setTimeout(() => {
+          if (finishSlide === finish) finish();
+        }, reduceMotion.matches ? 0 : 720);
+      }
+
+      function navigate(s) {
+        history.pushState({}, "", urlFor(s));
+        go(s);
+      }
+
+      window.addEventListener("popstate", () => go(fromURL()));
+
+      // --- hero parallax ----------------------------------------------
+      // Frozen while a gallery is showing or sliding: the page scroll
+      // then belongs to the gallery, and the hero has to come back
+      // exactly as it left.
+      let parallaxQueued = false;
+      function parallax() {
+        parallaxQueued = false;
+        if (current || finishSlide) return;
+        hero.style.transform = "translate3d(0, " + window.pageYOffset * 0.35 + "px, 0)";
+      }
+      if (!reduceMotion.matches) {
+        window.addEventListener(
+          "scroll",
+          () => {
+            if (parallaxQueued) return;
+            parallaxQueued = true;
+            requestAnimationFrame(parallax);
+          },
+          { passive: true },
+        );
+      }
+
+      heroTone(window.pageYOffset);
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (!finishSlide) heroTone(window.pageYOffset);
+        },
+        { passive: true },
+      );
+
+      // --- header hide on scroll down ---------------------------------
+      let lastY = window.pageYOffset;
+      let hidden = false;
+      window.addEventListener(
+        "scroll",
+        () => {
+          const y = window.pageYOffset;
+          const dy = y - lastY;
+          if (Math.abs(dy) <= 6) return;
+          if (dy > 0 && y > 80 && !hidden) {
+            hidden = true;
+            hdr.classList.add("is-hidden");
+          } else if (dy < 0 && hidden) {
+            hidden = false;
+            hdr.classList.remove("is-hidden");
+          }
+          lastY = y;
+        },
+        { passive: true },
+      );
+    </script>
+  </body>
+</html>

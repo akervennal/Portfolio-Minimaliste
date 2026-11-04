@@ -228,6 +228,253 @@ var SITE_CONFIG = {
       "note": "Toujours partant pour de nouveaux shootings ou projets photo — n'hésite pas à m'écrire."
     }
   },
+  "auto": {
+    "hero": "images/viking-cup-round-3-2026/7.jpg",
+    "series": [
+      {
+        "model": "Nissan S14",
+        "cars": [
+          [
+            {
+              "src": "images/viking-cup-round-3-2026/7.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-2026/MEL_8998.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/16.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-2026/MEL_9127.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/15.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/34.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/36.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-2026/MEL_9003.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/13.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-2026/MEL_9528.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/12.jpg",
+              "w": 1365,
+              "h": 2048
+            }
+          ],
+          [
+            {
+              "src": "images/viking-cup-round-3-2026/22.jpg",
+              "w": 1365,
+              "h": 2048
+            },
+            {
+              "src": "images/viking-cup-2026/MEL_9453.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/5.jpg",
+              "w": 1365,
+              "h": 2048
+            }
+          ],
+          [
+            {
+              "src": "images/viking-cup-round-3-2026/32.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/4.jpg",
+              "w": 2048,
+              "h": 1365
+            }
+          ]
+        ]
+      },
+      {
+        "model": "Mazda RX-8",
+        "cars": [
+          [
+            {
+              "src": "images/viking-cup-round-3-2026/3.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/18.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/2.jpg",
+              "w": 1365,
+              "h": 2048
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/39.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/40.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/19.jpg",
+              "w": 1365,
+              "h": 2048
+            }
+          ]
+        ]
+      },
+      {
+        "model": "BMW Série 1",
+        "cars": [
+          [
+            {
+              "src": "images/viking-cup-round-3-2026/24.jpg",
+              "w": 1365,
+              "h": 2048
+            },
+            {
+              "src": "images/viking-cup-round-3-2026/28.jpg",
+              "w": 2048,
+              "h": 1365
+            }
+          ]
+        ]
+      },
+      {
+        "model": "Hypercars",
+        "cars": [
+          [
+            {
+              "src": "images/24h-du-mans-2026/6-MEL_3648.jpg",
+              "w": 2400,
+              "h": 1600
+            },
+            {
+              "src": "images/24h-du-mans-2025/6-MEL_1101.jpg",
+              "w": 1365,
+              "h": 2048
+            },
+            {
+              "src": "images/24h-du-mans-2026/3-MEL_3734.jpg",
+              "w": 2400,
+              "h": 1600
+            },
+            {
+              "src": "images/24h-du-mans-2026/10-MEL_3236.jpg",
+              "w": 2400,
+              "h": 1600
+            },
+            {
+              "src": "images/24h-du-mans-2025/5-MEL_1111.jpg",
+              "w": 1365,
+              "h": 2048
+            },
+            {
+              "src": "images/24h-du-mans-2026/5-MEL_3624.jpg",
+              "w": 2400,
+              "h": 1600
+            },
+            {
+              "src": "images/24h-du-mans-2026/2-MEL_3956.jpg",
+              "w": 2400,
+              "h": 1600
+            },
+            {
+              "src": "images/24h-du-mans-2026/7-MEL_3370.jpg",
+              "w": 1600,
+              "h": 2400
+            },
+            {
+              "src": "images/24h-du-mans-2026/3-MEL_3934.jpg",
+              "w": 2400,
+              "h": 1600
+            },
+            {
+              "src": "images/24h-du-mans-2026/4-MEL_3693.jpg",
+              "w": 2400,
+              "h": 1600
+            },
+            {
+              "src": "images/24h-du-mans-2026/5-MEL_3751.jpg",
+              "w": 2400,
+              "h": 1600
+            },
+            {
+              "src": "images/24h-du-mans-2026/4-MEL_3817.jpg",
+              "w": 1600,
+              "h": 2400
+            },
+            {
+              "src": "images/24h-du-mans-2025/7-MEL_1095.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/24h-du-mans-2026/9-MEL_3318.jpg",
+              "w": 2400,
+              "h": 1600
+            },
+            {
+              "src": "images/24h-du-mans-2026/8-MEL_3292.jpg",
+              "w": 1600,
+              "h": 2400
+            },
+            {
+              "src": "images/24h-du-mans-2025/3-MEL_1451.jpg",
+              "w": 2048,
+              "h": 1365
+            },
+            {
+              "src": "images/24h-du-mans-2026/7-MEL_3353.jpg",
+              "w": 1600,
+              "h": 2400
+            },
+            {
+              "src": "images/24h-du-mans-2026/8-MEL_3330.jpg",
+              "w": 2400,
+              "h": 1600
+            }
+          ]
+        ]
+      }
+    ]
+  },
   "projects": {
     "viking-cup-round-3-2026": {
       "title": "Viking Cup, Round 3",

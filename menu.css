@@ -1,0 +1,150 @@
+/* ============================================================
+   MENU — three bars in the header. Opening blurs the page
+   behind the header while the links roll out from the bars.
+   ============================================================ */
+.menu-btn {
+  align-self: center;
+  position: relative;
+  width: 24px;
+  height: 16px;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+/* bigger tap target than the bars themselves */
+.menu-btn::before {
+  content: "";
+  position: absolute;
+  inset: -14px;
+}
+/* Drawn as a border and placed with top rather than a transform:
+   borders snap to whole device pixels, so all three bars keep exactly
+   the same thickness at any zoom or fractional header position. */
+.menu-btn span {
+  position: absolute;
+  right: 0;
+  width: 100%;
+  top: 7px;
+  border-top: 2px solid currentColor;
+  transition:
+    top 0.4s var(--ease),
+    transform 0.4s var(--ease),
+    width 0.4s var(--ease),
+    opacity 0.2s linear;
+}
+.menu-btn span:nth-child(1) {
+  top: 0;
+}
+.menu-btn span:nth-child(2) {
+  width: 75%;
+}
+.menu-btn span:nth-child(3) {
+  width: 50%;
+  top: 14px;
+}
+/* touch screens keep :hover after a tap, which would leave the bars grey */
+@media (hover: hover) {
+  .menu-btn:hover {
+    opacity: 0.55;
+  }
+}
+.menu-btn:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 8px;
+}
+.menu-btn[aria-expanded="true"] span:nth-child(1) {
+  top: 7px;
+  transform: rotate(45deg);
+}
+.menu-btn[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+.menu-btn[aria-expanded="true"] span:nth-child(3) {
+  width: 100%;
+  top: 7px;
+  transform: rotate(-45deg);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% - 8px);
+  right: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  visibility: hidden;
+  transition: visibility 0s linear 0.3s;
+}
+.menu.is-open {
+  visibility: visible;
+  transition-delay: 0s;
+}
+/* Each link starts tucked up behind the bars: the further down the
+   list, the further it travels. */
+.menu a {
+  --i: 0;
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(calc((var(--i) + 1) * -34px));
+  transition:
+    transform 0.3s var(--ease),
+    opacity 0.2s linear;
+}
+.menu a:nth-child(2) {
+  --i: 1;
+}
+.menu a:nth-child(3) {
+  --i: 2;
+}
+.menu.is-open a {
+  opacity: 1;
+  transform: none;
+  transition-duration: 0.55s, 0.35s;
+  transition-delay: calc(var(--i) * 55ms);
+}
+.menu.is-open a.is-current {
+  opacity: 0.55;
+}
+.menu.is-open a:hover {
+  opacity: 0.55;
+  transition-delay: 0s;
+}
+
+/* Sits just under the header (z-index 50), so the header and the
+   links stay sharp. --menu-tint follows the page background, which
+   changes while scrolling the home sequence. */
+.menu-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  background: color-mix(in srgb, var(--menu-tint, #fff) 45%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.35s var(--ease),
+    visibility 0s linear 0.35s;
+}
+.menu-scrim.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+@media (max-width: 700px) {
+  .menu {
+    right: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-btn span,
+  .menu,
+  .menu a,
+  .menu-scrim {
+    transition: none !important;
+  }
+}

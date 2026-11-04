@@ -82,18 +82,6 @@
       .hdr.is-hidden {
         transform: translateY(-140%);
       }
-      .hdr-nav {
-        display: flex;
-        align-items: baseline;
-        gap: 22px;
-      }
-      .hdr-link:hover {
-        opacity: 0.55;
-      }
-      .hdr-link.is-current {
-        opacity: 0.55;
-        pointer-events: none;
-      }
 
       /* ============================================================
          SEQUENCE
@@ -236,20 +224,25 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="menu.css" />
   </head>
 
   <body>
     <header class="hdr" id="hdr">
       <a class="hdr-name" href="index.html">Armel Kervennal</a>
-      <nav class="hdr-nav">
-        <a class="hdr-link" href="archive.html">archive</a>
-        <a class="hdr-link" href="about.html">about</a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
+      <nav class="menu" id="menu">
+        <a href="archive.html">archive</a>
+        <a href="auto.html">auto</a>
+        <a href="about.html">about</a>
       </nav>
     </header>
+    <div class="menu-scrim" id="menuScrim"></div>
 
     <main id="seq"></main>
 
     <script src="site-config.js"></script>
+    <script src="menu.js"></script>
     <script>
       // ============================================================
       // Root-relative paths in the config, resolved from inside /v3
