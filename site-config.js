@@ -8,7 +8,7 @@ var SITE_CONFIG = {
     {
       "type": "single",
       "src": "images/showcase/6-MEL_3648.jpg",
-      "bg": "#ffffff"
+      "bg": "#ad9690"
     },
     {
       "type": "group",
@@ -19,6 +19,11 @@ var SITE_CONFIG = {
         "images/R%C3%A9publique%20Czech%202026/48-MEL_6757.jpg",
         "images/R%C3%A9publique%20Czech%202026/4-MEL_6357.jpg"
       ]
+    },
+    {
+      "type": "single",
+      "src": "images/viking-cup-round-3-2026/9.jpg",
+      "bg": "#ffffff"
     },
     {
       "type": "group",
@@ -49,11 +54,11 @@ var SITE_CONFIG = {
     {
       "type": "single",
       "src": "images/showcase/5-IMG_4734_TIF.jpg",
-      "bg": "#7a7a7a"
+      "bg": "#000000"
     },
     {
       "type": "group",
-      "bg": "#ffffff",
+      "bg": "#000000",
       "photos": [
         "images/R%C3%A9publique%20Czech%202026/30-MEL_6638.jpg",
         "images/R%C3%A9publique%20Czech%202026/31-MEL_6642.jpg",
@@ -224,6 +229,56 @@ var SITE_CONFIG = {
     }
   },
   "projects": {
+    "viking-cup-round-3-2026": {
+      "title": "Viking Cup, Round 3",
+      "date": "Octobre 2026",
+      "dateLong": "Octobre 2026",
+      "year": "2026",
+      "location": "Laval, Mayenne",
+      "photos": [
+        "images/viking-cup-round-3-2026/1.jpg",
+        "images/viking-cup-round-3-2026/2.jpg",
+        "images/viking-cup-round-3-2026/3.jpg",
+        "images/viking-cup-round-3-2026/4.jpg",
+        "images/viking-cup-round-3-2026/5.jpg",
+        "images/viking-cup-round-3-2026/6.jpg",
+        "images/viking-cup-round-3-2026/7.jpg",
+        "images/viking-cup-round-3-2026/8.jpg",
+        "images/viking-cup-round-3-2026/9.jpg",
+        "images/viking-cup-round-3-2026/10.jpg",
+        "images/viking-cup-round-3-2026/11.jpg",
+        "images/viking-cup-round-3-2026/12.jpg",
+        "images/viking-cup-round-3-2026/13.jpg",
+        "images/viking-cup-round-3-2026/14.jpg",
+        "images/viking-cup-round-3-2026/15.jpg",
+        "images/viking-cup-round-3-2026/16.jpg",
+        "images/viking-cup-round-3-2026/17.jpg",
+        "images/viking-cup-round-3-2026/18.jpg",
+        "images/viking-cup-round-3-2026/19.jpg",
+        "images/viking-cup-round-3-2026/20.jpg",
+        "images/viking-cup-round-3-2026/21.jpg",
+        "images/viking-cup-round-3-2026/22.jpg",
+        "images/viking-cup-round-3-2026/23.jpg",
+        "images/viking-cup-round-3-2026/24.jpg",
+        "images/viking-cup-round-3-2026/25.jpg",
+        "images/viking-cup-round-3-2026/26.jpg",
+        "images/viking-cup-round-3-2026/27.jpg",
+        "images/viking-cup-round-3-2026/28.jpg",
+        "images/viking-cup-round-3-2026/29.jpg",
+        "images/viking-cup-round-3-2026/30.jpg",
+        "images/viking-cup-round-3-2026/31.jpg",
+        "images/viking-cup-round-3-2026/32.jpg",
+        "images/viking-cup-round-3-2026/33.jpg",
+        "images/viking-cup-round-3-2026/34.jpg",
+        "images/viking-cup-round-3-2026/35.jpg",
+        "images/viking-cup-round-3-2026/36.jpg",
+        "images/viking-cup-round-3-2026/37.jpg",
+        "images/viking-cup-round-3-2026/38.jpg",
+        "images/viking-cup-round-3-2026/39.jpg",
+        "images/viking-cup-round-3-2026/40.jpg"
+      ],
+      "cover": "images/viking-cup-round-3-2026/7.jpg"
+    },
     "republique-tcheque-2026": {
       "title": "République tchèque",
       "date": "Septembre 2026",
@@ -532,7 +587,7 @@ var SITE_CONFIG = {
       "cover": "images/Mo%C3%ABlan-sur-Mer/3-MEL_0851.jpg"
     },
     "viking-cup-2026": {
-      "title": "Viking Cup",
+      "title": "Viking Cup, Round 1",
       "date": "Mars 2026",
       "dateLong": "Mars 2026",
       "year": "2026",
