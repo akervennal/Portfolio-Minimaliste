@@ -121,14 +121,23 @@ a.yr-head:hover .yr-meta {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: #fff;
+  /* white only while open: iOS Safari tints the top of the screen from
+     full-screen fixed elements, even invisible ones */
+  background: transparent;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.35s var(--ease);
+  transition:
+    opacity 0.35s var(--ease),
+    background-color 0.35s var(--ease),
+    visibility 0s linear 0.35s;
 }
 .lb.open {
+  background: #fff;
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
+  transition-delay: 0s;
 }
 /* One .lb-item per photo, all absolutely stacked and positioned
    by JS (layoutLightbox) exactly like the homepage's group
