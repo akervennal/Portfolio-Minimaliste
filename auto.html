@@ -280,7 +280,9 @@
         animation-duration: 0.5s;
         animation-timing-function: var(--ease);
       }
-      /* The list photo growing into the gallery's full-screen one. */
+      /* The list photo growing into the gallery's full-screen one. On a
+         big screen this view transition stutters and flyCover() below
+         takes over with .car-fly and .car-veil; phones keep it. */
       ::view-transition-group(car-cover) {
         animation-duration: 0.8s;
         animation-timing-function: var(--ease);
@@ -290,6 +292,20 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+      }
+
+      .car-veil {
+        position: fixed;
+        inset: 0;
+        z-index: 39;
+        background: #fff;
+      }
+      .car-fly {
+        position: fixed;
+        z-index: 40;
+        object-fit: cover;
+        transform-origin: 0 0;
+        will-change: transform;
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -599,7 +615,7 @@
       // The photo of the car being opened (or left) grows into the other
       // view's: same view-transition-name on both sides of the swap.
       function go(s) {
-        if (s === current) return;
+        if (s === current || flying) return;
         if (!current) listY = window.pageYOffset;
 
         if (!document.startViewTransition || reduceMotion.matches) {
@@ -610,6 +626,11 @@
         const row = s ? view.querySelector('.model[data-i="' + series.indexOf(s) + '"] img') : null;
         const before = row || coverOf(current);
         const visible = before && before.getBoundingClientRect().bottom > 0;
+        if (visible && !phone.matches) {
+          lastModel = s || lastModel;
+          flyCover(s, before);
+          return;
+        }
         if (visible) before.style.viewTransitionName = "car-cover";
 
         let after = null;
@@ -628,6 +649,88 @@
       }
 
       let lastModel = null;
+      let flying = false;
+
+      const FLY_MS = 800;
+      const FLY_EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+
+      // The photo flies at its full-screen size, uncropped: a transform
+      // shrinks it onto the list photo, which has the same 3:2 shape, and
+      // a clip crops it to the screen at the other end. The compositor
+      // moves one decoded image, and nothing is laid out again.
+      async function flyCover(s, before) {
+        flying = true;
+        const fromList = !!s;
+        const start = before.getBoundingClientRect();
+        const box = fromList
+          ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight }
+          : start;
+
+        const fly = el("img", "car-fly");
+        fly.src = before.currentSrc || before.src;
+        fly.alt = "";
+        fly.style.visibility = "hidden";
+        const veil = el("div", "car-veil");
+        veil.style.opacity = fromList ? 0 : 1;
+        document.body.append(veil, fly);
+        await fly.decode().catch(() => {});
+
+        const ratio = fly.naturalWidth / fly.naturalHeight;
+        const width = Math.max(box.width, box.height * ratio);
+        const height = width / ratio;
+        const left = box.left + (box.width - width) / 2;
+        const top = box.top + (box.height - height) / 2;
+        Object.assign(fly.style, {
+          left: left + "px",
+          top: top + "px",
+          width: width + "px",
+          height: height + "px",
+        });
+        const cropped = { clipPath: "inset(" + (height - box.height) / 2 + "px " + (width - box.width) / 2 + "px)" };
+        const onThumb = (rect) => ({
+          transform:
+            "translate(" + (rect.left - left) + "px, " + (rect.top - top) + "px) scale(" + rect.width / width + ")",
+          clipPath: "inset(0px 0px)",
+        });
+
+        // Leaving a gallery, the list goes in now, under the veil, so the
+        // photo has a place to land.
+        let target = before;
+        let keyframes;
+        if (fromList) {
+          keyframes = [onThumb(start), { transform: "none", ...cropped }];
+          hdr.classList.remove("on-colour", "on-dark");
+          hdr.classList.add("on-photo");
+        } else {
+          show(null);
+          target = view.querySelector('.model[data-i="' + series.indexOf(lastModel) + '"] img');
+          keyframes = [{ transform: "none", ...cropped }, onThumb(target.getBoundingClientRect())];
+        }
+
+        const options = { duration: FLY_MS, easing: FLY_EASE, fill: "forwards" };
+        const flight = fly.animate(keyframes, options);
+        const fade = veil.animate(
+          [{ opacity: fromList ? 0 : 1 }, { opacity: fromList ? 1 : 0 }],
+          { ...options, duration: FLY_MS * 0.6 },
+        );
+        fly.style.visibility = "";
+        target.style.visibility = "hidden";
+        await Promise.all([flight.finished, fade.finished]).catch(() => {});
+
+        if (fromList) {
+          show(s);
+          await view.querySelector(".cover img").decode().catch(() => {});
+        } else {
+          target.style.visibility = "";
+        }
+        fly.remove();
+        veil.remove();
+        flying = false;
+
+        // A back or forward press during the flight.
+        const wanted = fromURL();
+        if (wanted !== current) go(wanted);
+      }
 
       function navigate(s) {
         history.pushState({}, "", urlFor(s));
