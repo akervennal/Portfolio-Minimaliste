@@ -141,15 +141,27 @@
 
 /* iOS Safari paints the status bar solid under a full-width fixed bar
    touching the top edge, and skips one starting 12px or more below it:
-   same spot on screen, but the offset comes from `top`, not padding. */
+   same spot on screen, but the offset comes from `top`, not padding.
+   It must never cross that edge either, or the strip comes back and
+   stays, so here the header fades in place instead of sliding away. */
 @media (max-width: 700px), (hover: none) {
   .hdr:not(.hdr-solid) {
     top: 20px;
     padding-top: 0;
     padding-bottom: 0;
+    transition:
+      opacity 0.35s var(--ease),
+      visibility 0s,
+      color 0.25s linear;
   }
   .hdr:not(.hdr-solid).is-hidden {
-    transform: translateY(calc(-100% - 40px));
+    transform: none;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.35s var(--ease),
+      visibility 0s linear 0.35s,
+      color 0.25s linear;
   }
   .hdr:not(.hdr-solid) .menu {
     top: calc(100% + 12px);
