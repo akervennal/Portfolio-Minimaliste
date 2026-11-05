@@ -283,6 +283,68 @@
         .hdr {
           font-size: 15px;
         }
+
+        /* ============================================================
+           PHONE — the same cycle, one screen per scene: the photo runs
+           edge to edge and melts into the colour, the sentence sits on
+           that colour, and each scroll stops on the next sentence. The
+           contact comes straight after the story.
+           ============================================================ */
+        html {
+          scroll-snap-type: y proximity;
+        }
+        #about {
+          display: flex;
+          flex-direction: column;
+        }
+        .story {
+          order: 1;
+        }
+        .contact {
+          order: 2;
+        }
+        .kit {
+          order: 3;
+        }
+        .quote {
+          order: 4;
+        }
+        .stage {
+          top: 0;
+          height: 100svh;
+          overflow: hidden;
+        }
+        .stage img {
+          inset: 0 0 auto;
+          margin: 0;
+          width: 100%;
+          height: 82svh;
+          max-width: none;
+          max-height: none;
+          object-fit: cover;
+          mask-image: linear-gradient(#000 58%, transparent);
+        }
+        .scenes {
+          padding-top: 0;
+        }
+        .scene,
+        .scene:last-child {
+          position: relative;
+          height: 100svh;
+          scroll-snap-align: start;
+          scroll-snap-stop: always;
+        }
+        .scene p {
+          position: absolute;
+          left: var(--pad);
+          right: var(--pad);
+          bottom: 44px;
+          max-width: none;
+          margin: 0;
+          font-size: 34px;
+          text-align: left;
+          transition: color 0.25s linear;
+        }
       }
 
       /* ============================================================
@@ -333,6 +395,7 @@
       const story = about.story || [];
       const root = document.getElementById("about");
       const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+      const phone = matchMedia("(max-width: 700px)");
 
       function el(tag, cls, text) {
         const n = document.createElement(tag);
@@ -526,6 +589,7 @@
 
       function runCycles() {
         if (!cycles.length) return false;
+        if (phone.matches) return runPhoneCycles();
         const middle = window.innerHeight / 2;
         const spacing = cycles.length > 1 ? cycles[1].text.offsetTop - cycles[0].text.offsetTop : window.innerHeight * 1.7;
         const first = cycles[0].text.getBoundingClientRect();
@@ -551,6 +615,34 @@
           snapColour(from.map((v, k) => v + (next[k] - v) * mix));
         }
         return inStory;
+      }
+
+      // Same timings, but a scene's clock starts with its sentence at rest
+      // and the last photo stays until the story scrolls away.
+      function runPhoneCycles() {
+        const height = window.innerHeight;
+        const last = cycles.length - 1;
+        const clock = -scenes.getBoundingClientRect().top / scenes.firstChild.offsetHeight;
+        const held = Math.max(0, Math.min(clock, last));
+        const index = Math.floor(held);
+        const t = held - index;
+        const from = cycles[index];
+        const next = cycles[index + 1];
+
+        cycles.forEach((cycle, i) => {
+          let shown = 0;
+          if (cycle === from) shown = next ? 1 - smooth(PHOTO_HOLDS, PHOTO_GONE, t) : 1;
+          else if (cycle === next) shown = smooth(NEXT_STARTS, NEXT_ARRIVED, t);
+          setPhoto(cycle, shown);
+          // Gone before it climbs onto the sharp part of the next photo.
+          const top = cycle.text.getBoundingClientRect().top;
+          cycle.text.style.opacity = Math.max(0, Math.min(1, (top - height * 0.3) / (height * 0.25)));
+        });
+
+        if (clock > last) return false;
+        const mix = smooth(NEXT_STARTS, NEXT_ARRIVED, t);
+        snapColour(from.lab.map((v, k) => v + ((next || from).lab[k] - v) * mix));
+        return true;
       }
 
       function onScroll() {
