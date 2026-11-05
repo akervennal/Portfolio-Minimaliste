@@ -137,6 +137,7 @@
         opacity: 0.3;
       }
       .model-name {
+        align-self: flex-start;
         font-size: clamp(52px, 12vw, 190px);
         font-weight: 500;
         letter-spacing: -0.03em;
@@ -173,11 +174,31 @@
       .gallery > .cover {
         order: -1;
       }
-      .gallery > .yr-head {
-        margin-top: 56px;
-      }
       .ser {
         padding-bottom: 14vh;
+      }
+      /* The photo drifts up slowly (coverDrift) and the rest of the page
+         scrolls over it. */
+      @media (min-width: 701px) {
+        .gallery > .cover {
+          position: sticky;
+          top: 0;
+        }
+        .gallery > .cover img {
+          will-change: transform;
+        }
+        .gallery > .yr-head {
+          z-index: 1;
+          margin-bottom: 0;
+          padding-top: 56px;
+          padding-bottom: 24px;
+          background: #fff;
+        }
+        .ser {
+          position: relative;
+          z-index: 1;
+          background: #fff;
+        }
       }
       .chapter {
         margin-top: 64px;
@@ -293,6 +314,16 @@
         height: 100%;
         object-fit: cover;
       }
+      /* The model's name resizes into the gallery's title. */
+      ::view-transition-group(car-title) {
+        animation-duration: 0.8s;
+        animation-timing-function: var(--ease);
+      }
+      ::view-transition-old(car-title),
+      ::view-transition-new(car-title) {
+        width: auto;
+        height: 100%;
+      }
 
       .car-veil {
         position: fixed;
@@ -384,10 +415,11 @@
         return s ? "auto.html?m=" + slug(s.model) : "auto.html";
       }
 
-      function setPage(bg, ink) {
+      function setPage(bg, ink, muted) {
         document.documentElement.style.backgroundColor = bg;
         document.body.style.backgroundColor = bg;
         document.body.style.color = ink;
+        document.documentElement.style.setProperty("--muted", muted);
       }
 
       // --- list -------------------------------------------------------
@@ -414,6 +446,8 @@
       const FRAME_MS = 1000 / 60;
       const SETTLED = 0.0015; // below this distance-to-target, snap and stop
       const ROW_REST = 0.3;
+      const WHITE_LAB = hexToOklab("#ffffff");
+      const KEEP_COLOUR_PX = 40; // phone gallery: scroll that turns the page white
       let curLab = null;
       let targetLab = null;
       let painting = false;
@@ -423,7 +457,7 @@
       // would run twice as fast on a 120Hz phone screen.
       function paintList() {
         painting = false;
-        if (current || !targetLab) return;
+        if ((current && !phone.matches) || !targetLab) return;
         const now = performance.now();
         const frames = Math.min(now - lastPaint, 100) / FRAME_MS;
         lastPaint = now;
@@ -453,8 +487,10 @@
         });
 
         const dark = curLab[0] < 0.62;
-        setPage(oklabToCss(curLab), dark ? "#f2f2f2" : "#111111");
-        hdr.classList.toggle("on-colour", !dark);
+        const muted = dark ? "rgba(242, 242, 242, 0.6)" : "rgba(17, 17, 17, 0.55)";
+        setPage(oklabToCss(curLab), dark ? "#f2f2f2" : "#111111", muted);
+        const white = curLab === WHITE_LAB;
+        hdr.classList.toggle("on-colour", !dark && !white);
         hdr.classList.toggle("on-dark", dark);
 
         if (settling && !painting) {
@@ -463,14 +499,18 @@
         }
       }
 
-      function activateRow(rowEl) {
-        activeRow = rows.find((row) => row.el === rowEl);
-        targetLab = hexToOklab(series[+rowEl.dataset.i].color);
+      function easeTo(lab) {
+        targetLab = lab;
         if (!painting) {
           painting = true;
           lastPaint = performance.now();
           requestAnimationFrame(paintList);
         }
+      }
+
+      function activateRow(rowEl) {
+        activeRow = rows.find((row) => row.el === rowEl);
+        easeTo(hexToOklab(series[+rowEl.dataset.i].color));
       }
 
       // Back from a gallery or on first load: no easing in, the page is
@@ -532,6 +572,7 @@
       phone.addEventListener("change", () => {
         cascades.forEach(layoutCascade);
         photoTone();
+        coverDrift();
       });
 
       function buildCover(s) {
@@ -576,9 +617,28 @@
 
         wrap.appendChild(sec);
         view.replaceChildren(wrap);
-        setPage("#fff", "#111");
-        hdr.classList.remove("on-colour", "on-dark");
+
+        // Phones arrive on the car's colour, which fades out on scroll
+        // (galleryColour); on a big screen the photo fills the page.
+        rows = [];
+        if (phone.matches) {
+          targetLab = galleryLab = hexToOklab(s.color);
+          paintList();
+        } else {
+          curLab = null;
+          setPage("#fff", "#111", "rgba(17, 17, 17, 0.55)");
+          hdr.classList.remove("on-colour", "on-dark");
+        }
       }
+
+      let galleryLab = null;
+
+      function galleryColour() {
+        if (!current || !phone.matches) return;
+        const lab = window.pageYOffset > KEEP_COLOUR_PX ? WHITE_LAB : galleryLab;
+        if (lab !== targetLab) easeTo(lab);
+      }
+      window.addEventListener("scroll", galleryColour, { passive: true });
 
       // White header while the full-screen photo is behind it; on phones
       // the photo sits lower, with the page's white behind the header.
@@ -592,6 +652,31 @@
         hdr.classList.toggle("on-photo", !!over);
       }
       window.addEventListener("scroll", photoTone, { passive: true });
+
+      // Mouse only: on touch screens the page scrolls ahead of the script
+      // and the photo jitters.
+      const DRIFT = 0.3; // share of the scroll the photo follows
+      const finePointer = matchMedia("(pointer: fine)");
+      let driftQueued = false;
+
+      function coverDrift() {
+        driftQueued = false;
+        const img = view.querySelector(".cover img");
+        if (!current || !img) return;
+        const drift = phone.matches || !finePointer.matches || reduceMotion.matches;
+        const y = Math.min(window.pageYOffset, window.innerHeight);
+        img.style.transform = drift ? "" : "translate3d(0, " + -y * DRIFT + "px, 0)";
+      }
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (driftQueued) return;
+          driftQueued = true;
+          requestAnimationFrame(coverDrift);
+        },
+        { passive: true },
+      );
 
       // --- routing ----------------------------------------------------
       function coverOf(s) {
@@ -625,26 +710,42 @@
 
         const row = s ? view.querySelector('.model[data-i="' + series.indexOf(s) + '"] img') : null;
         const before = row || coverOf(current);
-        const visible = before && before.getBoundingClientRect().bottom > 0;
+        // The gallery's photo stays on screen, so getting covered by the
+        // page is what counts for it, not its position.
+        const visible =
+          before &&
+          (s ? before.getBoundingClientRect().bottom > 0 : window.pageYOffset < window.innerHeight / 2);
         if (visible && !phone.matches) {
           lastModel = s || lastModel;
           flyCover(s, before);
           return;
         }
-        if (visible) before.style.viewTransitionName = "car-cover";
+        const titleOf = (img) => (img.closest(".model") ? img.closest(".model").querySelector(".model-name") : view.querySelector(".yr-y"));
+        const titleBefore = visible ? titleOf(before) : null;
+        if (visible) {
+          before.style.viewTransitionName = "car-cover";
+          titleBefore.style.viewTransitionName = "car-title";
+        }
 
         let after = null;
+        let titleAfter = null;
         const transition = document.startViewTransition(() => {
           if (before) before.style.viewTransitionName = "";
+          if (titleBefore) titleBefore.style.viewTransitionName = "";
           show(s);
           after = s ? coverOf(s) : view.querySelector('.model[data-i="' + series.indexOf(lastModel) + '"] img');
-          if (visible && after) after.style.viewTransitionName = "car-cover";
+          if (visible && after) {
+            after.style.viewTransitionName = "car-cover";
+            titleAfter = titleOf(after);
+            titleAfter.style.viewTransitionName = "car-title";
+          }
         });
         lastModel = s || lastModel;
         transition.updateCallbackDone.catch(() => {});
         transition.ready.catch(() => {});
         transition.finished.catch(() => {}).finally(() => {
           if (after) after.style.viewTransitionName = "";
+          if (titleAfter) titleAfter.style.viewTransitionName = "";
         });
       }
 
