@@ -237,6 +237,10 @@
       .mail:hover {
         opacity: 0.6;
       }
+      .contact .label {
+        display: block;
+        margin-bottom: 6px;
+      }
       .contact-more {
         display: flex;
         flex-wrap: wrap;
@@ -313,14 +317,17 @@
         }
         .contact {
           order: 2;
+          min-height: 100svh;
           scroll-snap-align: start;
         }
         .kit {
           order: 3;
+          min-height: 100svh;
           scroll-snap-align: start;
         }
         .quote {
           order: 4;
+          min-height: 100svh;
           scroll-snap-align: start;
         }
         /* Below the top edge, like the header in menu.css: iOS Safari
@@ -506,9 +513,21 @@
       // --- contact ----------------------------------------------------
       const cs = el("section", "contact");
       if (contact.note) cs.appendChild(el("p", "contact-note", contact.note));
-      const mail = el("a", "mail", contact.email);
-      mail.href = "mailto:" + contact.email;
-      cs.appendChild(mail);
+      function contactWay(label, text, href) {
+        const way = el("div");
+        const link = el("a", "mail", text);
+        link.href = href;
+        way.append(el("span", "label", label), link);
+        cs.appendChild(way);
+        return link;
+      }
+      const ways = [contactWay(labels.email || "Email", contact.email, "mailto:" + contact.email)];
+      if (contact.instagramHandle) {
+        const insta = contactWay(labels.instagram || "Instagram", contact.instagramHandle, contact.instagramUrl || "#");
+        insta.target = "_blank";
+        insta.rel = "noopener";
+        ways.push(insta);
+      }
 
       const more = el("div", "contact-more");
       const copy = el("button", "copy", labels.copy || "copier");
@@ -519,24 +538,18 @@
         setTimeout(() => (copy.textContent = labels.copy || "copier"), 1800);
       });
       more.appendChild(copy);
-      if (contact.instagramHandle) {
-        const a = el("a", null, contact.instagramHandle);
-        a.href = contact.instagramUrl || "#";
-        a.target = "_blank";
-        a.rel = "noopener";
-        more.appendChild(a);
-      }
       if (contact.location) more.appendChild(el("span", null, contact.location));
       cs.appendChild(more);
       root.appendChild(cs);
       sections.push({ el: cs, color: about.contactColor, phoneColor: about.contactColorPhone });
 
-      // The address fills the width, whatever its length.
+      // The longest of the two fills the width, whatever its length, and
+      // the other keeps the same size.
       function fitMail() {
         const room = cs.clientWidth - 2 * parseFloat(getComputedStyle(cs).paddingLeft);
-        mail.style.fontSize = "100px";
-        const size = (100 * room) / mail.offsetWidth;
-        mail.style.fontSize = Math.min(size, 190) + "px";
+        ways.forEach((a) => (a.style.fontSize = "100px"));
+        const size = (100 * room) / Math.max(...ways.map((a) => a.offsetWidth));
+        ways.forEach((a) => (a.style.fontSize = Math.min(size, 190) + "px"));
       }
       fitMail();
       document.fonts.ready.then(fitMail);

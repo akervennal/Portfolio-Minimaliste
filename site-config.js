@@ -41,8 +41,8 @@ var SITE_CONFIG = {
       "since": "depuis",
       "photos": "photos",
       "albums": "albums",
-      "copy": "copier l'adresse",
-      "copied": "adresse copiée"
+      "copy": "copier l'adresse mail",
+      "copied": "adresse mail copiée"
     }
   },
   "sequence": [
@@ -232,7 +232,7 @@ var SITE_CONFIG = {
       "gearColor": "#ebe9e4",
       "gearColorPhone": "#ffffff",
       "contactColor": "#e8dc5c",
-      "contactColorPhone": "#12385c",
+      "contactColorPhone": "#e8dc5c",
       "since": "2018"
     },
     "contact": {
