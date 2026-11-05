@@ -229,249 +229,311 @@ var SITE_CONFIG = {
     }
   },
   "auto": {
-    "hero": "images/viking-cup-round-3-2026/7.jpg",
-    "heroPhone": "images/viking-cup-round-3-2026/19.jpg",
     "series": [
       {
         "model": "Nissan S14",
-        "cars": [
-          [
-            {
-              "src": "images/viking-cup-round-3-2026/7.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-2026/MEL_8998.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/16.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-2026/MEL_9127.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/15.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/34.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/36.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-2026/MEL_9003.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/13.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-2026/MEL_9528.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/12.jpg",
-              "w": 1365,
-              "h": 2048
-            }
-          ],
-          [
-            {
-              "src": "images/viking-cup-round-3-2026/22.jpg",
-              "w": 1365,
-              "h": 2048
-            },
-            {
-              "src": "images/viking-cup-2026/MEL_9453.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/5.jpg",
-              "w": 1365,
-              "h": 2048
-            }
-          ],
-          [
-            {
-              "src": "images/viking-cup-round-3-2026/32.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/4.jpg",
-              "w": 2048,
-              "h": 1365
-            }
-          ]
+        "color": "#e9b9d4",
+        "cover": "images/viking-cup-round-3-2026/7.jpg",
+        "coverPhone": "images/viking-cup-round-3-2026/12.jpg",
+        "groups": [
+          {
+            "label": "Vue d'ensemble",
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/7.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-2026/MEL_9528.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/13.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          },
+          {
+            "label": "Détails",
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/12.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/36.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/34.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          },
+          {
+            "label": "Au garage",
+            "photos": [
+              {
+                "src": "images/viking-cup-2026/MEL_9003.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-2026/MEL_8998.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-2026/MEL_9127.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/15.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          },
+          {
+            "label": "En piste",
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/16.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          },
+          {
+            "label": "Deux autres S14",
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/22.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/5.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/viking-cup-2026/MEL_9453.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/32.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/4.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          }
         ]
       },
       {
         "model": "Mazda RX-8",
-        "cars": [
-          [
-            {
-              "src": "images/viking-cup-round-3-2026/3.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/18.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/2.jpg",
-              "w": 1365,
-              "h": 2048
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/39.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/40.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/19.jpg",
-              "w": 1365,
-              "h": 2048
-            }
-          ]
+        "color": "#f2b61a",
+        "cover": "images/viking-cup-round-3-2026/18.jpg",
+        "coverPhone": "images/viking-cup-round-3-2026/19.jpg",
+        "groups": [
+          {
+            "label": "À l'arrêt",
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/3.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/2.jpg",
+                "w": 1365,
+                "h": 2048
+              }
+            ]
+          },
+          {
+            "label": "Au paddock",
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/39.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/40.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          },
+          {
+            "label": "En piste",
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/19.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/18.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          }
         ]
       },
       {
         "model": "BMW Série 1",
-        "cars": [
-          [
-            {
-              "src": "images/viking-cup-round-3-2026/24.jpg",
-              "w": 1365,
-              "h": 2048
-            },
-            {
-              "src": "images/viking-cup-round-3-2026/28.jpg",
-              "w": 2048,
-              "h": 1365
-            }
-          ]
+        "color": "#c01909",
+        "cover": "images/viking-cup-round-3-2026/28.jpg",
+        "coverPhone": "images/viking-cup-round-3-2026/24.jpg",
+        "groups": [
+          {
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/24.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/28.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          }
         ]
       },
       {
         "model": "Hypercars",
-        "cars": [
-          [
-            {
-              "src": "images/24h-du-mans-2026/6-MEL_3648.jpg",
-              "w": 2400,
-              "h": 1600
-            },
-            {
-              "src": "images/24h-du-mans-2025/6-MEL_1101.jpg",
-              "w": 1365,
-              "h": 2048
-            },
-            {
-              "src": "images/24h-du-mans-2026/3-MEL_3734.jpg",
-              "w": 2400,
-              "h": 1600
-            },
-            {
-              "src": "images/24h-du-mans-2026/10-MEL_3236.jpg",
-              "w": 2400,
-              "h": 1600
-            },
-            {
-              "src": "images/24h-du-mans-2025/5-MEL_1111.jpg",
-              "w": 1365,
-              "h": 2048
-            },
-            {
-              "src": "images/24h-du-mans-2026/5-MEL_3624.jpg",
-              "w": 2400,
-              "h": 1600
-            },
-            {
-              "src": "images/24h-du-mans-2026/2-MEL_3956.jpg",
-              "w": 2400,
-              "h": 1600
-            },
-            {
-              "src": "images/24h-du-mans-2026/7-MEL_3370.jpg",
-              "w": 1600,
-              "h": 2400
-            },
-            {
-              "src": "images/24h-du-mans-2026/3-MEL_3934.jpg",
-              "w": 2400,
-              "h": 1600
-            },
-            {
-              "src": "images/24h-du-mans-2026/4-MEL_3693.jpg",
-              "w": 2400,
-              "h": 1600
-            },
-            {
-              "src": "images/24h-du-mans-2026/5-MEL_3751.jpg",
-              "w": 2400,
-              "h": 1600
-            },
-            {
-              "src": "images/24h-du-mans-2026/4-MEL_3817.jpg",
-              "w": 1600,
-              "h": 2400
-            },
-            {
-              "src": "images/24h-du-mans-2025/7-MEL_1095.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/24h-du-mans-2026/9-MEL_3318.jpg",
-              "w": 2400,
-              "h": 1600
-            },
-            {
-              "src": "images/24h-du-mans-2026/8-MEL_3292.jpg",
-              "w": 1600,
-              "h": 2400
-            },
-            {
-              "src": "images/24h-du-mans-2025/3-MEL_1451.jpg",
-              "w": 2048,
-              "h": 1365
-            },
-            {
-              "src": "images/24h-du-mans-2026/7-MEL_3353.jpg",
-              "w": 1600,
-              "h": 2400
-            },
-            {
-              "src": "images/24h-du-mans-2026/8-MEL_3330.jpg",
-              "w": 2400,
-              "h": 1600
-            }
-          ]
+        "color": "#0f1b2d",
+        "cover": "images/24h-du-mans-2026/6-MEL_3648.jpg",
+        "coverPhone": "images/24h-du-mans-2026/7-MEL_3353.jpg",
+        "groups": [
+          {
+            "label": "Au crépuscule",
+            "photos": [
+              {
+                "src": "images/24h-du-mans-2026/6-MEL_3648.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/24h-du-mans-2026/5-MEL_3624.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/24h-du-mans-2026/4-MEL_3693.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/24h-du-mans-2026/4-MEL_3817.jpg",
+                "w": 1600,
+                "h": 2400
+              },
+              {
+                "src": "images/24h-du-mans-2026/5-MEL_3751.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/24h-du-mans-2025/3-MEL_1451.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          },
+          {
+            "label": "Entre les arbres",
+            "photos": [
+              {
+                "src": "images/24h-du-mans-2026/7-MEL_3353.jpg",
+                "w": 1600,
+                "h": 2400
+              },
+              {
+                "src": "images/24h-du-mans-2026/7-MEL_3370.jpg",
+                "w": 1600,
+                "h": 2400
+              },
+              {
+                "src": "images/24h-du-mans-2026/8-MEL_3292.jpg",
+                "w": 1600,
+                "h": 2400
+              }
+            ]
+          },
+          {
+            "label": "À pleine vitesse",
+            "photos": [
+              {
+                "src": "images/24h-du-mans-2026/8-MEL_3330.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/24h-du-mans-2026/9-MEL_3318.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/24h-du-mans-2026/2-MEL_3956.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/24h-du-mans-2026/3-MEL_3734.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/24h-du-mans-2026/3-MEL_3934.jpg",
+                "w": 2400,
+                "h": 1600
+              }
+            ]
+          },
+          {
+            "label": "Sur la grille",
+            "photos": [
+              {
+                "src": "images/24h-du-mans-2026/10-MEL_3236.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/24h-du-mans-2025/5-MEL_1111.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/24h-du-mans-2025/6-MEL_1101.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/24h-du-mans-2025/7-MEL_1095.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          }
         ]
       }
     ]

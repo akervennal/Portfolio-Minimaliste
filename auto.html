@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Armel Kervennal — auto</title>
+    <title>Armel Kervennal — automobile</title>
     <meta
       name="description"
       content="Photographie automobile par Armel Kervennal."
@@ -44,6 +44,7 @@
       html,
       body {
         background: #fff;
+        transition: background-color 0.6s var(--ease);
       }
 
       body {
@@ -54,6 +55,7 @@
         color: var(--ink);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
       }
 
       a {
@@ -76,24 +78,12 @@
         /* no background: the soft halo vanishes on white and keeps the
            header readable when a photo scrolls underneath */
         --hdr-halo: drop-shadow(0 0 5px rgba(255, 255, 255, 0.85));
-        transition:
-          transform 0.5s var(--ease),
-          color 0.25s linear;
-      }
-      .hdr.is-hidden {
-        transform: translateY(-140%);
+        transition: color 0.25s linear;
       }
       .hdr > a,
       .hdr > button,
       .menu {
         filter: var(--hdr-halo);
-      }
-      /* White over the hero, except with the menu open: it then sits on
-         the pale blur, where black reads better. */
-      .hdr.on-hero:not(:has(.menu.is-open)) {
-        color: #fff;
-        --hdr-halo: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6))
-          drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
       }
       .hdr a {
         text-decoration: none;
@@ -101,9 +91,22 @@
       .hdr a:hover {
         opacity: 0.55;
       }
+      /* On a car's colour: no halo, and white on the dark ones. */
+      .hdr.on-colour {
+        --hdr-halo: none;
+      }
+      .hdr.on-dark {
+        color: #fff;
+        --hdr-halo: none;
+      }
+      /* White over a full-screen photo, except with the menu open: it
+         then sits on the pale blur, where black reads better. */
+      .hdr.on-photo:not(:has(.menu.is-open)) {
+        color: #fff;
+        --hdr-halo: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6))
+          drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+      }
 
-      /* Blocks fade + rise in on load, staggered via an inline
-         transition-delay set per element in JS, same as the about page. */
       .reveal {
         transition:
           opacity 0.7s var(--ease),
@@ -119,80 +122,69 @@
       }
 
       /* ============================================================
-         SLIDE — the list and the gallery sit side by side; opening a
-         model shifts the whole track one screen to the left. The panel
-         at rest off-screen collapses so it adds no scroll height.
+         LIST — one giant name per model; the page takes the colour of
+         whichever car is at the centre of the screen
          ============================================================ */
-      .stage {
-        overflow: hidden;
+      .models {
+        padding: 14svh var(--gap);
       }
-      .track {
+      .model {
         display: flex;
-        align-items: flex-start;
-        width: 200%;
-        transition: transform 0.7s var(--ease);
+        flex-direction: column;
+        justify-content: center;
+        gap: 24px;
+        min-height: 72svh;
+        text-decoration: none;
+        opacity: 0.3;
+        transition:
+          opacity 0.5s var(--ease),
+          color 0.6s var(--ease);
       }
-      .track.is-gal {
-        transform: translateX(-50%);
+      .model.is-active {
+        opacity: 1;
       }
-      .panel {
-        flex: none;
-        width: 50%;
+      .model-name {
+        font-size: clamp(52px, 12vw, 190px);
+        font-weight: 500;
+        letter-spacing: -0.03em;
+        line-height: 0.95;
       }
-      .panel.is-off {
-        height: 0;
-        overflow: hidden;
-        visibility: hidden;
+      .model-cover {
+        display: block;
+        width: min(42vw, 620px);
+        aspect-ratio: 3 / 2;
+        object-fit: cover;
       }
 
-      /* The frame scrolls with the page; the photo inside is pushed back
-         down by a fraction of the scroll, so it trails behind. */
-      .hero-wrap {
+      /* ============================================================
+         GALLERY — the car's photo full-screen, then its chapters, built
+         like a shoot: the whole car, the details, the action
+         ============================================================ */
+      .cover {
+        display: block;
         height: 100svh;
         overflow: hidden;
       }
-      .hero-wrap picture {
-        display: contents;
-      }
-      .hero {
+      .cover img {
         display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        will-change: transform;
       }
-
-      /* ============================================================
-         MODEL LIST — each row slides to that model's gallery
-         ============================================================ */
-      .models {
-        margin: 64px 0 120px;
-        border-top: 1px solid var(--line);
-      }
-      .model {
-        display: block;
-        padding: 14px var(--gap);
-        border-bottom: 1px solid var(--line);
-        text-decoration: none;
-        transition: opacity 0.3s;
-      }
-      .model:hover {
-        opacity: 0.55;
-      }
-      .model-name {
-        font-size: 46px;
-        font-weight: 500;
-        letter-spacing: -0.02em;
-        line-height: 1.1;
-      }
-
-      /* ============================================================
-         GALLERY — same page as an archive album (gallery.css); several
-         cars of one model get one grid each, with a gap between them
-         ============================================================ */
       .ser {
         --locs-gap: var(--gap);
-        padding: calc(var(--hdr-h) + 6vh) 0 14vh;
+        padding: 56px 0 14vh;
+      }
+      .chapter {
+        margin-top: 64px;
+        padding: 0 var(--gap);
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .chapter + .grid {
+        padding-top: 14px;
       }
       .grid + .grid {
         margin-top: 64px;
@@ -234,18 +226,18 @@
           padding: 20px 20px;
           font-size: 15px;
         }
-        /* the car on the phone photo sits left of centre */
-        .hero {
-          object-position: 38% center;
+        .model {
+          min-height: 64svh;
+          gap: 18px;
         }
-        .models {
-          margin: 44px 0 80px;
-        }
-        .model-name {
-          font-size: 28px;
+        .model-cover {
+          width: 100%;
         }
         .ser {
-          padding-top: calc(var(--hdr-h) + 5vh);
+          padding-top: 40px;
+        }
+        .chapter {
+          margin-top: 44px;
         }
         .grid + .grid {
           margin-top: 40px;
@@ -263,11 +255,24 @@
         animation-duration: 0.5s;
         animation-timing-function: var(--ease);
       }
+      /* The list photo growing into the gallery's full-screen one. */
+      ::view-transition-group(car-cover) {
+        animation-duration: 0.8s;
+        animation-timing-function: var(--ease);
+      }
+      ::view-transition-old(car-cover),
+      ::view-transition-new(car-cover) {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
 
       @media (prefers-reduced-motion: reduce) {
+        html,
+        body,
         .hdr,
         .reveal,
-        .track {
+        .model {
           transition: none;
         }
         ::view-transition-group(*),
@@ -287,18 +292,13 @@
       <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
       <nav class="menu" id="menu" hidden>
         <a href="archive.html">archive</a>
-        <a href="auto.html" class="is-current">auto</a>
+        <a href="auto.html" class="is-current">automobile</a>
         <a href="about.html">about</a>
       </nav>
     </header>
     <div class="menu-scrim" id="menuScrim" hidden></div>
 
-    <main class="stage">
-      <div class="track" id="track">
-        <div class="panel" id="home"></div>
-        <div class="panel is-off" id="gal"></div>
-      </div>
-    </main>
+    <main id="view"></main>
 
     <div class="lb" id="lb">
       <button class="lb-close" id="lbClose">fermer · esc</button>
@@ -312,14 +312,13 @@
     <script src="menu.js"></script>
     <script src="gallery.js"></script>
     <script>
-      const auto = (window.SITE_CONFIG && SITE_CONFIG.auto) || {};
-      const series = auto.series || [];
+      const series = ((window.SITE_CONFIG && SITE_CONFIG.auto) || {}).series || [];
       const hdr = document.getElementById("hdr");
-      const track = document.getElementById("track");
-      const home = document.getElementById("home");
-      const gal = document.getElementById("gal");
+      const view = document.getElementById("view");
+      const phone = matchMedia("(max-width: 700px)");
+      const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
-      // We put the scroll back ourselves once a slide has finished.
+      // We put the scroll back ourselves when returning to the list.
       history.scrollRestoration = "manual";
 
       function el(tag, cls, text) {
@@ -329,17 +328,10 @@
         return n;
       }
 
-      let revealIndex = 0;
-      function reveal(node) {
-        node.classList.add("reveal");
-        node.style.transitionDelay = revealIndex++ * 90 + "ms";
-        return node;
-      }
-
       function slug(model) {
         return model
           .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[̀-ͯ]/g, "")
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-");
       }
@@ -353,7 +345,67 @@
         return s ? "auto.html?m=" + slug(s.model) : "auto.html";
       }
 
-      const phone = matchMedia("(max-width: 700px)");
+      function isDark(hex) {
+        const n = parseInt(hex.slice(1), 16);
+        const [r, g, b] = [n >> 16, (n >> 8) & 255, n & 255];
+        return 0.299 * r + 0.587 * g + 0.114 * b < 128;
+      }
+
+      function setPage(bg, ink) {
+        document.documentElement.style.backgroundColor = bg;
+        document.body.style.backgroundColor = bg;
+        document.body.style.color = ink;
+      }
+
+      // --- list -------------------------------------------------------
+      let current = null; // the model on screen, null on the list
+      let activeRow = null;
+      let listY = 0;
+
+      const centreLine = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting || current) return;
+            activateRow(entry.target);
+          });
+        },
+        { rootMargin: "-50% 0px -50% 0px" },
+      );
+
+      function activateRow(row) {
+        if (activeRow) activeRow.classList.remove("is-active");
+        activeRow = row;
+        row.classList.add("is-active");
+        const { color } = series[+row.dataset.i];
+        const dark = isDark(color);
+        setPage(color, dark ? "#fff" : "#111");
+        hdr.classList.toggle("on-colour", !dark);
+        hdr.classList.toggle("on-dark", dark);
+      }
+
+      function renderList() {
+        const nav = el("nav", "models");
+        series.forEach((s, i) => {
+          const a = el("a", "model");
+          a.href = urlFor(s);
+          a.dataset.i = i;
+          a.appendChild(el("span", "model-name", s.model));
+          const img = el("img", "model-cover");
+          img.src = s.cover;
+          img.alt = s.model;
+          a.appendChild(img);
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            navigate(s);
+          });
+          nav.appendChild(a);
+          centreLine.observe(a);
+        });
+        view.replaceChildren(nav);
+        hdr.classList.remove("on-photo");
+      }
+
+      // --- gallery ----------------------------------------------------
       let cascades = [];
 
       function layoutCascade({ grid, cells, ratios }) {
@@ -369,13 +421,32 @@
 
       phone.addEventListener("change", () => cascades.forEach(layoutCascade));
 
-      function buildGallery(s) {
-        const sec = el("section", "ser");
-        const photos = s.cars.flat().map((p) => p.src);
+      function buildCover(s) {
+        const cover = el("div", "cover");
+        const picture = document.createElement("picture");
+        if (s.coverPhone) {
+          const source = document.createElement("source");
+          source.media = "(max-width: 700px)";
+          source.srcset = s.coverPhone;
+          picture.appendChild(source);
+        }
+        const img = document.createElement("img");
+        img.src = s.cover;
+        img.alt = s.model;
+        picture.appendChild(img);
+        cover.appendChild(picture);
+        return cover;
+      }
 
+      function renderGallery(s) {
+        const all = s.groups.flatMap((g) => g.photos.map((p) => p.src));
+        const wrap = el("div");
+        wrap.appendChild(buildCover(s));
+
+        const sec = el("section", "ser");
         const head = el("a", "yr-head");
         head.href = urlFor(null);
-        head.append(el("span", "yr-y", s.model), el("span", "yr-meta", String(photos.length)));
+        head.append(el("span", "yr-y", s.model), el("span", "yr-meta", String(all.length)));
         head.addEventListener("click", (e) => {
           e.preventDefault();
           navigate(null);
@@ -384,124 +455,85 @@
 
         cascades = [];
         let offset = 0;
-        s.cars.forEach((car) => {
-          const grid = buildPhotoGrid(car.map((p) => p.src), s.model, photos, offset);
+        s.groups.forEach((group) => {
+          if (group.label) sec.appendChild(el("h3", "chapter", group.label));
+          const grid = buildPhotoGrid(group.photos.map((p) => p.src), s.model, all, offset);
           grid.classList.add("organic");
           const cells = [...grid.children];
-          const ratios = car.map((p) => p.w / p.h);
+          const ratios = group.photos.map((p) => p.w / p.h);
           cells.forEach((cell, i) => cell.style.setProperty("--r", ratios[i].toFixed(3)));
           const cascade = { grid, cells, ratios };
           cascades.push(cascade);
           layoutCascade(cascade);
           sec.appendChild(grid);
-          offset += car.length;
+          offset += group.photos.length;
         });
-        return sec;
+
+        wrap.appendChild(sec);
+        view.replaceChildren(wrap);
+        setPage("#fff", "#111");
+        hdr.classList.remove("on-colour", "on-dark");
       }
 
-      const hero = el("img", "hero");
-      if (auto.hero) {
-        hero.src = auto.hero;
-        hero.alt = "";
-        // A vertical photo on phones: the wide one loses too much there.
-        const picture = document.createElement("picture");
-        if (auto.heroPhone) {
-          const source = document.createElement("source");
-          source.media = "(max-width: 700px)";
-          source.srcset = auto.heroPhone;
-          picture.appendChild(source);
+      // White header while the full-screen photo is behind it.
+      function photoTone() {
+        const cover = view.querySelector(".cover");
+        const over = current && cover && window.pageYOffset < cover.offsetHeight - hdr.offsetHeight;
+        hdr.classList.toggle("on-photo", !!over);
+      }
+      window.addEventListener("scroll", photoTone, { passive: true });
+
+      // --- routing ----------------------------------------------------
+      function coverOf(s) {
+        if (s) return view.querySelector(".cover img");
+        return activeRow && activeRow.querySelector(".model-cover");
+      }
+
+      function show(s) {
+        current = s;
+        if (s) {
+          renderGallery(s);
+          window.scrollTo(0, 0);
+        } else {
+          activeRow = null;
+          renderList();
+          window.scrollTo(0, listY);
         }
-        picture.appendChild(hero);
-        const wrap = el("div", "hero-wrap");
-        wrap.appendChild(picture);
-        home.appendChild(reveal(wrap));
+        photoTone();
       }
 
-      const models = el("nav", "models");
-      series.forEach((s) => {
-        const a = el("a", "model");
-        a.href = urlFor(s);
-        a.appendChild(el("span", "model-name", s.model));
-        a.addEventListener("click", (e) => {
-          e.preventDefault();
-          navigate(s);
-        });
-        models.appendChild(a);
-      });
-      home.appendChild(reveal(models));
-
-      // ?m=... opens straight on a gallery: shared link or reload.
-      let current = fromURL();
-      if (current) {
-        gal.appendChild(reveal(buildGallery(current)));
-        gal.classList.remove("is-off");
-        home.classList.add("is-off");
-        track.classList.add("is-gal");
-      }
-
-      // Two frames: one for layout/paint to settle, one for the browser
-      // to register the pre-transition styles before we flip them.
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          track.querySelectorAll(".reveal").forEach((n) => n.classList.add("in"));
-        });
-      });
-
-      // --- slide between the list and a gallery -----------------------
-      // Each panel has its own scroll position, but the page has only
-      // one. While sliding, the incoming panel is offset so the part we
-      // want sits in view; once it lands, the offset and the real scroll
-      // are swapped in the same tick, so nothing visibly jumps.
-      const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
-      let homeY = 0;
-      let finishSlide = null;
-
-      function heroTone(y) {
-        const wrap = home.querySelector(".hero-wrap");
-        const overHero = !current && wrap && y < wrap.offsetHeight - hdr.offsetHeight;
-        hdr.classList.toggle("on-hero", !!overHero);
-      }
-
+      // The photo of the car being opened (or left) grows into the other
+      // view's: same view-transition-name on both sides of the swap.
       function go(s) {
         if (s === current) return;
-        if (finishSlide) finishSlide();
+        if (!current) listY = window.pageYOffset;
 
-        const y = window.pageYOffset;
-        const leavingHome = !current;
-        if (leavingHome) homeY = y;
-        if (s) gal.replaceChildren(buildGallery(s));
-
-        const from = s ? (leavingHome ? home : gal) : gal;
-        const to = s ? gal : home;
-        const targetY = s ? 0 : homeY;
-        current = s;
-
-        // gallery to gallery can't happen by clicking, only through
-        // browser history: no slide to play, just swap.
-        if (from === to) {
-          window.scrollTo(0, 0);
+        if (!document.startViewTransition || reduceMotion.matches) {
+          show(s);
           return;
         }
 
-        hdr.classList.remove("is-hidden");
-        hidden = false;
-        heroTone(targetY);
+        const row = s ? view.querySelector('.model[data-i="' + series.indexOf(s) + '"] img') : null;
+        const before = row || coverOf(current);
+        const visible = before && before.getBoundingClientRect().bottom > 0;
+        if (visible) before.style.viewTransitionName = "car-cover";
 
-        to.classList.remove("is-off");
-        to.style.marginTop = y - targetY + "px";
-        track.classList.toggle("is-gal", !!s);
-
-        const finish = () => {
-          finishSlide = null;
-          from.classList.add("is-off");
-          to.style.marginTop = "";
-          window.scrollTo(0, targetY);
-        };
-        finishSlide = finish;
-        setTimeout(() => {
-          if (finishSlide === finish) finish();
-        }, reduceMotion.matches ? 0 : 720);
+        let after = null;
+        const transition = document.startViewTransition(() => {
+          if (before) before.style.viewTransitionName = "";
+          show(s);
+          after = s ? coverOf(s) : view.querySelector('.model[data-i="' + series.indexOf(lastModel) + '"] img');
+          if (visible && after) after.style.viewTransitionName = "car-cover";
+        });
+        lastModel = s || lastModel;
+        transition.updateCallbackDone.catch(() => {});
+        transition.ready.catch(() => {});
+        transition.finished.catch(() => {}).finally(() => {
+          if (after) after.style.viewTransitionName = "";
+        });
       }
+
+      let lastModel = null;
 
       function navigate(s) {
         history.pushState({}, "", urlFor(s));
@@ -510,58 +542,16 @@
 
       window.addEventListener("popstate", () => go(fromURL()));
 
-      // --- hero parallax ----------------------------------------------
-      // Frozen while a gallery is showing or sliding: the page scroll
-      // then belongs to the gallery, and the hero has to come back
-      // exactly as it left. Mouse only: on touch screens the page scrolls
-      // ahead of the script, so the photo visibly jitters.
-      let parallaxQueued = false;
-      function parallax() {
-        parallaxQueued = false;
-        if (current || finishSlide) return;
-        hero.style.transform = "translate3d(0, " + window.pageYOffset * 0.35 + "px, 0)";
-      }
-      if (!reduceMotion.matches && matchMedia("(pointer: fine)").matches) {
-        window.addEventListener(
-          "scroll",
-          () => {
-            if (parallaxQueued) return;
-            parallaxQueued = true;
-            requestAnimationFrame(parallax);
-          },
-          { passive: true },
-        );
-      }
-
-      heroTone(window.pageYOffset);
-      window.addEventListener(
-        "scroll",
-        () => {
-          if (!finishSlide) heroTone(window.pageYOffset);
-        },
-        { passive: true },
-      );
-
-      // --- header hide on scroll down ---------------------------------
-      let lastY = window.pageYOffset;
-      let hidden = false;
-      window.addEventListener(
-        "scroll",
-        () => {
-          const y = window.pageYOffset;
-          const dy = y - lastY;
-          if (Math.abs(dy) <= 6) return;
-          if (dy > 0 && y > 80 && !hidden) {
-            hidden = true;
-            hdr.classList.add("is-hidden");
-          } else if (dy < 0 && hidden) {
-            hidden = false;
-            hdr.classList.remove("is-hidden");
-          }
-          lastY = y;
-        },
-        { passive: true },
-      );
+      // --- first paint ------------------------------------------------
+      const first = fromURL();
+      lastModel = first;
+      show(first);
+      view.firstElementChild.classList.add("reveal");
+      // Two frames: one for layout/paint to settle, one for the browser
+      // to register the pre-transition styles before we flip them.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => view.firstElementChild.classList.add("in"));
+      });
     </script>
   </body>
 </html>
