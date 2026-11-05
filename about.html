@@ -98,9 +98,24 @@
          the right. Each scene names its photo: as long as it doesn't
          change the photo stays. The phone has its own version, below.
          ============================================================ */
+      /* The contact comes straight after the story. */
+      #about {
+        display: flex;
+        flex-direction: column;
+      }
       .story {
+        order: 1;
         display: grid;
         grid-template-columns: 1fr 1fr;
+      }
+      .contact {
+        order: 2;
+      }
+      .kit {
+        order: 3;
+      }
+      .quote {
+        order: 4;
       }
       .stage {
         grid-column: 2;
@@ -300,27 +315,14 @@
            PHONE — the same cycle, one screen per scene: the photo runs
            edge to edge and melts into the colour, the sentence sits on
            that colour, and each scroll glides to the next block (see
-           settle() in the script). The contact comes straight after the
-           story.
+           settle() in the script).
            ============================================================ */
-        #about {
-          display: flex;
-          flex-direction: column;
-        }
         .story {
-          order: 1;
           grid-template-columns: 1fr;
         }
-        .contact {
-          order: 2;
-          min-height: 100svh;
-        }
-        .kit {
-          order: 3;
-          min-height: 100svh;
-        }
+        .contact,
+        .kit,
         .quote {
-          order: 4;
           min-height: 100svh;
         }
         /* Below the top edge, like the header in menu.css: iOS Safari
@@ -676,8 +678,8 @@
             return;
           }
           const r = box.getBoundingClientRect();
-          // From the moment a text enters to when it sits centred.
-          const progress = (vh * 0.9 - r.top) / (vh * 0.4 + r.height / 2);
+          // Fully lit soon after entering, well before it reaches the centre.
+          const progress = (vh * 0.9 - r.top) / (vh * 0.2);
           const lit = progress * words.length;
           words.forEach((w, i) => {
             const on = Math.max(0, Math.min(1, lit - i));
