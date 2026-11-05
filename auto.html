@@ -164,9 +164,20 @@
         height: 100%;
         object-fit: cover;
       }
-      .ser {
+      .gallery {
         --locs-gap: var(--gap);
-        padding: 56px 0 14vh;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      .gallery > .cover {
+        order: -1;
+      }
+      .gallery > .yr-head {
+        margin-top: 56px;
+      }
+      .ser {
+        padding-bottom: 14vh;
       }
       .chapter {
         margin-top: 64px;
@@ -236,6 +247,16 @@
         .cover img {
           height: auto;
           aspect-ratio: 3 / 2;
+        }
+        /* the title sits on top of that photo, in the space above it */
+        .gallery > .yr-head {
+          position: absolute;
+          top: calc(50svh - 33.33vw);
+          left: 0;
+          right: 0;
+          width: 100%;
+          margin: 0;
+          transform: translateY(calc(-100% - 12px));
         }
         .ser {
           padding-top: 24px;
@@ -373,17 +394,24 @@
       // Same treatment as the homepage (see the scroll loop in index.html):
       // the row at the centre sets a target, and the colour and the rows'
       // opacity ease toward it, in OKLab, at their own pace.
-      const EASE = 0.085; // per-frame lerp factor, ~600ms to settle at 60fps
+      const EASE = 0.085; // lerp factor per 60fps frame, ~600ms to settle
+      const FRAME_MS = 1000 / 60;
       const SETTLED = 0.0015; // below this distance-to-target, snap and stop
       const ROW_REST = 0.3;
       let curLab = null;
       let targetLab = null;
       let painting = false;
+      let lastPaint = 0;
 
+      // Scaled by the time since the last frame: a fixed factor per frame
+      // would run twice as fast on a 120Hz phone screen.
       function paintList() {
         painting = false;
         if (current || !targetLab) return;
-        const ease = reduceMotion.matches ? 1 : EASE;
+        const now = performance.now();
+        const frames = Math.min(now - lastPaint, 100) / FRAME_MS;
+        lastPaint = now;
+        const ease = reduceMotion.matches ? 1 : 1 - Math.pow(1 - EASE, frames);
         let settling = false;
 
         if (!curLab) {
@@ -424,6 +452,7 @@
         targetLab = hexToOklab(series[+rowEl.dataset.i].color);
         if (!painting) {
           painting = true;
+          lastPaint = performance.now();
           requestAnimationFrame(paintList);
         }
       }
@@ -500,10 +529,9 @@
 
       function renderGallery(s) {
         const all = s.groups.flatMap((g) => g.photos.map((p) => p.src));
-        const wrap = el("div");
+        const wrap = el("div", "gallery");
         wrap.appendChild(buildCover(s));
 
-        const sec = el("section", "ser");
         const head = el("a", "yr-head");
         head.href = urlFor(null);
         head.append(el("span", "yr-y", s.model), el("span", "yr-meta", String(all.length)));
@@ -511,8 +539,9 @@
           e.preventDefault();
           navigate(null);
         });
-        sec.appendChild(head);
+        wrap.appendChild(head);
 
+        const sec = el("section", "ser");
         cascades = [];
         let offset = 0;
         s.groups.forEach((group) => {
