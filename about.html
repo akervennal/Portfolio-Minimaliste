@@ -314,9 +314,13 @@
         /* ============================================================
            PHONE — the same cycle, one screen per scene: the photo runs
            edge to edge and melts into the colour, the sentence sits on
-           that colour, and each scroll glides to the next block (see
-           settle() in the script).
+           that colour, and each scroll stops on the next block.
            ============================================================ */
+        /* Mandatory: with proximity, a short swipe on iOS stops halfway
+           between two scenes. So every block needs a stop of its own. */
+        html {
+          scroll-snap-type: y mandatory;
+        }
         .story {
           grid-template-columns: 1fr;
         }
@@ -324,6 +328,7 @@
         .kit,
         .quote {
           min-height: 100svh;
+          scroll-snap-align: start;
         }
         /* Below the top edge, like the header in menu.css: iOS Safari
            paints the status bar solid over anything fixed against it. The
@@ -350,6 +355,8 @@
           height: 100svh;
           min-height: 0;
           padding: 0;
+          scroll-snap-align: start;
+          scroll-snap-stop: always;
         }
         .scene p,
         .scene p.short {
@@ -717,74 +724,6 @@
           img.style.opacity = img.style.filter = text.style.opacity = "";
         });
       });
-
-      // --- phone: glide to the nearest block --------------------------
-      // Not CSS scroll snapping: mandatory cuts the swipe's momentum dead
-      // and its speed can't be set, proximity leaves the page stranded
-      // between two blocks. Here the swipe runs its course, then the page
-      // glides the rest of the way. Past NEXT_FROM of a block, in the
-      // direction of the swipe, it goes on to the next one.
-      const SETTLE_WAIT = 120; // ms without a scroll: the swipe is over
-      const GLIDE_MS = 700;
-      const NEXT_FROM = 0.2;
-      let settleTimer;
-      let glide = null;
-      let touching = false;
-      let restY = window.pageYOffset;
-
-      function glideTo(y) {
-        const from = window.pageYOffset;
-        const start = performance.now();
-        function step(now) {
-          const t = reduceMotion.matches ? 1 : Math.min((now - start) / GLIDE_MS, 1);
-          window.scrollTo(0, from + (y - from) * (1 - Math.pow(1 - t, 3)));
-          if (t < 1) glide = requestAnimationFrame(step);
-          else {
-            glide = null;
-            restY = y;
-          }
-        }
-        glide = requestAnimationFrame(step);
-      }
-
-      function settle() {
-        if (!phone.matches || touching || glide !== null) return;
-        const y = window.pageYOffset;
-        const end = document.documentElement.scrollHeight - window.innerHeight;
-        const tops = sections.map(({ el: s }) => Math.min(s.getBoundingClientRect().top + y, end)).sort((a, b) => a - b);
-        const after = tops.findIndex((top) => top > y);
-        if (after < 1) return restY = y;
-        const from = tops[after - 1];
-        const to = tops[after];
-        // A block taller than the screen scrolls freely until its end.
-        const extra = Math.max(0, to - from - window.innerHeight);
-        const past = (y - from - extra) / (to - from - extra);
-        if (past <= 0) return restY = y;
-        const onward = y >= restY ? past > NEXT_FROM : past > 1 - NEXT_FROM;
-        glideTo(onward ? to : from + extra);
-      }
-
-      function settleSoon() {
-        clearTimeout(settleTimer);
-        settleTimer = setTimeout(settle, SETTLE_WAIT);
-      }
-
-      window.addEventListener("scroll", () => {
-        if (glide === null) settleSoon();
-      }, { passive: true });
-      window.addEventListener("touchstart", () => {
-        touching = true;
-        clearTimeout(settleTimer);
-        cancelAnimationFrame(glide);
-        glide = null;
-      }, { passive: true });
-      ["touchend", "touchcancel"].forEach((type) => {
-        window.addEventListener(type, () => {
-          touching = false;
-          settleSoon();
-        }, { passive: true });
-      });
-
       // Each photo that loads pushes the page down: "load" doesn't bubble,
       // hence the capture.
       root.addEventListener("load", queueScroll, true);
