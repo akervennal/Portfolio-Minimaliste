@@ -234,7 +234,7 @@ var SITE_CONFIG = {
         "model": "Nissan S14",
         "color": "#e9b9d4",
         "cover": "images/viking-cup-round-3-2026/7.jpg",
-          "groups": [
+        "groups": [
           {
             "label": "Vue d'ensemble",
             "photos": [
@@ -346,7 +346,7 @@ var SITE_CONFIG = {
         "model": "Mazda RX-8",
         "color": "#f2b61a",
         "cover": "images/viking-cup-round-3-2026/18.jpg",
-          "groups": [
+        "groups": [
           {
             "label": "À l'arrêt",
             "photos": [
@@ -398,7 +398,7 @@ var SITE_CONFIG = {
         "model": "BMW Série 1",
         "color": "#c01909",
         "cover": "images/viking-cup-round-3-2026/28.jpg",
-          "groups": [
+        "groups": [
           {
             "photos": [
               {
@@ -416,10 +416,36 @@ var SITE_CONFIG = {
         ]
       },
       {
+        "model": "Porsche 911 Targa",
+        "color": "#a8553a",
+        "cover": "images/R%C3%A9publique%20Czech%202026/31-MEL_6642.jpg",
+        "groups": [
+          {
+            "photos": [
+              {
+                "src": "images/R%C3%A9publique%20Czech%202026/31-MEL_6642.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/R%C3%A9publique%20Czech%202026/30-MEL_6638.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/R%C3%A9publique%20Czech%202026/32-MEL_6647.jpg",
+                "w": 1365,
+                "h": 2048
+              }
+            ]
+          }
+        ]
+      },
+      {
         "model": "Hypercars",
         "color": "#0f1b2d",
         "cover": "images/24h-du-mans-2026/6-MEL_3648.jpg",
-          "groups": [
+        "groups": [
           {
             "label": "Au crépuscule",
             "photos": [
