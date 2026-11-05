@@ -1583,7 +1583,7 @@
         return [
           h("h2", null, "À propos"),
           h("h3", null, "Récit"),
-          h("p", { class: "help" }, "Chaque bloc a sa photo, son texte et sa couleur de fond. La photo apparaît seule sur sa couleur, puis se dissout quand le texte monte par-dessus, et le bloc suivant prend le relais."),
+          h("p", { class: "help" }, "Chaque bloc a son texte, sa photo et sa couleur de fond. Sur PC, la photo reste affichée tant que le bloc suivant garde la même : en en changeant, elle se fond dans la nouvelle, et un texte court s'affiche plus grand. Sur téléphone, chaque bloc occupe un écran."),
           story.map((scene, index) => {
             const handle = grip();
             return sortable(

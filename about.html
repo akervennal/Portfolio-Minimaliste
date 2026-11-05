@@ -94,54 +94,62 @@
       }
 
       /* ============================================================
-         STORY — a cycle per scene, driven by the scroll: the photo sits
-         alone on its colour like on the homepage, the text comes up over
-         it while it blurs away into that colour, the text leaves, and
-         the next colour and photo arrive together. The text scrolls with
-         the page; only the photos and the colour are computed. Its
-         spacing (--cycle) and the JS timings below go together.
+         STORY — the text scrolls on the left while the photo holds on
+         the right. Each scene names its photo: as long as it doesn't
+         change the photo stays. The phone has its own version, below.
          ============================================================ */
       .story {
-        --cycle: 140svh;
         display: grid;
+        grid-template-columns: 1fr 1fr;
       }
       .stage {
-        grid-area: 1 / 1;
+        grid-column: 2;
+        grid-row: 1;
         position: sticky;
-        top: 64px;
-        height: calc(100svh - 64px);
+        top: 0;
+        height: 100svh;
+        padding: 84px var(--pad) 32px;
       }
       .stage img {
         position: absolute;
-        inset: 0;
-        margin: auto;
-        max-width: 92vw;
-        max-height: 72vh;
-        width: auto;
-        height: auto;
+        inset: 84px var(--pad) 32px;
+        width: calc(100% - var(--pad) * 2);
+        height: calc(100% - 116px);
+        object-fit: contain;
         opacity: 0;
-        will-change: opacity, filter;
+        transition: opacity 1.4s var(--ease);
+      }
+      .stage img.on {
+        opacity: 1;
       }
       .scenes {
-        grid-area: 1 / 1;
-        position: relative;
-        padding-top: calc(100svh + 8px);
+        grid-column: 1;
+        grid-row: 1;
       }
       .scene {
-        height: var(--cycle);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 120svh;
         padding: 0 var(--pad);
       }
-      .scene:last-child {
-        height: calc(var(--cycle) * 0.85);
+      .scene:first-child {
+        min-height: 100svh;
       }
       .scene p {
-        max-width: 15em;
-        margin: 0 auto;
-        font-size: clamp(34px, 5vw, 80px);
+        max-width: 19em;
+        font-size: clamp(26px, 2.9vw, 46px);
         font-weight: 500;
-        line-height: 1.06;
+        line-height: 1.16;
+        letter-spacing: -0.02em;
+      }
+      .scene p.short {
+        font-size: clamp(38px, 4.8vw, 76px);
+        line-height: 1.04;
         letter-spacing: -0.03em;
-        text-align: center;
+      }
+      .w {
+        opacity: 0.16;
       }
 
       /* ============================================================
@@ -301,6 +309,7 @@
         }
         .story {
           order: 1;
+          grid-template-columns: 1fr;
         }
         .contact {
           order: 2;
@@ -318,39 +327,44 @@
            paints the status bar solid over anything fixed against it. The
            photos reach past that edge, to carry on behind the clock. */
         .stage {
+          grid-column: 1;
           top: 20px;
           height: calc(100svh - 20px);
+          padding: 0;
         }
         .stage img {
           inset: -100px 0 auto;
-          margin: 0;
           width: 100%;
           height: calc(82svh + 80px);
-          max-width: none;
-          max-height: none;
           object-fit: cover;
           mask-image: linear-gradient(#000 calc(100% - 34svh), transparent);
-        }
-        .scenes {
-          padding-top: 0;
+          transition: none;
+          will-change: opacity, filter;
         }
         .scene,
-        .scene:last-child {
+        .scene:first-child {
           position: relative;
+          display: block;
           height: 100svh;
+          min-height: 0;
+          padding: 0;
           scroll-snap-align: start;
           scroll-snap-stop: always;
         }
-        .scene p {
+        .scene p,
+        .scene p.short {
           position: absolute;
           left: var(--pad);
           right: var(--pad);
           bottom: 44px;
           max-width: none;
-          margin: 0;
           font-size: 34px;
-          text-align: left;
+          line-height: 1.06;
+          letter-spacing: -0.03em;
           transition: color 0.25s linear;
+        }
+        .w {
+          opacity: 1 !important;
         }
       }
 
@@ -367,6 +381,12 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
+        .stage img {
+          transition: none;
+        }
+        .w {
+          opacity: 1;
+        }
         ::view-transition-group(*),
         ::view-transition-old(*),
         ::view-transition-new(*) {
@@ -412,19 +432,29 @@
       }
 
       // --- story ------------------------------------------------------
+      const SHORT_TEXT = 110; // up to this length, a scene is set larger
       const stage = el("div", "stage");
       const scenes = el("div", "scenes");
-      const sections = []; // every block after the story, each with its colour
+      const sections = []; // every block that sets the page's colour
+      const texts = []; // { box, words } lit up by the scroll
       const cycles = story.map((scene) => {
         const sec = el("section", "scene");
-        const text = el("p", null, scene.text);
+        sec.dataset.photo = scene.photo || "";
+        const text = el("p", scene.text.length <= SHORT_TEXT ? "short" : null);
+        const words = scene.text.split(/\s+/).filter(Boolean).map((word) => {
+          const w = el("span", "w", word);
+          text.append(w, " ");
+          return w;
+        });
         sec.appendChild(text);
         scenes.appendChild(sec);
+        texts.push({ box: text, words });
+        sections.push({ el: sec, color: scene.color });
         const img = el("img");
         img.alt = "";
         if (scene.photo) img.src = scene.photo;
         stage.appendChild(img);
-        return { text, img, lab: hexToOklab(scene.color || "#ffffff") };
+        return { text, img, src: sec.dataset.photo, lab: hexToOklab(scene.color || "#ffffff") };
       });
 
       const storyEl = el("div", "story");
@@ -580,12 +610,10 @@
       }
 
       // --- scroll -----------------------------------------------------
-      // Each scene's clock: 0 starts its cycle, 0.5 has the text centred,
-      // 1 is the start of the next one. At the top of the page the first
-      // scene is already at PHOTO_HOLDS, with its text showing at the
-      // bottom of the screen to say there is more.
-      const PHOTO_HOLDS = 0.17; // the photo starts to go as the text arrives
-      const PHOTO_GONE = 0.45; // just before the text reaches the centre
+      // Phone: each scene's clock runs from 0, its sentence at rest, to 1,
+      // the next one at rest. The photos and the colour follow it exactly.
+      const PHOTO_HOLDS = 0.17; // the photo starts to go as the text leaves
+      const PHOTO_GONE = 0.45;
       const NEXT_STARTS = 0.48;
       const NEXT_ARRIVED = 0.8;
       const MAX_BLUR = 26;
@@ -600,38 +628,7 @@
         cycle.img.style.filter = shown > 0 && shown < 1 ? "blur(" + (1 - shown) * MAX_BLUR + "px)" : "none";
       }
 
-      function runCycles() {
-        if (!cycles.length) return false;
-        if (phone.matches) return runPhoneCycles();
-        const middle = window.innerHeight / 2;
-        const spacing = cycles.length > 1 ? cycles[1].text.offsetTop - cycles[0].text.offsetTop : window.innerHeight * 1.7;
-        const first = cycles[0].text.getBoundingClientRect();
-        // Scenes elapsed: a text is centred when this is its index + 0.5.
-        const clock = 0.5 + (middle - (first.top + first.height / 2)) / spacing;
-        const index = Math.max(0, Math.floor(clock));
-        const t = clock - index;
-        const inStory = index < cycles.length;
-
-        cycles.forEach((cycle, i) => {
-          let shown = 0;
-          if (i === index) shown = 1 - smooth(PHOTO_HOLDS, PHOTO_GONE, t);
-          else if (i === index + 1) shown = smooth(NEXT_STARTS, NEXT_ARRIVED, t);
-          setPhoto(cycle, shown);
-          // Gone before it reaches the header, or the two would overlap.
-          cycle.text.style.opacity = Math.max(0, Math.min(1, (cycle.text.getBoundingClientRect().top - 60) / 70));
-        });
-
-        if (inStory) {
-          const from = cycles[index].lab;
-          const next = cycles[index + 1] ? cycles[index + 1].lab : hexToOklab(sections[0]?.color || "#ffffff");
-          const mix = smooth(NEXT_STARTS, NEXT_ARRIVED, t);
-          snapColour(from.map((v, k) => v + (next[k] - v) * mix));
-        }
-        return inStory;
-      }
-
-      // Same timings, but a scene's clock starts with its sentence at rest
-      // and the last photo stays until the story scrolls away.
+      // The last photo stays until the story scrolls away.
       function runPhoneCycles() {
         const height = window.innerHeight;
         const last = cycles.length - 1;
@@ -658,15 +655,46 @@
         return true;
       }
 
+      let shownPhoto = null;
+
+      function showPhoto(src) {
+        if (!src || src === shownPhoto) return;
+        shownPhoto = src;
+        cycles.forEach((cycle) => cycle.img.classList.toggle("on", cycle.src === src));
+      }
+
+      function lightWords() {
+        const vh = window.innerHeight;
+        // The opening sentence is on screen before any scroll: always lit.
+        texts.forEach(({ box, words }, index) => {
+          if (index === 0) {
+            words.forEach((w) => (w.style.opacity = 1));
+            return;
+          }
+          const r = box.getBoundingClientRect();
+          // From the moment a text enters to when it sits centred.
+          const progress = (vh * 0.9 - r.top) / (vh * 0.4 + r.height / 2);
+          const lit = progress * words.length;
+          words.forEach((w, i) => {
+            const on = Math.max(0, Math.min(1, lit - i));
+            w.style.opacity = reduceMotion.matches ? 1 : 0.16 + on * 0.84;
+          });
+        });
+      }
+
       function onScroll() {
         scrollQueued = false;
-        if (runCycles()) return;
+        if (phone.matches && cycles.length && runPhoneCycles()) return;
         const middle = window.innerHeight / 2;
         const active = sections.find(({ el: s }) => {
           const r = s.getBoundingClientRect();
           return r.top <= middle && r.bottom > middle;
         });
-        if (active) setColour((phone.matches && active.phoneColor) || active.color);
+        if (active) {
+          setColour((phone.matches && active.phoneColor) || active.color);
+          showPhoto(active.el.dataset.photo);
+        }
+        lightWords();
       }
 
       let scrollQueued = false;
@@ -677,6 +705,12 @@
       }
       window.addEventListener("scroll", queueScroll, { passive: true });
       window.addEventListener("resize", queueScroll);
+      // Turning a phone can cross over to the PC version, which is all CSS.
+      phone.addEventListener("change", () => {
+        cycles.forEach(({ img, text }) => {
+          img.style.opacity = img.style.filter = text.style.opacity = "";
+        });
+      });
       // Each photo that loads pushes the page down: "load" doesn't bubble,
       // hence the capture.
       root.addEventListener("load", queueScroll, true);
