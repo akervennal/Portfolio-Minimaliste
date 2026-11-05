@@ -229,8 +229,8 @@ var SITE_CONFIG = {
         }
       ],
       "quoteColor": "#111111",
-      "gearColor": "#f5ed05",
-      "contactColor": "#ffffff",
+      "gearColor": "#ffffff",
+      "contactColor": "#12385c",
       "since": "2018"
     },
     "contact": {
