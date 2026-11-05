@@ -3,1343 +3,1800 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
     <title>Administration</title>
+    <link rel="icon" type="image/png" href="Favicon/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Live Server reloads any open page when a file changes, which would
+         cut an import short: its reload socket never connects here. -->
+    <script>
+      window.WebSocket = class {
+        close() {}
+        send() {}
+      };
+    </script>
+
     <style>
       :root {
-        --bg: #101012;
-        --panel: #17171a;
-        --card: #1e1e22;
-        --line: #2c2c32;
-        --ink: #e9e9ec;
-        --muted: #8b8b95;
-        --accent: #6ea8fe;
-        --danger: #d9534f;
+        --ink: #111;
+        --muted: rgba(17, 17, 17, 0.55);
+        --line: rgba(17, 17, 17, 0.12);
+        --soft: #f4f4f3;
+        --accent: #1f5eff;
+        --danger: #c01909;
       }
-      * { margin: 0; padding: 0; box-sizing: border-box; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
       body {
-        font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: var(--bg);
+        height: 100%;
+      }
+      body {
+        font: 400 15px/1.5 "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--ink);
+        background: #fff;
+        -webkit-font-smoothing: antialiased;
+      }
+      button,
+      input,
+      textarea {
+        font: inherit;
+        color: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      a {
+        color: inherit;
+      }
+      [hidden] {
+        display: none !important;
+      }
+
+      .btn {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 7px;
+        padding: 7px 13px;
+        white-space: nowrap;
+        text-decoration: none;
+      }
+      .btn:hover:not(:disabled) {
+        background: var(--soft);
+      }
+      .btn:disabled {
+        opacity: 0.35;
+        cursor: default;
+      }
+      .btn.primary {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+      }
+      .btn.primary:hover:not(:disabled) {
+        background: #333;
+      }
+      .btn.danger {
+        color: var(--danger);
+      }
+      .link {
+        border: 0;
+        background: none;
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .link:hover {
         color: var(--ink);
       }
-      button, input, select, textarea { font: inherit; color: inherit; }
-      button { cursor: pointer; }
 
-      /* ---------- gate ---------- */
-      #overlay {
-        position: fixed; inset: 0; z-index: 100;
-        display: flex; flex-direction: column;
-        align-items: center; justify-content: center;
-        gap: 14px; text-align: center; padding: 24px;
-        background: var(--bg);
+      /* --- connection screen -------------------------------------- */
+      #gate {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        padding: 24px;
+        text-align: center;
       }
-      #overlay h1 { font-size: 22px; font-weight: 600; }
-      #overlay p { color: var(--muted); max-width: 460px; }
-      .btn {
-        background: var(--accent); color: #06121f; border: 0;
-        padding: 10px 18px; border-radius: 6px; font-weight: 600;
+      #gate h1 {
+        font-size: 34px;
+        font-weight: 500;
+        letter-spacing: -0.02em;
       }
-      .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
-      #overlayFolder {
-        display: none; padding: 4px 10px; border: 1px solid var(--line);
-        border-radius: 999px; font-size: 12px; color: var(--muted);
+      #gate p {
+        max-width: 46ch;
+        color: var(--muted);
       }
-      #errMsg { display: none; color: var(--danger); }
-      #switchBtn { display: none; }
+      #gateError {
+        color: var(--danger) !important;
+      }
 
-      /* ---------- app ---------- */
-      #app { display: none; }
-      #app.on { display: block; }
-      .sticky-head {
-        position: sticky; top: 0; z-index: 20;
-        background: var(--panel);
+      /* --- layout ------------------------------------------------- */
+      #app {
+        height: 100%;
+        display: grid;
+        grid-template: "bar bar" auto "nav main" 1fr / 190px 1fr;
       }
-      .top {
-        display: flex; align-items: center; gap: 12px;
-        padding: 12px 18px; background: var(--panel);
+      #bar {
+        grid-area: bar;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
         border-bottom: 1px solid var(--line);
       }
-      .top .folder { color: var(--muted); font-size: 12px; }
-      .top .spacer { flex: 1; }
-      .tabs {
-        display: flex; gap: 4px; padding: 12px 18px 0;
-        background: var(--panel); border-bottom: 1px solid var(--line);
+      #bar strong {
+        font-weight: 500;
       }
-      .tab {
-        background: none; border: 0; padding: 8px 14px;
-        color: var(--muted); border-bottom: 2px solid transparent;
+      #status {
+        color: var(--muted);
+        font-size: 13px;
       }
-      .tab.on { color: var(--ink); border-bottom-color: var(--accent); }
-      .panel { display: none; padding: 18px; }
-      .panel.on { display: block; }
-      .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: none; }
-      .dot.on { display: block; }
+      #status.dirty {
+        color: var(--accent);
+      }
+      .spacer {
+        flex: 1;
+      }
+      #nav {
+        grid-area: nav;
+        padding: 12px 8px;
+        border-right: 1px solid var(--line);
+        overflow-y: auto;
+      }
+      #nav button {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        border: 0;
+        background: none;
+        border-radius: 7px;
+        padding: 8px 10px;
+        text-align: left;
+      }
+      #nav button:hover {
+        background: var(--soft);
+      }
+      #nav button.on {
+        background: var(--ink);
+        color: #fff;
+      }
+      #nav small {
+        opacity: 0.55;
+      }
+      #main {
+        grid-area: main;
+        overflow-y: auto;
+        padding: 22px 26px 80px;
+      }
+      .page {
+        max-width: 1120px;
+        margin: 0 auto;
+      }
 
-      /* ---------- sequence ---------- */
+      /* --- page content ------------------------------------------- */
+      .head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+      }
+      h2 {
+        font-size: 28px;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+      }
+      h3 {
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 26px 0 10px;
+      }
+      .help {
+        color: var(--muted);
+        font-size: 13.5px;
+        margin-bottom: 16px;
+        max-width: 75ch;
+      }
+      .fields {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 12px;
+      }
+      .field {
+        display: block;
+      }
+      .field.wide {
+        grid-column: 1 / -1;
+      }
+      .field > span {
+        display: block;
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-bottom: 3px;
+      }
+      .field input,
+      .field textarea,
+      .inline {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 7px 10px;
+        background: #fff;
+      }
+      .field textarea,
+      textarea.inline {
+        resize: vertical;
+        min-height: 70px;
+      }
+      input:focus,
+      textarea:focus {
+        outline: 2px solid var(--accent);
+        outline-offset: -1px;
+      }
+      input[type="color"] {
+        width: 44px;
+        height: 34px;
+        padding: 2px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: #fff;
+        cursor: pointer;
+        flex: none;
+      }
+
       .row {
-        display: flex; align-items: center; gap: 12px;
-        background: var(--card); border: 1px solid var(--line);
-        border-radius: 8px; padding: 10px; margin-bottom: 8px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        margin-bottom: 8px;
+        background: #fff;
       }
-      .row.drag { opacity: 0.4; }
-      .grip { color: var(--muted); cursor: grab; padding: 0 4px; }
-      .row .idx { color: var(--muted); font-size: 12px; width: 24px; }
-      .thumbs { display: flex; gap: 3px; }
-      .thumbs img {
-        width: 62px; height: 44px; object-fit: cover;
-        border-radius: 3px; background: #000; display: block;
+      .row.click {
+        align-items: center;
+        cursor: pointer;
       }
-      .more { color: var(--muted); font-size: 12px; align-self: center; }
-      .row .grow { flex: 1; }
-      .swatch {
-        width: 30px; height: 30px; padding: 0; border: 1px solid var(--line);
-        border-radius: 5px; background: none;
+      .row.click:hover {
+        background: var(--soft);
       }
-      .hex {
-        width: 88px; background: var(--panel); border: 1px solid var(--line);
-        border-radius: 5px; padding: 6px 8px; font-family: monospace;
+      .row .grow {
+        flex: 1;
+        min-width: 0;
       }
-      .mini {
-        background: var(--panel); border: 1px solid var(--line);
-        border-radius: 5px; padding: 6px 10px; font-size: 12px; color: var(--muted);
+      .grip {
+        cursor: grab;
+        color: var(--muted);
+        user-select: none;
+        padding: 6px 2px;
+        line-height: 1;
       }
-      .mini:hover { color: var(--ink); }
-      .mini.del:hover { color: var(--danger); border-color: var(--danger); }
-      .drawer {
-        border: 1px solid var(--line); border-top: 0;
-        border-radius: 0 0 8px 8px; background: var(--panel);
-        padding: 10px; margin: -12px 0 8px; display: flex; gap: 6px; flex-wrap: wrap;
+      .num {
+        width: 22px;
+        padding-top: 6px;
+        font-size: 13px;
+        color: var(--muted);
+        text-align: right;
+        flex: none;
       }
-      .drawer .gp { position: relative; }
-      .drawer .gp img {
-        width: 84px; height: 58px; object-fit: cover;
-        border-radius: 3px; display: block; cursor: grab;
+      .is-dragging {
+        opacity: 0.35;
       }
-      .drawer .gp button {
-        position: absolute; top: 2px; right: 2px;
-        background: rgba(0,0,0,.7); border: 0; color: #fff;
-        border-radius: 3px; width: 18px; height: 18px; line-height: 1; font-size: 12px;
+      .drop-before {
+        box-shadow: inset 0 3px 0 var(--accent);
       }
-      .ins { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-      /* ---------- pool ---------- */
-      .pool {
-        position: sticky; bottom: 0; margin-top: 18px;
-        background: var(--panel); border: 1px solid var(--line);
-        border-radius: 8px; padding: 10px;
+      .drop-after {
+        box-shadow: inset 0 -3px 0 var(--accent);
       }
-      .poolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
-      select {
-        background: var(--card); border: 1px solid var(--line);
-        border-radius: 5px; padding: 6px 8px; max-width: 280px;
+      .tile.drop-before {
+        box-shadow: inset 4px 0 0 var(--accent);
       }
-      #poolGrid, #projPoolGrid { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
-      #poolGrid img, #projPoolGrid img {
-        width: 84px; height: 58px; object-fit: cover; border-radius: 3px;
-        cursor: grab; flex: 0 0 auto; background: #000;
+      .tile.drop-after {
+        box-shadow: inset -4px 0 0 var(--accent);
+      }
+      .file-over {
+        outline: 2px dashed var(--accent);
+        outline-offset: 3px;
+        border-radius: 8px;
       }
 
-      /* ---------- content ---------- */
-      .block {
-        background: var(--card); border: 1px solid var(--line);
-        border-radius: 8px; padding: 14px; margin-bottom: 14px;
+      /* --- photos ------------------------------------------------- */
+      .photos {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        min-height: 92px;
       }
-      .block h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 12px; }
-      .fld { margin-bottom: 10px; }
-      .fld label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-      .fld input, .fld textarea {
-        width: 100%; background: var(--panel); border: 1px solid var(--line);
-        border-radius: 5px; padding: 8px 10px;
+      .tile {
+        position: relative;
+        height: 92px;
+        min-width: 62px;
+        background: var(--soft);
+        border-radius: 5px;
+        overflow: hidden;
       }
-      .fld textarea { min-height: 78px; resize: vertical; line-height: 1.55; }
-      .listrow { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
-      .listrow textarea {
-        flex: 1; background: var(--panel); border: 1px solid var(--line);
-        border-radius: 5px; padding: 8px 10px; min-height: 78px;
-        resize: vertical; line-height: 1.55;
+      .tile img {
+        display: block;
+        height: 100%;
+        width: auto;
+        min-width: 62px;
+        object-fit: cover;
       }
-      .gearitem { border: 1px solid var(--line); border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+      .tile.missing::after {
+        content: "Fichier introuvable";
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 4px;
+        text-align: center;
+        font-size: 11px;
+        color: #fff;
+        background: var(--danger);
+      }
+      .tile button {
+        position: absolute;
+        top: 3px;
+        width: 22px;
+        height: 22px;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.65);
+        color: #fff;
+        font-size: 12px;
+        line-height: 22px;
+        padding: 0;
+        opacity: 0;
+      }
+      .tile:hover button,
+      .tile button.on {
+        opacity: 1;
+      }
+      .tile .x {
+        right: 3px;
+      }
+      .tile .star {
+        left: 3px;
+      }
+      .tile .star.on {
+        background: #f2b61a;
+        color: #000;
+      }
+      .add {
+        height: 92px;
+        min-width: 92px;
+        border: 1px dashed var(--line);
+        border-radius: 5px;
+        background: none;
+        color: var(--muted);
+        padding: 0 10px;
+      }
+      .add:hover {
+        border-color: var(--ink);
+        color: var(--ink);
+      }
 
-      /* ---------- projects ---------- */
-      .projfld {
-        background: var(--panel); border: 1px solid var(--line); border-radius: 5px;
-        padding: 6px 8px; font-size: 12px; width: 110px;
+      .albums {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
       }
-      .projfld.title { width: 170px; }
-      .projfld.year { width: 56px; }
-      .gp.is-cover { outline: 2px solid var(--accent); outline-offset: 2px; }
+      .album {
+        border: 0;
+        background: none;
+        text-align: left;
+        border-radius: 7px;
+        overflow: hidden;
+        cursor: pointer;
+      }
+      .album .tile {
+        height: auto;
+        aspect-ratio: 3 / 2;
+        display: block;
+      }
+      .album .tile img {
+        width: 100%;
+      }
+      .album b {
+        display: block;
+        font-weight: 500;
+        font-size: 14px;
+        margin-top: 4px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      .album small {
+        color: var(--muted);
+      }
+
+      /* --- modal -------------------------------------------------- */
+      #modal {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: grid;
+        place-items: center;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 20px;
+      }
+      .box {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 460px;
+        max-height: calc(100vh - 40px);
+        background: #fff;
+        border-radius: 12px;
+        padding: 18px;
+        gap: 12px;
+      }
+      .box.big {
+        max-width: 1120px;
+        height: calc(100vh - 40px);
+      }
+      .box h2 {
+        font-size: 21px;
+      }
+      .picker {
+        flex: 1;
+        min-height: 0;
+        display: grid;
+        grid-template-columns: 210px 1fr;
+        grid-template-rows: minmax(0, 1fr);
+        gap: 12px;
+      }
+      .folders {
+        overflow-y: auto;
+        border-right: 1px solid var(--line);
+        padding-right: 8px;
+      }
+      .folders button {
+        display: block;
+        width: 100%;
+        border: 0;
+        background: none;
+        padding: 5px 8px;
+        border-radius: 6px;
+        text-align: left;
+        font-size: 13.5px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      .folders button:hover {
+        background: var(--soft);
+      }
+      .folders button.on {
+        background: var(--ink);
+        color: #fff;
+      }
+      .pickgrid {
+        overflow-y: auto;
+        align-content: flex-start;
+        padding: 3px;
+      }
+      .pickgrid .tile {
+        cursor: pointer;
+      }
+      .tile.picked {
+        outline: 3px solid var(--accent);
+        outline-offset: -3px;
+      }
+      .tile b {
+        position: absolute;
+        right: 4px;
+        bottom: 4px;
+        min-width: 20px;
+        border-radius: 10px;
+        background: var(--accent);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+      }
+      .foot {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
 
       #toast {
-        position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-        background: #000; border: 1px solid var(--line); color: var(--ink);
-        padding: 10px 16px; border-radius: 6px; opacity: 0;
-        transition: opacity .25s; pointer-events: none; z-index: 200;
+        position: fixed;
+        z-index: 30;
+        left: 50%;
+        bottom: 20px;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 90vw;
+        background: var(--ink);
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 8px;
       }
-      #toast.on { opacity: 1; }
+      #toast.error {
+        background: var(--danger);
+      }
+      #toast button {
+        border: 0;
+        background: none;
+        color: #fff;
+        text-decoration: underline;
+      }
     </style>
   </head>
 
   <body>
-    <div id="overlay">
-      <h1 id="overlayTitle">Administration</h1>
-      <p id="overlaySubtitle">
-        Choisis le dossier racine du portfolio (celui qui contient
-        <code>images/</code> et <code>index.html</code>).<br />
-        Fonctionne uniquement dans Chrome ou Edge, en local.
+    <div id="gate">
+      <h1>Administration</h1>
+      <p id="gateText">
+        Choisis le dossier de ton site, celui qui contient
+        <b>index.html</b> et <b>images</b>. Il faut Chrome ou Edge.
       </p>
-      <span id="overlayFolder"></span>
-      <div style="display: flex; gap: 8px">
-        <button class="btn" id="openBtn">Ouvrir le dossier</button>
-        <button class="btn ghost" id="switchBtn">Choisir un autre dossier</button>
-      </div>
-      <p id="errMsg"></p>
+      <button class="btn primary" id="gateBtn">Ouvrir le dossier du site</button>
+      <button class="link" id="gateOther" hidden>Choisir un autre dossier</button>
+      <p id="gateError"></p>
     </div>
 
-    <div id="app">
-      <div class="sticky-head">
-        <div class="top">
-          <strong>Portfolio</strong>
-          <span class="folder" id="folderName"></span>
-          <span class="dot" id="dirtyDot" title="Modifications non enregistrées"></span>
-          <span class="spacer"></span>
-          <button class="mini" id="previewBtn">Aperçu</button>
-          <button class="mini" id="reloadBtn">Recharger</button>
-          <button class="btn" id="saveBtn">Enregistrer</button>
-        </div>
-
-        <div class="tabs">
-          <button class="tab on" data-panel="seq">Séquence</button>
-          <button class="tab" data-panel="proj">Projets</button>
-          <button class="tab" data-panel="content">Contenu</button>
-        </div>
-      </div>
-
-      <section class="panel on" id="panel-seq">
-        <div id="seqList"></div>
-        <div class="pool">
-          <div class="poolbar">
-            <select id="folderSel"></select>
-            <button class="mini" id="uploadBtn">Importer des images…</button>
-            <span class="folder">Glisse une vignette dans la séquence pour l'ajouter.</span>
-          </div>
-          <div id="poolGrid"></div>
-        </div>
-      </section>
-
-      <section class="panel" id="panel-proj">
-        <div id="projList"></div>
-        <button class="btn" id="addProjBtn" style="margin-bottom: 18px">+ Nouveau projet</button>
-        <div class="pool">
-          <div class="poolbar">
-            <select id="projFolderSel"></select>
-            <button class="mini" id="projUploadBtn">Importer des images…</button>
-            <span class="folder">Glisse une vignette dans un projet ouvert pour l'ajouter. L'archive du site regroupe les projets par année puis par lieu — un lieu par projet.</span>
-          </div>
-          <div id="projPoolGrid"></div>
-        </div>
-      </section>
-
-      <section class="panel" id="panel-content"></section>
+    <div id="app" hidden>
+      <header id="bar">
+        <strong>Admin</strong>
+        <span id="status"></span>
+        <span class="spacer"></span>
+        <button class="btn" id="undoBtn" title="Ctrl+Z">Annuler</button>
+        <button class="btn" id="redoBtn" title="Ctrl+Y">Rétablir</button>
+        <a class="btn" id="viewBtn" target="_blank">Voir le site</a>
+        <button class="btn primary" id="saveBtn" title="Ctrl+S">Enregistrer</button>
+      </header>
+      <nav id="nav"></nav>
+      <main id="main"></main>
     </div>
 
-    <div id="toast"></div>
-    <input type="file" id="sharedFileInput" accept="image/*" multiple hidden />
+    <div id="modal" hidden></div>
+    <div id="toast" hidden></div>
+    <input type="file" id="fileInput" accept="image/*" multiple hidden />
 
     <script>
-      // ══════════════════════════════════════════════════════════════
-      // State
-      // ══════════════════════════════════════════════════════════════
+      // ============================================================
+      // HELPERS
+      // ============================================================
+      const $ = (id) => document.getElementById(id);
+
+      function h(tag, props, ...kids) {
+        const n = document.createElement(tag);
+        Object.entries(props || {}).forEach(([k, v]) => {
+          if (v == null) return;
+          if (k === "class") n.className = v;
+          else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+          else if (k in n) n[k] = v;
+          else n.setAttribute(k, v);
+        });
+        n.append(...kids.flat(Infinity).filter((k) => k != null && k !== false));
+        return n;
+      }
+
+      function slugify(text) {
+        return (
+          String(text)
+            .normalize("NFD")
+            .replace(/[̀-ͯ]/g, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "") || "sans-nom"
+        );
+      }
+
+      let toastTimer;
+      function toast(message, { error, undo: withUndo, stay } = {}) {
+        const t = $("toast");
+        t.className = error ? "error" : "";
+        t.replaceChildren(message);
+        if (withUndo) {
+          t.append(h("button", { onclick: () => { undo(); t.hidden = true; } }, "Annuler"));
+        }
+        t.hidden = false;
+        clearTimeout(toastTimer);
+        if (!stay) toastTimer = setTimeout(() => (t.hidden = true), error ? 7000 : 4000);
+      }
+
+      // ============================================================
+      // STORAGE: the site's folder, the remembered handle, thumbnails
+      // ============================================================
       let root = null;
-      let storedHandle = null;
-      let cfg = null;
-      let dirty = false;
-      const thumbs = {};
-      let poolFiles = [];
-      let openGroup = -1;
 
-      const CFG_DIR = "";
-      const CFG_FILE = "site-config.js";
-      const CFG_VAR = "SITE_CONFIG";
-
-      function markDirty() {
-        dirty = true;
-        document.getElementById("dirtyDot").classList.add("on");
-      }
-      function clearDirty() {
-        dirty = false;
-        document.getElementById("dirtyDot").classList.remove("on");
-      }
-
-      let toastT;
-      function toast(msg) {
-        const t = document.getElementById("toast");
-        t.textContent = msg;
-        t.classList.add("on");
-        clearTimeout(toastT);
-        toastT = setTimeout(() => t.classList.remove("on"), 2200);
-      }
-
-      // ══════════════════════════════════════════════════════════════
-      // IndexedDB — remember the chosen folder.
-      // Same DB/store/key as the root admin on purpose: both tools want
-      // the same folder, so this reconnects silently if that one was used.
-      // ══════════════════════════════════════════════════════════════
-      const IDB_NAME = "portfolio-admin";
-      const IDB_STORE = "handles";
-
-      function idbOpen() {
+      function idb() {
         return new Promise((res, rej) => {
-          const r = indexedDB.open(IDB_NAME, 1);
-          r.onupgradeneeded = () => r.result.createObjectStore(IDB_STORE);
+          const r = indexedDB.open("portfolio-admin", 2);
+          r.onupgradeneeded = () => {
+            ["handles", "thumbs"].forEach((s) => {
+              if (!r.result.objectStoreNames.contains(s)) r.result.createObjectStore(s);
+            });
+          };
           r.onsuccess = () => res(r.result);
           r.onerror = () => rej(r.error);
         });
       }
-      async function idbSaveHandle(h) {
-        const db = await idbOpen();
-        await new Promise((res, rej) => {
-          const tx = db.transaction(IDB_STORE, "readwrite");
-          tx.objectStore(IDB_STORE).put(h, "root");
-          tx.oncomplete = res;
-          tx.onerror = () => rej(tx.error);
+      async function idbGet(store, key) {
+        const db = await idb();
+        return new Promise((res) => {
+          const q = db.transaction(store).objectStore(store).get(key);
+          q.onsuccess = () => res(q.result);
+          q.onerror = () => res(undefined);
         });
       }
-      async function idbLoadHandle() {
-        const db = await idbOpen();
-        return new Promise((res, rej) => {
-          const tx = db.transaction(IDB_STORE, "readonly");
-          const q = tx.objectStore(IDB_STORE).get("root");
-          q.onsuccess = () => res(q.result || null);
-          q.onerror = () => rej(q.error);
-        });
+      async function idbSet(store, key, value) {
+        const db = await idb();
+        db.transaction(store, "readwrite").objectStore(store).put(value, key);
       }
 
-      // ══════════════════════════════════════════════════════════════
-      // File system
-      // ══════════════════════════════════════════════════════════════
-      async function resolveFile(path) {
+      function decode(part) {
+        try {
+          return decodeURIComponent(part);
+        } catch {
+          return part;
+        }
+      }
+      async function dirAt(path, create) {
+        let d = root;
+        for (const p of path.split("/").filter(Boolean)) {
+          d = await d.getDirectoryHandle(decode(p), { create: !!create }).catch(() => null);
+          if (!d) return null;
+        }
+        return d;
+      }
+      async function fileAt(path) {
         const parts = path.split("/").filter(Boolean);
-        let h = root;
-        for (let i = 0; i < parts.length - 1; i++) {
-          h = await h.getDirectoryHandle(decodeURIComponent(parts[i])).catch(() => null);
-          if (!h) return null;
-        }
-        return h.getFileHandle(decodeURIComponent(parts[parts.length - 1])).catch(() => null);
+        const name = parts.pop();
+        const d = await dirAt(parts.join("/"));
+        return d ? d.getFileHandle(decode(name)).catch(() => null) : null;
       }
 
-      async function resolveDir(path, create) {
-        const parts = path.split("/").filter(Boolean);
-        let h = root;
-        for (const p of parts) {
-          h = await h
-            .getDirectoryHandle(decodeURIComponent(p), { create: !!create })
-            .catch(() => null);
-          if (!h) return null;
-        }
-        return h;
-      }
+      const IMG = /\.(jpe?g|png|webp)$/i;
 
-      async function scanDir(encodedPath) {
-        const dh = await resolveDir(encodedPath);
-        if (!dh) return [];
+      async function imageFolders() {
         const out = [];
-        for await (const [name, h] of dh.entries()) {
-          if (h.kind === "file" && /\.(jpg|jpeg|png|webp)$/i.test(name)) {
-            out.push(encodedPath + "/" + name);
-          } else if (h.kind === "directory") {
-            out.push(...(await scanDir(encodedPath + "/" + encodeURIComponent(name))));
-          }
+        const d = await dirAt("images");
+        for await (const [name, handle] of d.entries()) {
+          if (handle.kind === "directory") out.push({ name, path: "images/" + encodeURIComponent(name) });
         }
-        return out.sort();
+        return out.sort((a, b) => a.name.localeCompare(b.name, "fr", { numeric: true }));
       }
-
-      async function listImageFolders() {
-        const dh = await resolveDir("images");
-        if (!dh) return [];
+      async function imagesIn(path) {
         const out = [];
-        for await (const [name, h] of dh.entries()) {
-          if (h.kind === "directory") out.push("images/" + encodeURIComponent(name));
+        const d = await dirAt(path);
+        if (!d) return out;
+        for await (const [name, handle] of d.entries()) {
+          if (handle.kind === "file" && IMG.test(name)) out.push(path + "/" + encodeURIComponent(name));
         }
-        return out.sort();
+        return out.sort((a, b) => a.localeCompare(b, "fr", { numeric: true }));
       }
 
-      async function thumb(src) {
-        if (thumbs[src]) return thumbs[src];
-        const fh = await resolveFile(src);
-        if (!fh) return "";
-        const url = URL.createObjectURL(await fh.getFile());
-        thumbs[src] = url;
-        return url;
+      // Small previews, kept between visits: full-size photos would make
+      // this page crawl with 400 of them on screen.
+      const thumbs = new Map();
+      const waiting = [];
+      let running = 0;
+
+      function pump() {
+        while (running < 3 && waiting.length) {
+          running++;
+          const job = waiting.pop();
+          job().finally(() => {
+            running--;
+            pump();
+          });
+        }
       }
-      function setThumb(img, src) {
-        thumb(src).then((u) => {
-          if (u) img.src = u;
+      async function makeThumb(src) {
+        const handle = await fileAt(src);
+        if (!handle) return null;
+        const file = await handle.getFile();
+        const key = src + "|" + file.lastModified + "|" + file.size;
+        let blob = await idbGet("thumbs", key);
+        if (!blob) {
+          const bmp = await createImageBitmap(file, { resizeHeight: 200, resizeQuality: "medium" });
+          const canvas = new OffscreenCanvas(bmp.width, bmp.height);
+          canvas.getContext("2d").drawImage(bmp, 0, 0);
+          bmp.close();
+          blob = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.72 });
+          idbSet("thumbs", key, blob);
+        }
+        return URL.createObjectURL(blob);
+      }
+      function thumbOf(src) {
+        if (!thumbs.has(src)) {
+          thumbs.set(src, new Promise((res) => {
+            waiting.push(() => makeThumb(src).catch(() => null).then(res));
+            pump();
+          }));
+        }
+        return thumbs.get(src);
+      }
+      const seen = new IntersectionObserver((entries) => {
+        entries.forEach(({ isIntersecting, target }) => {
+          if (!isIntersecting) return;
+          seen.unobserve(target);
+          thumbOf(target.dataset.src).then((url) => {
+            if (url) target.src = url;
+            else target.closest(".tile").classList.add("missing");
+          });
         });
+      });
+      function photo(src) {
+        const img = h("img", { alt: "", draggable: false });
+        img.dataset.src = src;
+        seen.observe(img);
+        return img;
       }
 
-      async function readCfg() {
-        const fh = await resolveFile(CFG_DIR + "/" + CFG_FILE);
-        if (!fh) throw new Error(CFG_FILE + " introuvable dans ce dossier.");
-        const text = await (await fh.getFile()).text();
-        const json = text
-          .replace(new RegExp("^var\\s+" + CFG_VAR + "\\s*=\\s*"), "")
-          .replace(/;\s*$/, "");
-        return JSON.parse(json);
-      }
+      // --- import -----------------------------------------------------
+      const MAX_SIDE = 2400; // beyond this, resized to EXPORT_SIDE
+      const EXPORT_SIDE = 2048;
+      const MAX_BYTES = 1.5 * 1024 * 1024;
 
-      async function writeCfg() {
-        // Paranoia gate: the site and this editor both read the file back
-        // with a regex strip + JSON.parse, so one malformed write bricks
-        // both. Prove it round-trips before touching the disk.
-        const payload = JSON.stringify(cfg, null, 2);
-        JSON.parse(payload);
-        if (/\bundefined\b|\bNaN\b/.test(payload)) {
-          throw new Error("Configuration invalide — enregistrement annulé.");
+      async function optimise(file) {
+        const bmp = await createImageBitmap(file);
+        const side = Math.max(bmp.width, bmp.height);
+        if (side <= MAX_SIDE && file.size <= MAX_BYTES && /jpe?g$/i.test(file.type)) {
+          bmp.close();
+          return { blob: file, name: file.name };
         }
-        const dir = await resolveDir(CFG_DIR, true);
-        if (!dir) throw new Error("Dossier racine introuvable.");
-        const fh = await dir.getFileHandle(CFG_FILE, { create: true });
-        const w = await fh.createWritable();
-        await w.write("var " + CFG_VAR + " = " + payload + ";\n");
-        await w.close();
+        const scale = Math.min(1, EXPORT_SIDE / side);
+        const canvas = new OffscreenCanvas(Math.round(bmp.width * scale), Math.round(bmp.height * scale));
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+        bmp.close();
+        const blob = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.88 });
+        return { blob, name: file.name.replace(/\.[^.]+$/, "") + ".jpg" };
       }
 
-      // ══════════════════════════════════════════════════════════════
-      // Upload
-      // ══════════════════════════════════════════════════════════════
-      async function uploadFilesToFolder(folderPath, fileList) {
-        const dir = await resolveDir(folderPath, true);
-        if (!dir) throw new Error("Dossier introuvable : " + folderPath);
+      async function freeName(dir, name) {
+        const clean = name.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w.-]+/g, "-");
+        const dot = clean.lastIndexOf(".");
+        let candidate = clean;
+        for (let i = 2; await dir.getFileHandle(candidate).catch(() => null); i++) {
+          candidate = clean.slice(0, dot) + "-" + i + clean.slice(dot);
+        }
+        return candidate;
+      }
+
+      // Copies photos into the site's folder, resized for the web.
+      async function importFiles(folder, files) {
+        const list = [...files];
+        const dir = await dirAt(folder, true);
         const added = [];
-        for (const file of fileList) {
-          if (!/\.(jpe?g|png|webp)$/i.test(file.name)) continue;
-          let name = file.name;
-          const exists = (n) => dir.getFileHandle(n).then(() => true).catch(() => false);
-          if (await exists(name)) {
-            const dot = name.lastIndexOf(".");
-            const base = dot > -1 ? name.slice(0, dot) : name;
-            const ext = dot > -1 ? name.slice(dot) : "";
-            let i = 2, cand;
-            do { cand = base + "-" + i + ext; i++; } while (await exists(cand));
-            name = cand;
+        const refused = [];
+        for (const [i, file] of list.entries()) {
+          toast("Import des photos… " + (i + 1) + " / " + list.length, { stay: true });
+          try {
+            const { blob, name } = await optimise(file);
+            const finalName = await freeName(dir, name);
+            const handle = await dir.getFileHandle(finalName, { create: true });
+            const w = await handle.createWritable();
+            await w.write(blob);
+            await w.close();
+            added.push(folder + "/" + encodeURIComponent(finalName));
+          } catch {
+            refused.push(file.name);
           }
-          const fh = await dir.getFileHandle(name, { create: true });
-          const w = await fh.createWritable();
-          await w.write(file);
-          await w.close();
-          added.push(folderPath + "/" + name);
+        }
+        if (refused.length) {
+          toast("Non importées (format non lu, HEIC par exemple) : " + refused.join(", "), { error: true });
+        } else {
+          toast(added.length + " photo" + (added.length > 1 ? "s" : "") + " importée" + (added.length > 1 ? "s" : ""));
         }
         return added;
       }
 
-      // ══════════════════════════════════════════════════════════════
-      // Sequence panel
-      // ══════════════════════════════════════════════════════════════
-      const seqList = document.getElementById("seqList");
-      let dragSrc = null; // {kind:'row'|'pool'|'gp', ...}
-
-      function entryPhotos(e) {
-        return e.type === "group" ? e.photos || [] : [e.src];
-      }
-
-      function renderSeq() {
-        seqList.innerHTML = "";
-        (cfg.sequence || []).forEach((entry, i) => {
-          const row = document.createElement("div");
-          row.className = "row";
-          row.draggable = true;
-          row.dataset.i = i;
-
-          const grip = document.createElement("span");
-          grip.className = "grip";
-          grip.textContent = "⋮⋮";
-          row.appendChild(grip);
-
-          const idx = document.createElement("span");
-          idx.className = "idx";
-          idx.textContent = i + 1;
-          row.appendChild(idx);
-
-          const tw = document.createElement("div");
-          tw.className = "thumbs";
-          const photos = entryPhotos(entry);
-          photos.slice(0, 4).forEach((src) => {
-            const im = document.createElement("img");
-            setThumb(im, src);
-            tw.appendChild(im);
-          });
-          row.appendChild(tw);
-          if (photos.length > 4) {
-            const m = document.createElement("span");
-            m.className = "more";
-            m.textContent = "+" + (photos.length - 4);
-            row.appendChild(m);
-          }
-
-          const grow = document.createElement("span");
-          grow.className = "grow";
-          row.appendChild(grow);
-
-          // colour
-          const sw = document.createElement("input");
-          sw.type = "color";
-          sw.className = "swatch";
-          sw.value = entry.bg || "#ffffff";
-          const hex = document.createElement("input");
-          hex.className = "hex";
-          hex.value = entry.bg || "#ffffff";
-          sw.addEventListener("input", () => {
-            entry.bg = sw.value;
-            hex.value = sw.value;
-            markDirty();
-          });
-          hex.addEventListener("change", () => {
-            const v = hex.value.trim();
-            if (/^#[0-9a-f]{6}$/i.test(v)) {
-              entry.bg = v;
-              sw.value = v;
-              markDirty();
-            } else {
-              hex.value = entry.bg || "#ffffff";
-            }
-          });
-          row.appendChild(sw);
-          row.appendChild(hex);
-
-          const white = document.createElement("button");
-          white.className = "mini";
-          white.textContent = "blanc";
-          white.addEventListener("click", () => {
-            entry.bg = "#ffffff";
-            markDirty();
-            renderSeq();
-          });
-          row.appendChild(white);
-
-          // group / ungroup
-          const gbtn = document.createElement("button");
-          gbtn.className = "mini";
-          if (entry.type === "group") {
-            gbtn.textContent = openGroup === i ? "fermer" : "série (" + photos.length + ")";
-            gbtn.addEventListener("click", () => {
-              openGroup = openGroup === i ? -1 : i;
-              renderSeq();
-            });
-          } else {
-            gbtn.textContent = "→ série";
-            gbtn.addEventListener("click", () => {
-              cfg.sequence[i] = { type: "group", bg: entry.bg || "#ffffff", photos: [entry.src] };
-              openGroup = i;
-              markDirty();
-              renderSeq();
-            });
-          }
-          row.appendChild(gbtn);
-
-          if (entry.type === "group" && photos.length === 1) {
-            const u = document.createElement("button");
-            u.className = "mini";
-            u.textContent = "→ seule";
-            u.addEventListener("click", () => {
-              cfg.sequence[i] = { type: "single", bg: entry.bg || "#ffffff", src: photos[0] };
-              openGroup = -1;
-              markDirty();
-              renderSeq();
-            });
-            row.appendChild(u);
-          }
-
-          const del = document.createElement("button");
-          del.className = "mini del";
-          del.textContent = "×";
-          del.addEventListener("click", () => {
-            cfg.sequence.splice(i, 1);
-            openGroup = -1;
-            markDirty();
-            renderSeq();
-          });
-          row.appendChild(del);
-
-          // drag reorder
-          row.addEventListener("dragstart", (e) => {
-            dragSrc = { kind: "row", i: i };
-            row.classList.add("drag");
-            e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("text/plain", String(i));
-          });
-          row.addEventListener("dragend", () => {
-            row.classList.remove("drag");
-            clearIns();
-            dragSrc = null;
-          });
-
-          seqList.appendChild(row);
-
-          // group drawer
-          if (entry.type === "group" && openGroup === i) {
-            seqList.appendChild(buildDrawer(entry, i));
-          }
-        });
-      }
-
-      function buildDrawer(entry, ei) {
-        const d = document.createElement("div");
-        d.className = "drawer";
-        d.dataset.group = ei;
-
-        (entry.photos || []).forEach((src, k) => {
-          const gp = document.createElement("div");
-          gp.className = "gp";
-          gp.draggable = true;
-          gp.dataset.k = k;
-
-          const im = document.createElement("img");
-          setThumb(im, src);
-          gp.appendChild(im);
-
-          const x = document.createElement("button");
-          x.textContent = "×";
-          x.addEventListener("click", () => {
-            entry.photos.splice(k, 1);
-            if (entry.photos.length === 0) {
-              cfg.sequence.splice(ei, 1);
-              openGroup = -1;
-            }
-            markDirty();
-            renderSeq();
-          });
-          gp.appendChild(x);
-
-          gp.addEventListener("dragstart", (e) => {
-            e.stopPropagation();
-            dragSrc = { kind: "gp", group: ei, k: k };
-            e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("text/plain", "gp");
-          });
-          gp.addEventListener("dragend", () => {
-            clearIns();
-            dragSrc = null;
-          });
-
-          d.appendChild(gp);
-        });
-
-        const hint = document.createElement("span");
-        hint.className = "folder";
-        hint.style.alignSelf = "center";
-        hint.textContent = "Glisse une vignette ici pour l'ajouter à la série.";
-        d.appendChild(hint);
-
-        d.addEventListener("dragover", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          d.classList.add("ins");
-        });
-        d.addEventListener("dragleave", () => d.classList.remove("ins"));
-        d.addEventListener("drop", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          d.classList.remove("ins");
-          if (!dragSrc) return;
-          if (dragSrc.kind === "pool") {
-            entry.photos.push(dragSrc.src);
-          } else if (dragSrc.kind === "gp" && dragSrc.group === ei) {
-            const at = insertIndexH(d, e.clientX);
-            const [m] = entry.photos.splice(dragSrc.k, 1);
-            entry.photos.splice(at > dragSrc.k ? at - 1 : at, 0, m);
-          } else if (dragSrc.kind === "row") {
-            const from = cfg.sequence[dragSrc.i];
-            entryPhotos(from).forEach((s) => entry.photos.push(s));
-            cfg.sequence.splice(dragSrc.i, 1);
-            if (dragSrc.i < ei) openGroup = ei - 1;
-          }
-          markDirty();
-          renderSeq();
-        });
-
-        return d;
-      }
-
-      function insertIndexH(container, x) {
-        const kids = [...container.querySelectorAll(".gp")];
-        for (let i = 0; i < kids.length; i++) {
-          const r = kids[i].getBoundingClientRect();
-          if (x < r.left + r.width / 2) return i;
-        }
-        return kids.length;
-      }
-
-      function clearIns() {
-        document.querySelectorAll(".ins").forEach((n) => n.classList.remove("ins"));
-      }
-
-      // vertical insertion point within the sequence list
-      function insertIndexV(y) {
-        const rows = [...seqList.querySelectorAll(".row")];
-        for (let i = 0; i < rows.length; i++) {
-          const r = rows[i].getBoundingClientRect();
-          if (y < r.top + r.height / 2) return i;
-        }
-        return rows.length;
-      }
-
-      seqList.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = dragSrc && dragSrc.kind === "pool" ? "copy" : "move";
-      });
-      seqList.addEventListener("drop", (e) => {
-        e.preventDefault();
-        if (!dragSrc) return;
-        const at = insertIndexV(e.clientY);
-        if (dragSrc.kind === "row") {
-          const [m] = cfg.sequence.splice(dragSrc.i, 1);
-          cfg.sequence.splice(at > dragSrc.i ? at - 1 : at, 0, m);
-        } else if (dragSrc.kind === "pool") {
-          cfg.sequence.splice(at, 0, {
-            type: "single",
-            src: dragSrc.src,
-            bg: "#ffffff",
-          });
-        } else if (dragSrc.kind === "gp") {
-          const g = cfg.sequence[dragSrc.group];
-          const [s] = g.photos.splice(dragSrc.k, 1);
-          cfg.sequence.splice(at, 0, { type: "single", src: s, bg: g.bg || "#ffffff" });
-          if (g.photos.length === 0) cfg.sequence.splice(cfg.sequence.indexOf(g), 1);
-        }
-        openGroup = -1;
-        markDirty();
-        renderSeq();
-      });
-
-      // ══════════════════════════════════════════════════════════════
-      // Pool
-      // ══════════════════════════════════════════════════════════════
-      const folderSel = document.getElementById("folderSel");
-      const poolGrid = document.getElementById("poolGrid");
-
-      async function renderPool() {
-        poolGrid.innerHTML = "";
-        poolFiles = await scanDir(folderSel.value);
-        poolFiles.forEach((src) => {
-          const im = document.createElement("img");
-          im.draggable = true;
-          im.title = src.split("/").pop();
-          setThumb(im, src);
-          im.addEventListener("dragstart", (e) => {
-            dragSrc = { kind: "pool", src: src };
-            e.dataTransfer.effectAllowed = "copy";
-            e.dataTransfer.setData("text/plain", src);
-          });
-          im.addEventListener("dragend", () => {
-            clearIns();
-            dragSrc = null;
-          });
-          poolGrid.appendChild(im);
-        });
-      }
-
-      folderSel.addEventListener("change", renderPool);
-
-      document.getElementById("uploadBtn").addEventListener("click", () => {
-        const input = document.getElementById("sharedFileInput");
-        input.onchange = async () => {
-          const files = [...input.files];
+      function chooseFiles() {
+        return new Promise((res) => {
+          const input = $("fileInput");
           input.value = "";
-          if (!files.length) return;
-          try {
-            const added = await uploadFilesToFolder(folderSel.value, files);
-            toast(added.length + " image(s) importée(s)");
-            await renderPool();
-          } catch (e) {
-            toast(e.message);
+          input.onchange = () => res([...input.files]);
+          input.oncancel = () => res([]);
+          input.click();
+        });
+      }
+
+      async function sizeOf(src) {
+        const handle = await fileAt(src);
+        const bmp = await createImageBitmap(await handle.getFile());
+        const size = { src, w: bmp.width, h: bmp.height };
+        bmp.close();
+        return size;
+      }
+
+      // ============================================================
+      // STATE: the config, save, undo
+      // ============================================================
+      const CFG_FILE = "site-config.js";
+      let cfg = null;
+      let savedJson = "";
+      let diskText = "";
+      let past = [];
+      let future = [];
+      let view = { page: "home" };
+
+      const json = () => JSON.stringify(cfg);
+
+      async function readDisk() {
+        const handle = await root.getFileHandle(CFG_FILE);
+        return (await handle.getFile()).text();
+      }
+      function parseCfg(text) {
+        return JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
+      }
+
+      function snapshot() {
+        past.push(json());
+        if (past.length > 80) past.shift();
+        future = [];
+      }
+      function commit(change) {
+        snapshot();
+        change();
+        render();
+      }
+      function undo() {
+        if (!past.length) return;
+        future.push(json());
+        cfg = JSON.parse(past.pop());
+        render();
+      }
+      function redo() {
+        if (!future.length) return;
+        past.push(json());
+        cfg = JSON.parse(future.pop());
+        render();
+      }
+
+      function refreshBar() {
+        const dirty = json() !== savedJson;
+        $("status").textContent = dirty ? "Modifications non enregistrées" : "Tout est enregistré";
+        $("status").className = dirty ? "dirty" : "";
+        $("saveBtn").disabled = !dirty;
+        $("undoBtn").disabled = !past.length;
+        $("redoBtn").disabled = !future.length;
+        const model = view.page === "model" && cfg.auto.series[view.index];
+        $("viewBtn").href =
+          view.page === "album" ? "archive.html?y=" + encodeURIComponent(cfg.projects[view.id].year) + "&p=" + encodeURIComponent(view.id)
+          : model ? "auto.html?m=" + slugify(model.model)
+          : { archive: "archive.html", auto: "auto.html", about: "about.html" }[view.page] || "index.html";
+        document.title = (dirty ? "• " : "") + "Administration";
+      }
+
+      // What would break the site. Changes nothing, so the page stays as
+      // it is for fixing the problem.
+      function problems() {
+        const out = [];
+        Object.values(cfg.projects).forEach((p) => {
+          if (!String(p.title || "").trim()) out.push("Un album n'a pas de titre.");
+          if (!String(p.year || "").trim()) out.push("L'album « " + p.title + " » n'a pas d'année.");
+          if (!p.photos.length) out.push("L'album « " + p.title + " » n'a aucune photo.");
+        });
+        cfg.auto.series.forEach((s) => {
+          if (!s.groups.some((g) => g.photos.length)) out.push("La voiture « " + s.model + " » n'a aucune photo.");
+        });
+        return out;
+      }
+
+      // Clears what the editing leaves behind.
+      function tidy() {
+        cfg.sequence = cfg.sequence.filter((e) => blockPhotos(e).length);
+        cfg.auto.series.forEach((s) => {
+          s.groups = s.groups.filter((g) => g.photos.length);
+          s.groups.forEach((g) => {
+            if (!g.label) delete g.label;
+          });
+          if (!s.cover) s.cover = s.groups[0].photos[0].src;
+        });
+      }
+
+      async function save() {
+        const [problem] = problems();
+        if (problem) {
+          toast(problem + " Corrige-le avant d'enregistrer.", { error: true });
+          return;
+        }
+        tidy();
+        render();
+        const now = await readDisk();
+        if (now !== diskText && !confirm("Le fichier du site a changé depuis l'ouverture de l'admin. Remplacer par ta version ?")) return;
+        const text = "var SITE_CONFIG = " + JSON.stringify(cfg, null, 2) + ";\n";
+        parseCfg(text);
+        const handle = await root.getFileHandle(CFG_FILE);
+        const w = await handle.createWritable();
+        await w.write(text);
+        await w.close();
+        diskText = text;
+        savedJson = json();
+        refreshBar();
+        toast("Enregistré sur ton PC. Pour publier : double-clique sur « Mettre en ligne.bat » dans le dossier du site.", { stay: false });
+      }
+
+      // ============================================================
+      // DRAG AND DROP
+      //
+      // One rule for everything that can be reordered: an item knows its
+      // list through get/set, so moving between two lists of the same
+      // kind (one car's chapters, two home blocks) needs nothing extra.
+      // ============================================================
+      let drag = null;
+
+      function clearMarks() {
+        document.querySelectorAll(".drop-before, .drop-after").forEach((n) => n.classList.remove("drop-before", "drop-after"));
+      }
+      function moveItem(target, index) {
+        const from = drag;
+        commit(() => {
+          if (from.owner === target.owner) {
+            const list = from.get();
+            const [item] = list.splice(from.index, 1);
+            list.splice(index - (from.index < index ? 1 : 0), 0, item);
+            from.set(list);
+          } else {
+            const source = from.get();
+            const [item] = source.splice(from.index, 1);
+            from.set(source);
+            const list = target.get();
+            list.splice(index, 0, item);
+            target.set(list);
           }
+        });
+      }
+      function sortable(item, { kind, owner, get, set, index, axis, handle }) {
+        const list = { kind, owner, get, set };
+        const start = (e) => {
+          drag = { ...list, index };
+          e.dataTransfer.effectAllowed = "move";
+          e.dataTransfer.setData("text/plain", "");
+          item.classList.add("is-dragging");
+          e.stopPropagation();
         };
-        input.click();
-      });
+        if (handle) {
+          handle.addEventListener("mousedown", () => (item.draggable = true));
+          item.addEventListener("mouseup", () => (item.draggable = false));
+        } else {
+          item.draggable = true;
+        }
+        item.addEventListener("dragstart", start);
+        item.addEventListener("dragend", () => {
+          drag = null;
+          item.classList.remove("is-dragging");
+          if (handle) item.draggable = false;
+          clearMarks();
+        });
+        const after = (e) => {
+          const r = item.getBoundingClientRect();
+          return axis === "x" ? e.clientX > r.left + r.width / 2 : e.clientY > r.top + r.height / 2;
+        };
+        item.addEventListener("dragover", (e) => {
+          if (!drag || drag.kind !== kind) return;
+          e.preventDefault();
+          e.stopPropagation();
+          clearMarks();
+          item.classList.add(after(e) ? "drop-after" : "drop-before");
+        });
+        item.addEventListener("drop", (e) => {
+          if (!drag || drag.kind !== kind) return;
+          e.preventDefault();
+          e.stopPropagation();
+          moveItem(list, index + (after(e) ? 1 : 0));
+        });
+        return item;
+      }
 
-      // ══════════════════════════════════════════════════════════════
-      // Projects panel — feeds the archive (archive.html), which
-      // groups these by year then by location. One project = one
-      // location's photos from one shoot; several projects can share a
-      // location within the same year, the archive merges them.
-      // ══════════════════════════════════════════════════════════════
-      const projList = document.getElementById("projList");
-      let openProj = null; // id of the currently expanded project, or null
-      let projDragSrc = null; // {kind:'photo'|'pool', ...}
+      function hasFiles(e) {
+        return [...e.dataTransfer.types].includes("Files");
+      }
+      // Photos dragged in from the Windows explorer.
+      function fileDrop(el, onFiles) {
+        el.addEventListener("dragover", (e) => {
+          if (!hasFiles(e)) return;
+          e.preventDefault();
+          e.stopPropagation();
+          el.classList.add("file-over");
+        });
+        el.addEventListener("dragleave", () => el.classList.remove("file-over"));
+        el.addEventListener("drop", (e) => {
+          if (!hasFiles(e)) return;
+          e.preventDefault();
+          e.stopPropagation();
+          el.classList.remove("file-over");
+          onFiles([...e.dataTransfer.files]);
+        });
+      }
 
-      function slugify(s) {
-        const stripped = (s || "")
-          .normalize("NFD")
-          .split("")
-          .filter((ch) => {
-            const c = ch.charCodeAt(0);
-            return c < 0x0300 || c > 0x036f;
-          })
-          .join("");
-        return (
-          stripped
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "") || "projet"
+      // A row of photos. Items are plain paths, or {src, w, h} when
+      // `sized` is set, as the automobile page needs them.
+      function photoGrid({ kind, owner, get, set, folder, sized, cover, onCover, addLabel }) {
+        const srcOf = (item) => (sized ? item.src : item);
+        const list = get();
+        const addAll = async (srcs) => {
+          if (!srcs.length) return;
+          const items = [];
+          for (const src of srcs) items.push(sized ? await sizeOf(src) : src);
+          commit(() => set([...get(), ...items]));
+        };
+        const grid = h("div", { class: "photos" },
+          list.map((item, index) => {
+            const src = srcOf(item);
+            const isCover = cover === src;
+            return sortable(
+              h("div", { class: "tile" },
+                photo(src),
+                onCover && h("button", {
+                  class: "star" + (isCover ? " on" : ""),
+                  title: "Photo de couverture",
+                  onclick: () => commit(() => onCover(src)),
+                }, "★"),
+                h("button", {
+                  class: "x",
+                  title: "Retirer du site (le fichier reste sur ton PC)",
+                  onclick: () => {
+                    commit(() => {
+                      const next = get();
+                      next.splice(index, 1);
+                      set(next);
+                      if (isCover && onCover) onCover(null);
+                    });
+                    toast("Photo retirée", { undo: true });
+                  },
+                }, "×"),
+              ),
+              { kind, owner, get, set, index, axis: "x" },
+            );
+          }),
+          h("button", { class: "add", onclick: () => pickPhotos({ folder }).then(addAll) }, addLabel || "+ Ajouter"),
+        );
+        grid.addEventListener("dragover", (e) => {
+          if (drag && drag.kind === kind) e.preventDefault();
+        });
+        grid.addEventListener("drop", (e) => {
+          if (!drag || drag.kind !== kind) return;
+          e.preventDefault();
+          moveItem({ kind, owner, get, set }, list.length);
+        });
+        fileDrop(grid, async (files) => addAll(await importFiles(folder, files)));
+        return grid;
+      }
+
+      // ============================================================
+      // FORMS AND DIALOGS
+      // ============================================================
+      function bindEdit(input, read, write) {
+        let typing = false;
+        input.value = read() ?? "";
+        input.addEventListener("focus", () => (typing = false));
+        input.addEventListener("input", () => {
+          if (!typing) snapshot();
+          typing = true;
+          write(input.value);
+          refreshBar();
+        });
+        return input;
+      }
+      function field(label, obj, key, { long, wide, hint, placeholder } = {}) {
+        const input = h(long ? "textarea" : "input", { placeholder });
+        return h("label", { class: "field" + (wide || long ? " wide" : "") },
+          h("span", null, label),
+          bindEdit(input, () => obj[key], (v) => (obj[key] = v)),
+          hint && h("span", { style: "margin-top:3px" }, hint),
         );
       }
-
-      function uniqueProjSlug(base) {
-        let slug = base,
-          n = 2;
-        while (cfg.projects[slug]) {
-          slug = base + "-" + n;
-          n++;
-        }
-        return slug;
+      function colour(obj, key) {
+        const input = h("input", { type: "color", title: "Couleur" });
+        return bindEdit(input, () => obj[key] || "#ffffff", (v) => (obj[key] = v));
       }
 
-      function renderProj() {
-        projList.innerHTML = "";
-        Object.keys(cfg.projects).forEach((id) => {
-          const p = cfg.projects[id];
-          projList.appendChild(buildProjRow(id, p));
-          if (openProj === id) projList.appendChild(buildProjDrawer(id, p));
-        });
+      let cancelModal = null;
+
+      function openModal(box, onCancel) {
+        cancelModal = onCancel;
+        $("modal").replaceChildren(box);
+        $("modal").hidden = false;
+      }
+      function closeModal() {
+        cancelModal = null;
+        $("modal").hidden = true;
+        $("modal").replaceChildren();
       }
 
-      function buildProjRow(id, p) {
-        const row = document.createElement("div");
-        row.className = "row";
-
-        const tw = document.createElement("div");
-        tw.className = "thumbs";
-        (p.photos || []).slice(0, 4).forEach((src) => {
-          const im = document.createElement("img");
-          setThumb(im, src);
-          tw.appendChild(im);
-        });
-        row.appendChild(tw);
-
-        const title = document.createElement("input");
-        title.className = "projfld title";
-        title.value = p.title || "";
-        title.placeholder = "Titre";
-        title.addEventListener("input", () => {
-          p.title = title.value;
-          markDirty();
-        });
-        row.appendChild(title);
-
-        const date = document.createElement("input");
-        date.className = "projfld";
-        date.value = p.date || "";
-        date.placeholder = "Date (ex. Mars 2026)";
-        date.addEventListener("input", () => {
-          p.date = date.value;
-          p.dateLong = date.value;
-          markDirty();
-        });
-        row.appendChild(date);
-
-        const year = document.createElement("input");
-        year.className = "projfld year";
-        year.value = p.year || "";
-        year.placeholder = "Année";
-        year.addEventListener("input", () => {
-          p.year = year.value;
-          markDirty();
-        });
-        row.appendChild(year);
-
-        const loc = document.createElement("input");
-        loc.className = "projfld";
-        loc.value = p.location || "";
-        loc.placeholder = "Lieu";
-        loc.addEventListener("input", () => {
-          p.location = loc.value;
-          markDirty();
-        });
-        row.appendChild(loc);
-
-        const grow = document.createElement("span");
-        grow.className = "grow";
-        row.appendChild(grow);
-
-        const count = document.createElement("span");
-        count.className = "folder";
-        const n = (p.photos || []).length;
-        count.textContent = n + (n > 1 ? " photos" : " photo");
-        row.appendChild(count);
-
-        const obtn = document.createElement("button");
-        obtn.className = "mini";
-        obtn.textContent = openProj === id ? "fermer" : "ouvrir";
-        obtn.addEventListener("click", () => {
-          openProj = openProj === id ? null : id;
-          renderProj();
-        });
-        row.appendChild(obtn);
-
-        const del = document.createElement("button");
-        del.className = "mini del";
-        del.textContent = "×";
-        del.addEventListener("click", () => {
-          if (!confirm("Supprimer le projet « " + (p.title || id) + " » ?")) return;
-          delete cfg.projects[id];
-          if (openProj === id) openProj = null;
-          markDirty();
-          renderProj();
-        });
-        row.appendChild(del);
-
-        return row;
-      }
-
-      function buildProjDrawer(id, p) {
-        const d = document.createElement("div");
-        d.className = "drawer";
-        p.photos = p.photos || [];
-
-        p.photos.forEach((src, k) => {
-          const gp = document.createElement("div");
-          gp.className = "gp";
-          if (p.cover === src) gp.classList.add("is-cover");
-          gp.draggable = true;
-          gp.dataset.k = k;
-
-          const im = document.createElement("img");
-          setThumb(im, src);
-          gp.appendChild(im);
-
-          const star = document.createElement("button");
-          star.style.left = "2px";
-          star.style.right = "auto";
-          star.textContent = p.cover === src ? "★" : "☆";
-          star.title = "Utiliser comme couverture";
-          star.addEventListener("click", (e) => {
-            e.stopPropagation();
-            p.cover = src;
-            markDirty();
-            renderProj();
-          });
-          gp.appendChild(star);
-
-          const x = document.createElement("button");
-          x.textContent = "×";
-          x.addEventListener("click", () => {
-            p.photos.splice(k, 1);
-            if (p.cover === src) delete p.cover;
-            markDirty();
-            renderProj();
-          });
-          gp.appendChild(x);
-
-          gp.addEventListener("dragstart", (e) => {
-            e.stopPropagation();
-            projDragSrc = { kind: "photo", id: id, k: k };
-            e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("text/plain", "gp");
-          });
-          gp.addEventListener("dragend", () => {
-            clearIns();
-            projDragSrc = null;
-          });
-
-          d.appendChild(gp);
-        });
-
-        const hint = document.createElement("span");
-        hint.className = "folder";
-        hint.style.alignSelf = "center";
-        hint.textContent = "Glisse une vignette du pool ci-dessous pour l'ajouter à ce projet.";
-        d.appendChild(hint);
-
-        d.addEventListener("dragover", (e) => {
-          e.preventDefault();
-          d.classList.add("ins");
-        });
-        d.addEventListener("dragleave", () => d.classList.remove("ins"));
-        d.addEventListener("drop", (e) => {
-          e.preventDefault();
-          d.classList.remove("ins");
-          if (!projDragSrc) return;
-          if (projDragSrc.kind === "pool") {
-            if (!p.photos.includes(projDragSrc.src)) p.photos.push(projDragSrc.src);
-          } else if (projDragSrc.kind === "photo" && projDragSrc.id === id) {
-            const at = insertIndexH(d, e.clientX);
-            const [m] = p.photos.splice(projDragSrc.k, 1);
-            p.photos.splice(at > projDragSrc.k ? at - 1 : at, 0, m);
-          }
-          markDirty();
-          renderProj();
-        });
-
-        return d;
-      }
-
-      document.getElementById("addProjBtn").addEventListener("click", async () => {
-        const title = (prompt("Titre du projet ? (ex. Pyrénées)") || "").trim();
-        if (!title) return;
-        const year =
-          (prompt("Année ?", String(new Date().getFullYear())) || "").trim() ||
-          String(new Date().getFullYear());
-
-        const slug = uniqueProjSlug(slugify(title + "-" + year));
-        const folder = "images/" + slug;
-
-        const dir = await resolveDir(folder, true);
-        if (!dir) {
-          toast("Impossible de créer le dossier " + folder);
-          return;
-        }
-
-        cfg.projects = {
-          [slug]: {
-            title,
-            date: "",
-            dateLong: "",
-            year,
-            location: "",
-            folder,
-            photos: [],
+      function ask(title, fields, confirmLabel) {
+        return new Promise((res) => {
+          const values = Object.fromEntries(fields.map((f) => [f.key, f.value || ""]));
+          const done = (out) => {
+            closeModal();
+            res(out);
+          };
+          const form = h("form", {
+            class: "box",
+            onsubmit: (e) => {
+              e.preventDefault();
+              done(values);
+            },
           },
-          ...cfg.projects,
-        };
+            h("h2", null, title),
+            fields.map((f) => field(f.label, values, f.key, { wide: true })),
+            h("div", { class: "foot" },
+              h("span", { class: "spacer" }),
+              h("button", { class: "btn", type: "button", onclick: () => done(null) }, "Annuler"),
+              h("button", { class: "btn primary" }, confirmLabel || "Créer"),
+            ),
+          );
+          openModal(form, () => done(null));
+          form.querySelector("input").focus();
+        });
+      }
 
-        // make the new folder available (and selected) in the pool below,
-        // ready to receive uploads for this project right away
-        if (![...projFolderSel.options].some((o) => o.value === folder)) {
-          const o = document.createElement("option");
-          o.value = folder;
-          o.textContent = slug;
-          projFolderSel.appendChild(o);
+      // Resolves with the chosen paths, in the order they were clicked.
+      async function pickPhotos({ folder }) {
+        const folders = await imageFolders();
+        const known = folders.some((f) => f.path === folder);
+        const target = folder;
+        return new Promise((res) => {
+          let current = known ? folder : (folders[0] || {}).path;
+          const chosen = [];
+          const list = h("div", { class: "folders" });
+          const grid = h("div", { class: "photos pickgrid" });
+          const count = h("span", { class: "help", style: "margin:0" });
+          const addBtn = h("button", {
+            class: "btn primary",
+            disabled: true,
+            onclick: () => {
+              closeModal();
+              res(chosen);
+            },
+          }, "Ajouter");
+          const refreshCount = () => {
+            count.textContent = chosen.length ? chosen.length + " sélectionnée" + (chosen.length > 1 ? "s" : "") : "Clique sur les photos à ajouter";
+            addBtn.disabled = !chosen.length;
+          };
+          const markTile = (tile, src) => {
+            const at = chosen.indexOf(src);
+            tile.classList.toggle("picked", at >= 0);
+            tile.querySelector("b")?.remove();
+            if (at >= 0) tile.append(h("b", null, at + 1));
+          };
+          const refreshMarks = () => {
+            grid.querySelectorAll(".tile").forEach((t) => markTile(t, t.dataset.src));
+            refreshCount();
+          };
+          const showFolder = async (path) => {
+            current = path;
+            list.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.path === path));
+            const srcs = await imagesIn(path);
+            if (current !== path) return;
+            grid.replaceChildren(...srcs.map((src) => {
+              const tile = h("div", {
+                class: "tile",
+                onclick: () => {
+                  const at = chosen.indexOf(src);
+                  if (at >= 0) chosen.splice(at, 1);
+                  else chosen.push(src);
+                  refreshMarks();
+                },
+              }, photo(src));
+              tile.dataset.src = src;
+              markTile(tile, src);
+              return tile;
+            }));
+            if (!srcs.length) grid.append(h("p", { class: "help" }, "Ce dossier est vide. Importe des photos depuis ton PC."));
+          };
+          const addFolderButton = (name, path) => {
+            const b = h("button", { onclick: () => showFolder(path), title: name }, name);
+            b.dataset.path = path;
+            list.append(b);
+          };
+          if (!known) addFolderButton(decode(target.split("/").pop()) + " (nouveau)", target);
+          folders.forEach((f) => addFolderButton(f.name, f.path));
+          const doImport = async (files) => {
+            if (!files.length) return;
+            const added = await importFiles(target, files);
+            chosen.push(...added);
+            await showFolder(target);
+            refreshMarks();
+          };
+          const box = h("div", { class: "box big" },
+            h("div", { class: "foot" },
+              h("h2", null, "Ajouter des photos"),
+              h("span", { class: "spacer" }),
+              h("button", { class: "btn primary", onclick: async () => doImport(await chooseFiles()) }, "Importer depuis mon PC"),
+            ),
+            h("p", { class: "help", style: "margin:0" }, "Tu peux aussi glisser des photos ici depuis l'explorateur. Elles sont copiées dans le site et allégées pour le web."),
+            h("div", { class: "picker" }, list, grid),
+            h("div", { class: "foot" },
+              count,
+              h("span", { class: "spacer" }),
+              h("button", { class: "btn", onclick: () => { closeModal(); res([]); } }, "Annuler"),
+              addBtn,
+            ),
+          );
+          fileDrop(box, doImport);
+          openModal(box, () => {
+            closeModal();
+            res([]);
+          });
+          showFolder(known ? folder : target);
+          refreshCount();
+        });
+      }
+
+      // ============================================================
+      // PAGES
+      // ============================================================
+      const main = $("main");
+      const go = (next) => {
+        view = next;
+        render();
+        main.scrollTop = 0;
+      };
+
+      function grip() {
+        return h("span", { class: "grip", title: "Glisser pour déplacer" }, "⠿");
+      }
+      function back(label, page) {
+        return h("button", { class: "link", onclick: () => go({ page }) }, "← " + label);
+      }
+
+      // --- Accueil ----------------------------------------------------
+      const HOME_FOLDER = "images/showcase";
+
+      function blockPhotos(e) {
+        return e.type === "group" ? [...(e.photos || [])] : e.src ? [e.src] : [];
+      }
+      function setBlockPhotos(e, photos) {
+        if (photos.length === 1) {
+          e.type = "single";
+          e.src = photos[0];
+          delete e.photos;
+        } else {
+          e.type = "group";
+          e.photos = photos;
+          delete e.src;
         }
-        projFolderSel.value = folder;
-        await renderProjPool();
-
-        openProj = slug;
-        markDirty();
-        renderProj();
-      });
-
-      // Separate folder picker / thumbnail pool, same helpers as the
-      // sequence tab's — dragged into an open project's drawer above.
-      const projFolderSel = document.getElementById("projFolderSel");
-      const projPoolGrid = document.getElementById("projPoolGrid");
-
-      async function renderProjPool() {
-        projPoolGrid.innerHTML = "";
-        if (!projFolderSel.value) return;
-        const files = await scanDir(projFolderSel.value);
-        files.forEach((src) => {
-          const im = document.createElement("img");
-          im.draggable = true;
-          im.title = src.split("/").pop();
-          setThumb(im, src);
-          im.addEventListener("dragstart", (e) => {
-            projDragSrc = { kind: "pool", src: src };
-            e.dataTransfer.effectAllowed = "copy";
-            e.dataTransfer.setData("text/plain", src);
-          });
-          im.addEventListener("dragend", () => {
-            clearIns();
-            projDragSrc = null;
-          });
-          projPoolGrid.appendChild(im);
-        });
       }
 
-      projFolderSel.addEventListener("change", renderProjPool);
-
-      document.getElementById("projUploadBtn").addEventListener("click", () => {
-        const input = document.getElementById("sharedFileInput");
-        input.onchange = async () => {
-          const files = [...input.files];
-          input.value = "";
-          if (!files.length || !projFolderSel.value) return;
-          try {
-            const added = await uploadFilesToFolder(projFolderSel.value, files);
-            toast(added.length + " image(s) importée(s)");
-            await renderProjPool();
-          } catch (e) {
-            toast(e.message);
-          }
+      function pageHome() {
+        const blocks = () => [...cfg.sequence];
+        const setBlocks = (list) => (cfg.sequence = list);
+        const addBlocks = (srcs, together) => {
+          if (!srcs.length) return;
+          commit(() => {
+            const groups = together ? [srcs] : srcs.map((s) => [s]);
+            groups.forEach((photos) => {
+              const e = { bg: "#ffffff" };
+              setBlockPhotos(e, photos);
+              cfg.sequence.unshift(e);
+            });
+          });
         };
-        input.click();
-      });
-
-      // ══════════════════════════════════════════════════════════════
-      // Content panel
-      // ══════════════════════════════════════════════════════════════
-      function field(parent, label, value, onChange, multiline) {
-        const w = document.createElement("div");
-        w.className = "fld";
-        const l = document.createElement("label");
-        l.textContent = label;
-        w.appendChild(l);
-        const inp = document.createElement(multiline ? "textarea" : "input");
-        inp.value = value || "";
-        inp.addEventListener("input", () => {
-          onChange(inp.value);
-          markDirty();
-        });
-        w.appendChild(inp);
-        parent.appendChild(w);
-        return inp;
+        return [
+          h("h2", null, "Accueil"),
+          h("p", { class: "help" }, "Le défilé de la page principale, de haut en bas. Un bloc d'une photo l'affiche seule, plusieurs photos font un carrousel. La couleur est celle du fond derrière le bloc."),
+          h("div", { class: "foot", style: "margin-bottom:14px" },
+            h("button", { class: "btn primary", onclick: () => pickPhotos({ folder: HOME_FOLDER }).then((s) => addBlocks(s, false)) }, "+ Photos seules"),
+            h("button", { class: "btn", onclick: () => pickPhotos({ folder: HOME_FOLDER }).then((s) => addBlocks(s, true)) }, "+ Carrousel"),
+          ),
+          cfg.sequence.map((entry, index) => {
+            const handle = grip();
+            return sortable(
+              h("div", { class: "row" },
+                handle,
+                h("span", { class: "num" }, index + 1),
+                colour(entry, "bg"),
+                h("div", { class: "grow" },
+                  photoGrid({
+                    kind: "home",
+                    owner: entry,
+                    folder: HOME_FOLDER,
+                    get: () => blockPhotos(entry),
+                    set: (list) => {
+                      if (list.length) setBlockPhotos(entry, list);
+                      else cfg.sequence.splice(cfg.sequence.indexOf(entry), 1);
+                    },
+                  }),
+                ),
+                index > 0 && h("button", {
+                  class: "link",
+                  title: "Mettre tout en haut",
+                  onclick: () => commit(() => {
+                    cfg.sequence.splice(index, 1);
+                    cfg.sequence.unshift(entry);
+                  }),
+                }, "↑"),
+              ),
+              { kind: "block", owner: cfg.sequence, get: blocks, set: setBlocks, index, handle },
+            );
+          }),
+        ];
       }
 
-      function block(title) {
-        const b = document.createElement("div");
-        b.className = "block";
-        const h = document.createElement("h2");
-        h.textContent = title;
-        b.appendChild(h);
-        return b;
+      // --- Archive ----------------------------------------------------
+      function albumIdsByYear() {
+        const years = {};
+        Object.keys(cfg.projects).forEach((id) => {
+          const y = cfg.projects[id].year || "—";
+          (years[y] = years[y] || []).push(id);
+        });
+        return years;
       }
-
-      function renderContent() {
-        const p = document.getElementById("panel-content");
-        p.innerHTML = "";
-        cfg.content = cfg.content || {};
-        const about = (cfg.content.about = cfg.content.about || {});
-        const contact = (cfg.content.contact = cfg.content.contact || {});
-
-        // quote
-        const b1 = block("Citation");
-        field(b1, "Citation", about.quote, (v) => (about.quote = v), true);
-        field(b1, "Auteur de la citation", about.quoteAuthor, (v) => (about.quoteAuthor = v));
-        p.appendChild(b1);
-
-        // approche
-        const b2 = block("Approche");
-        about.approche = about.approche || [];
-        about.approche.forEach((par, i) => {
-          const r = document.createElement("div");
-          r.className = "listrow";
-          const ta = document.createElement("textarea");
-          ta.value = par;
-          ta.addEventListener("input", () => {
-            about.approche[i] = ta.value;
-            markDirty();
-          });
-          r.appendChild(ta);
-          const x = document.createElement("button");
-          x.className = "mini del";
-          x.textContent = "×";
-          x.addEventListener("click", () => {
-            about.approche.splice(i, 1);
-            markDirty();
-            renderContent();
-          });
-          r.appendChild(x);
-          b2.appendChild(r);
-        });
-        const addP = document.createElement("button");
-        addP.className = "mini";
-        addP.textContent = "+ paragraphe";
-        addP.addEventListener("click", () => {
-          about.approche.push("");
-          markDirty();
-          renderContent();
-        });
-        b2.appendChild(addP);
-        p.appendChild(b2);
-
-        // gear — label and model only, no commentary (not shown on the page)
-        const b3 = block("Équipement");
-        about.gear = about.gear || [];
-        about.gear.forEach((g, gi) => {
-          const gw = document.createElement("div");
-          gw.className = "gearitem";
-          field(gw, "Label", g.label, (v) => (g.label = v));
-          field(gw, "Titre", g.title, (v) => (g.title = v));
-          const rm = document.createElement("button");
-          rm.className = "mini del";
-          rm.textContent = "supprimer cet élément";
-          rm.addEventListener("click", () => {
-            about.gear.splice(gi, 1);
-            markDirty();
-            renderContent();
-          });
-          gw.appendChild(rm);
-          b3.appendChild(gw);
-        });
-        const addG = document.createElement("button");
-        addG.className = "mini";
-        addG.textContent = "+ élément";
-        addG.addEventListener("click", () => {
-          about.gear.push({ label: "", title: "" });
-          markDirty();
-          renderContent();
-        });
-        b3.appendChild(addG);
-        p.appendChild(b3);
-
-        // contact
-        const b4 = block("Contact");
-        field(b4, "Email", contact.email, (v) => (contact.email = v));
-        field(b4, "Instagram (handle)", contact.instagramHandle, (v) => (contact.instagramHandle = v));
-        field(b4, "Instagram (URL)", contact.instagramUrl, (v) => (contact.instagramUrl = v));
-        field(b4, "Basé à", contact.location, (v) => (contact.location = v));
-        field(b4, "Note", contact.note, (v) => (contact.note = v), true);
-        p.appendChild(b4);
-      }
-
-      // ══════════════════════════════════════════════════════════════
-      // Tabs / actions
-      // ══════════════════════════════════════════════════════════════
-      document.querySelectorAll(".tab").forEach((t) => {
-        t.addEventListener("click", () => {
-          document.querySelectorAll(".tab").forEach((x) => x.classList.remove("on"));
-          document.querySelectorAll(".panel").forEach((x) => x.classList.remove("on"));
-          t.classList.add("on");
-          document.getElementById("panel-" + t.dataset.panel).classList.add("on");
-        });
-      });
-
-      document.getElementById("saveBtn").addEventListener("click", async () => {
-        try {
-          await writeCfg();
-          clearDirty();
-          toast("Enregistré ✓");
-        } catch (e) {
-          toast(e.message);
-        }
-      });
-
-      document.getElementById("reloadBtn").addEventListener("click", async () => {
-        if (dirty && !confirm("Des modifications ne sont pas enregistrées. Recharger quand même ?")) return;
-        cfg = await readCfg();
-        cfg.sequence = cfg.sequence || [];
-        cfg.projects = cfg.projects || {};
-        openGroup = -1;
-        openProj = null;
-        clearDirty();
-        renderSeq();
-        renderProj();
-        renderContent();
-        toast("Rechargé");
-      });
-
-      document.getElementById("previewBtn").addEventListener("click", () => {
-        window.open("index.html", "_blank");
-      });
-
-      window.addEventListener("beforeunload", (e) => {
-        if (!dirty) return;
-        e.preventDefault();
-        e.returnValue = "";
-      });
-
-      // ══════════════════════════════════════════════════════════════
-      // Boot
-      // ══════════════════════════════════════════════════════════════
-      async function init() {
-        cfg = await readCfg();
-        cfg.sequence = cfg.sequence || [];
-        cfg.projects = cfg.projects || {};
-        document.getElementById("folderName").textContent = root.name || "";
-
-        const folders = await listImageFolders();
-        [folderSel, projFolderSel].forEach((sel) => {
-          sel.innerHTML = "";
-          folders.forEach((f) => {
-            const o = document.createElement("option");
-            o.value = f;
-            o.textContent = decodeURIComponent(f.replace("images/", ""));
-            sel.appendChild(o);
-          });
-        });
-        const showcase = folders.find((f) => /showcase/i.test(f));
-        if (showcase) folderSel.value = showcase;
-
-        renderSeq();
-        renderProj();
-        renderContent();
-        await renderPool();
-        await renderProjPool();
-        clearDirty();
-      }
-
-      async function enterApp() {
-        await init();
-        document.getElementById("overlay").style.display = "none";
-        document.getElementById("app").classList.add("on");
-      }
-
-      async function tryReconnect(handle) {
-        let p = await handle.queryPermission({ mode: "readwrite" });
-        if (p !== "granted") p = await handle.requestPermission({ mode: "readwrite" });
-        return p === "granted";
-      }
-
-      document.getElementById("openBtn").addEventListener("click", async () => {
-        const err = document.getElementById("errMsg");
-        err.style.display = "none";
-        try {
-          if (storedHandle) {
-            if (!(await tryReconnect(storedHandle))) throw new Error("Permission refusée pour ce dossier.");
-            root = storedHandle;
+      // Albums keep the order of the config's keys: rewriting the object
+      // is what moves one.
+      function setYearOrder(year, ids) {
+        const years = albumIdsByYear();
+        years[year] = ids;
+        const next = {};
+        Object.keys(cfg.projects).forEach((id) => {
+          const y = cfg.projects[id].year || "—";
+          if (y === year) {
+            ids.forEach((i) => (next[i] = cfg.projects[i]));
           } else {
-            root = await window.showDirectoryPicker({ mode: "readwrite" });
-            await idbSaveHandle(root);
-            storedHandle = root;
+            next[id] = cfg.projects[id];
           }
-          await enterApp();
-        } catch (e) {
-          if (e.name !== "AbortError") {
-            err.textContent = e.message;
-            err.style.display = "block";
-          }
-        }
-      });
+        });
+        cfg.projects = next;
+      }
 
-      document.getElementById("switchBtn").addEventListener("click", async () => {
-        const err = document.getElementById("errMsg");
-        err.style.display = "none";
+      async function newAlbum() {
+        const values = await ask("Nouvel album", [
+          { key: "title", label: "Titre" },
+          { key: "year", label: "Année", value: String(new Date().getFullYear()) },
+        ]);
+        if (!values || !values.title.trim()) return;
+        const base = slugify(values.title + "-" + values.year);
+        let id = base;
+        for (let i = 2; cfg.projects[id]; i++) id = base + "-" + i;
+        const date = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(new Date());
+        const pretty = date[0].toUpperCase() + date.slice(1);
+        commit(() => {
+          cfg.projects = {
+            [id]: { title: values.title.trim(), date: pretty, dateLong: pretty, year: values.year.trim(), location: "", photos: [] },
+            ...cfg.projects,
+          };
+          view = { page: "album", id };
+        });
+      }
+
+      function pageArchive() {
+        const years = albumIdsByYear();
+        const yearKeys = Object.keys(years).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+        return [
+          h("div", { class: "head" },
+            h("h2", null, "Archive"),
+            h("span", { class: "spacer" }),
+            h("button", { class: "btn primary", onclick: newAlbum }, "+ Nouvel album"),
+          ),
+          h("p", { class: "help" }, "Les albums sont rangés par année. Glisse-les pour changer leur ordre, clique pour les ouvrir."),
+          yearKeys.map((y) => [
+            h("h3", null, y + " · " + years[y].length + " albums"),
+            h("div", { class: "albums" },
+              years[y].map((id, index) => {
+                const p = cfg.projects[id];
+                const cover = p.cover || p.photos[0];
+                return sortable(
+                  h("button", { class: "album", onclick: () => go({ page: "album", id }) },
+                    h("span", { class: "tile" }, cover && photo(cover)),
+                    h("b", null, p.title),
+                    h("small", null, p.photos.length + " photos"),
+                  ),
+                  {
+                    kind: "album-" + y,
+                    owner: y,
+                    get: () => [...albumIdsByYear()[y]],
+                    set: (ids) => setYearOrder(y, ids),
+                    index,
+                    axis: "x",
+                  },
+                );
+              }),
+            ),
+          ]),
+        ];
+      }
+
+      function pageAlbum() {
+        const id = view.id;
+        const p = cfg.projects[id];
+        return [
+          back("Archive", "archive"),
+          h("div", { class: "head", style: "margin-top:8px" },
+            h("h2", null, p.title || "Sans titre"),
+            h("span", { class: "spacer" }),
+            h("button", {
+              class: "btn danger",
+              onclick: () => {
+                snapshot();
+                delete cfg.projects[id];
+                go({ page: "archive" });
+                toast("Album supprimé", { undo: true });
+              },
+            }, "Supprimer l'album"),
+          ),
+          h("div", { class: "fields", style: "margin:14px 0" },
+            field("Titre", p, "title"),
+            field("Année", p, "year", { hint: "Détermine dans quelle année il apparaît." }),
+          ),
+          h("h3", null, p.photos.length + " photos"),
+          h("p", { class: "help" }, "Glisse pour changer l'ordre, ★ pour choisir la couverture. Sans ★, c'est la première photo."),
+          photoGrid({
+            kind: "album",
+            owner: p,
+            folder: "images/" + encodeURIComponent(p.folder || id),
+            get: () => [...p.photos],
+            set: (list) => (p.photos = list),
+            cover: p.cover || null,
+            onCover: (src) => {
+              if (src && p.cover !== src) p.cover = src;
+              else delete p.cover;
+            },
+          }),
+          h("h3", null, "Notes"),
+          h("p", { class: "help" }, "Pour t'y retrouver : ces infos ne s'affichent pas sur le site."),
+          h("div", { class: "fields" },
+            field("Date", p, "date"),
+            field("Lieu", p, "location"),
+          ),
+        ];
+      }
+
+      // --- Automobile -------------------------------------------------
+      const AUTO_FOLDER = "images/automobile";
+
+      async function newModel() {
+        const values = await ask("Nouvelle voiture", [{ key: "model", label: "Modèle" }]);
+        if (!values || !values.model.trim()) return;
+        commit(() => {
+          cfg.auto.series.push({ model: values.model.trim(), color: "#dddddd", groups: [{ photos: [] }] });
+          view = { page: "model", index: cfg.auto.series.length - 1 };
+        });
+      }
+
+      function pageAuto() {
+        const list = () => [...cfg.auto.series];
+        return [
+          h("div", { class: "head" },
+            h("h2", null, "Automobile"),
+            h("span", { class: "spacer" }),
+            h("button", { class: "btn primary", onclick: newModel }, "+ Nouvelle voiture"),
+          ),
+          h("p", { class: "help" }, "Une ligne par voiture, dans l'ordre de la page. Clique pour modifier ses photos."),
+          cfg.auto.series.map((s, index) => {
+            const handle = grip();
+            const cover = s.cover || s.groups.flatMap((g) => g.photos)[0]?.src;
+            const count = s.groups.reduce((n, g) => n + g.photos.length, 0);
+            return sortable(
+              h("div", { class: "row click", onclick: () => go({ page: "model", index }) },
+                handle,
+                h("div", { class: "tile" }, cover && photo(cover)),
+                h("div", { class: "grow" },
+                  h("div", { style: "font-size:18px;font-weight:500" }, s.model),
+                  h("small", { style: "color:var(--muted)" }, count + " photos"),
+                ),
+                h("span", { style: "width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:" + s.color }),
+              ),
+              { kind: "model", owner: cfg.auto, get: list, set: (l) => (cfg.auto.series = l), index, handle },
+            );
+          }),
+        ];
+      }
+
+      function pageModel() {
+        const s = cfg.auto.series[view.index];
+        const chapters = () => [...s.groups];
+        const cover = s.cover || null;
+        return [
+          back("Automobile", "auto"),
+          h("div", { class: "head", style: "margin-top:8px" },
+            h("h2", null, s.model || "Sans nom"),
+            h("span", { class: "spacer" }),
+            h("button", {
+              class: "btn danger",
+              onclick: () => {
+                snapshot();
+                cfg.auto.series.splice(view.index, 1);
+                go({ page: "auto" });
+                toast("Voiture supprimée", { undo: true });
+              },
+            }, "Supprimer la voiture"),
+          ),
+          h("div", { class: "fields", style: "margin:14px 0" },
+            field("Modèle", s, "model"),
+            h("label", { class: "field" },
+              h("span", null, "Couleur de fond"),
+              colour(s, "color"),
+            ),
+          ),
+          h("h3", null, "Chapitres"),
+          h("p", { class: "help" }, "★ choisit la photo phare, celle qui s'ouvre en grand. Glisse une photo vers un autre chapitre pour la déplacer. Sans titre, un chapitre s'affiche sans intertitre."),
+          s.groups.map((g, index) => {
+            const handle = grip();
+            return sortable(
+              h("div", { class: "row" },
+                handle,
+                h("div", { class: "grow" },
+                  bindEdit(h("input", { class: "inline", placeholder: "Titre du chapitre", style: "margin-bottom:8px" }), () => g.label, (v) => (g.label = v)),
+                  photoGrid({
+                    kind: "auto",
+                    owner: g,
+                    sized: true,
+                    folder: AUTO_FOLDER,
+                    get: () => [...g.photos],
+                    set: (list) => (g.photos = list),
+                    cover,
+                    onCover: (src) => {
+                      if (src && s.cover !== src) s.cover = src;
+                      else delete s.cover;
+                    },
+                  }),
+                ),
+                h("button", {
+                  class: "link",
+                  title: "Supprimer ce chapitre",
+                  onclick: () => {
+                    commit(() => s.groups.splice(index, 1));
+                    toast("Chapitre supprimé", { undo: true });
+                  },
+                }, "×"),
+              ),
+              { kind: "chapter", owner: s, get: chapters, set: (l) => (s.groups = l), index, handle },
+            );
+          }),
+          h("button", { class: "btn", onclick: () => commit(() => s.groups.push({ label: "", photos: [] })) }, "+ Nouveau chapitre"),
+        ];
+      }
+
+      // --- À propos ---------------------------------------------------
+      function pageAbout() {
+        const about = cfg.content.about;
+        const contact = cfg.content.contact;
+        return [
+          h("h2", null, "À propos"),
+          h("h3", null, "Citation"),
+          h("div", { class: "fields" },
+            field("Citation", about, "quote", { long: true }),
+            field("Auteur", about, "quoteAuthor"),
+          ),
+          h("h3", null, "Texte"),
+          about.approche.map((text, index) => {
+            const handle = grip();
+            return sortable(
+              h("div", { class: "row" },
+                handle,
+                bindEdit(h("textarea", { class: "inline grow", rows: 3 }), () => about.approche[index], (v) => (about.approche[index] = v)),
+                h("button", { class: "link", title: "Supprimer", onclick: () => commit(() => about.approche.splice(index, 1)) }, "×"),
+              ),
+              { kind: "para", owner: about, get: () => [...about.approche], set: (l) => (about.approche = l), index, handle },
+            );
+          }),
+          h("button", { class: "btn", onclick: () => commit(() => about.approche.push("")) }, "+ Paragraphe"),
+          h("h3", null, "Équipement"),
+          h("p", { class: "help" }, "Deux lignes qui se suivent avec la même catégorie s'affichent ensemble."),
+          about.gear.map((g, index) => {
+            const handle = grip();
+            return sortable(
+              h("div", { class: "row" },
+                handle,
+                h("div", { class: "grow fields" },
+                  field("Catégorie", g, "label"),
+                  field("Modèle", g, "title"),
+                ),
+                h("button", { class: "link", title: "Supprimer", onclick: () => commit(() => about.gear.splice(index, 1)) }, "×"),
+              ),
+              { kind: "gear", owner: about, get: () => [...about.gear], set: (l) => (about.gear = l), index, handle },
+            );
+          }),
+          h("button", { class: "btn", onclick: () => commit(() => about.gear.push({ label: "", title: "" })) }, "+ Matériel"),
+          h("h3", null, "Contact"),
+          h("div", { class: "fields" },
+            field("Email", contact, "email"),
+            field("Basé à", contact, "location"),
+            field("Instagram (nom affiché)", contact, "instagramHandle"),
+            field("Instagram (lien)", contact, "instagramUrl"),
+            field("Phrase de contact", contact, "note", { long: true }),
+          ),
+        ];
+      }
+
+      // --- Réglages ---------------------------------------------------
+      async function replaceFavicon() {
+        const [file] = await chooseFiles();
+        if (!file) return;
+        const bmp = await createImageBitmap(file);
+        const side = Math.min(bmp.width, bmp.height, 512);
+        const canvas = new OffscreenCanvas(side, side);
+        const crop = Math.min(bmp.width, bmp.height);
+        canvas.getContext("2d").drawImage(bmp, (bmp.width - crop) / 2, (bmp.height - crop) / 2, crop, crop, 0, 0, side, side);
+        bmp.close();
+        const blob = await canvas.convertToBlob({ type: "image/png" });
+        const handle = await (await dirAt("Favicon", true)).getFileHandle("favicon.png", { create: true });
+        const w = await handle.createWritable();
+        await w.write(blob);
+        await w.close();
+        toast("Icône remplacée. Il reste à mettre en ligne.");
+      }
+
+      function pageSettings() {
+        const site = cfg.site;
+        const pageNames = { home: "Accueil", archive: "Archive", auto: "Automobile", about: "À propos" };
+        return [
+          h("h2", null, "Réglages du site"),
+          h("h3", null, "Nom"),
+          h("div", { class: "fields" }, field("Nom en haut de chaque page", site, "name")),
+          h("h3", null, "Menu"),
+          h("p", { class: "help" }, "Les noms affichés dans le menu aux trois barres, et leur ordre."),
+          site.menu.map((item, index) => {
+            const handle = grip();
+            return sortable(
+              h("div", { class: "row", style: "align-items:center" },
+                handle,
+                bindEdit(h("input", { class: "inline grow" }), () => item.label, (v) => (item.label = v)),
+              ),
+              { kind: "menu", owner: site, get: () => [...site.menu], set: (l) => (site.menu = l), index, handle },
+            );
+          }),
+          h("h3", null, "Google et onglets du navigateur"),
+          Object.entries(pageNames).map(([key, name]) =>
+            h("div", { class: "row" },
+              h("div", { class: "grow fields" },
+                field(name + " : titre", site.pages[key], "title"),
+                field(name + " : description", site.pages[key], "description"),
+              ),
+            ),
+          ),
+          h("h3", null, "Petits textes"),
+          h("div", { class: "fields" },
+            field("Bouton de fermeture d'une photo", site.labels, "close"),
+            field("Libellé Email", site.labels, "email"),
+            field("Libellé Instagram", site.labels, "instagram"),
+            field("Libellé du lieu", site.labels, "location"),
+          ),
+          h("h3", null, "Icône de l'onglet"),
+          h("div", { class: "foot" },
+            h("img", { src: "Favicon/favicon.png", alt: "", style: "width:34px;height:34px;border-radius:6px" }),
+            h("button", { class: "btn", onclick: replaceFavicon }, "Remplacer l'icône"),
+          ),
+        ];
+      }
+
+      const PAGES = {
+        home: pageHome,
+        archive: pageArchive,
+        album: pageAlbum,
+        auto: pageAuto,
+        model: pageModel,
+        about: pageAbout,
+        settings: pageSettings,
+      };
+      const NAV = [
+        ["home", "Accueil", () => cfg.sequence.length],
+        ["archive", "Archive", () => Object.keys(cfg.projects).length],
+        ["auto", "Automobile", () => cfg.auto.series.length],
+        ["about", "À propos"],
+        ["settings", "Réglages"],
+      ];
+      const PARENT = { album: "archive", model: "auto" };
+
+      function render() {
+        if (view.page === "album" && !cfg.projects[view.id]) view = { page: "archive" };
+        if (view.page === "model" && !cfg.auto.series[view.index]) view = { page: "auto" };
+        const y = main.scrollTop;
+        const active = PARENT[view.page] || view.page;
+        $("nav").replaceChildren(
+          ...NAV.map(([page, label, count]) =>
+            h("button", { class: page === active ? "on" : "", onclick: () => go({ page }) },
+              label,
+              count && h("small", null, count()),
+            ),
+          ),
+        );
+        main.replaceChildren(h("div", { class: "page" }, PAGES[view.page]()));
+        main.scrollTop = y;
+        refreshBar();
+      }
+
+      // ============================================================
+      // START
+      // ============================================================
+      async function open(handle) {
+        root = handle;
+        let text;
         try {
-          root = await window.showDirectoryPicker({ mode: "readwrite" });
-          await idbSaveHandle(root);
-          storedHandle = root;
-          await enterApp();
-        } catch (e) {
-          if (e.name !== "AbortError") {
-            err.textContent = e.message;
-            err.style.display = "block";
-          }
+          text = await readDisk();
+        } catch {
+          root = null;
+          $("gateError").textContent = "Ce dossier ne contient pas site-config.js : ce n'est pas celui du site.";
+          return;
         }
-      });
+        cfg = parseCfg(text);
+        diskText = text;
+        savedJson = json();
+        idbSet("handles", "root", handle);
+        $("gate").hidden = true;
+        $("app").hidden = false;
+        render();
+      }
 
-      (async () => {
+      async function chooseFolder() {
+        $("gateError").textContent = "";
         if (!window.showDirectoryPicker) {
-          document.getElementById("errMsg").textContent =
-            "Ce navigateur ne supporte pas l'accès aux fichiers. Utilise Chrome ou Edge.";
-          document.getElementById("errMsg").style.display = "block";
+          $("gateError").textContent = "Ce navigateur ne peut pas ouvrir de dossier : utilise Chrome ou Edge sur ton PC.";
           return;
         }
         try {
-          storedHandle = await idbLoadHandle();
+          await open(await window.showDirectoryPicker({ id: "portfolio", mode: "readwrite" }));
         } catch (e) {
-          storedHandle = null;
+          if (e.name !== "AbortError") $("gateError").textContent = e.message;
         }
-        if (!storedHandle) return;
+      }
 
-        const f = document.getElementById("overlayFolder");
-        f.textContent = storedHandle.name || "";
-        f.style.display = "inline-block";
-
-        try {
-          if ((await storedHandle.queryPermission({ mode: "readwrite" })) === "granted") {
-            root = storedHandle;
-            await enterApp();
-            return;
-          }
-        } catch (e) {
-          /* fall through to manual reconnect */
+      async function start() {
+        $("gateBtn").onclick = chooseFolder;
+        $("gateOther").onclick = chooseFolder;
+        const known = await idbGet("handles", "root").catch(() => null);
+        if (!known) return;
+        if ((await known.queryPermission({ mode: "readwrite" })) === "granted") {
+          await open(known);
+          return;
         }
+        $("gateText").textContent = "Reprendre là où tu en étais, dans le dossier « " + known.name + " ».";
+        $("gateBtn").textContent = "Continuer";
+        $("gateOther").hidden = false;
+        $("gateBtn").onclick = async () => {
+          if ((await known.requestPermission({ mode: "readwrite" })) === "granted") await open(known);
+        };
+      }
 
-        document.getElementById("overlayTitle").textContent = "Bon retour";
-        document.getElementById("overlaySubtitle").innerHTML =
-          "Reconnecte-toi au dossier déjà utilisé.<br>Un seul clic, pas besoin de le rechercher.";
-        document.getElementById("openBtn").textContent = "Continuer";
-        document.getElementById("switchBtn").style.display = "inline-block";
-      })();
+      $("saveBtn").onclick = () => save().catch((e) => toast("Enregistrement impossible : " + e.message, { error: true }));
+      $("undoBtn").onclick = undo;
+      $("redoBtn").onclick = redo;
+
+      $("modal").addEventListener("mousedown", (e) => {
+        if (e.target === $("modal") && cancelModal) cancelModal();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && cancelModal) cancelModal();
+        if (!cfg || !(e.ctrlKey || e.metaKey)) return;
+        const key = e.key.toLowerCase();
+        const typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+        if (key === "s") {
+          e.preventDefault();
+          $("saveBtn").click();
+        } else if (key === "z" && !e.shiftKey && !typing) {
+          e.preventDefault();
+          undo();
+        } else if ((key === "y" || (key === "z" && e.shiftKey)) && !typing) {
+          e.preventDefault();
+          redo();
+        }
+      });
+      window.addEventListener("beforeunload", (e) => {
+        if (cfg && json() !== savedJson) e.preventDefault();
+      });
+      // A file dropped outside a photo area must not open in the tab.
+      window.addEventListener("dragover", (e) => e.preventDefault());
+      window.addEventListener("drop", (e) => e.preventDefault());
+
+      start();
     </script>
   </body>
 </html>

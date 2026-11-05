@@ -1,3 +1,22 @@
+// Wording set in the admin. The HTML keeps the same text as a fallback.
+(function () {
+  const site = (window.SITE_CONFIG && SITE_CONFIG.site) || {};
+  const page = (site.pages || {})[document.body.dataset.page];
+  if (page && page.title) document.title = page.title;
+  if (page && page.description) {
+    document.querySelector('meta[name="description"]').content = page.description;
+  }
+  const name = document.querySelector(".hdr > a");
+  if (name && site.name) name.textContent = site.name;
+  const menu = document.getElementById("menu");
+  (site.menu || []).forEach((item) => {
+    const link = menu.querySelector('a[href="' + item.href + '"]');
+    if (!link) return;
+    link.textContent = item.label;
+    menu.appendChild(link);
+  });
+})();
+
 (function () {
   const btn = document.getElementById("menuBtn");
   const menu = document.getElementById("menu");

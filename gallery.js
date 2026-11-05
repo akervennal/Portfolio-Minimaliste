@@ -77,6 +77,8 @@ function buildPhotoGrid(photos, title, allPhotos = photos, offset = 0) {
 // "new" tree, and the browser interpolates between them.
 // ============================================================
 const lb = document.getElementById("lb");
+const lbLabels = (window.SITE_CONFIG && SITE_CONFIG.site && SITE_CONFIG.site.labels) || {};
+if (lbLabels.close) document.getElementById("lbClose").textContent = lbLabels.close;
 const lbStage = document.getElementById("lbStage");
 const lbCounter = document.getElementById("lbCounter");
 let lbPhotos = [];

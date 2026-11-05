@@ -277,7 +277,7 @@
     <link rel="stylesheet" href="menu.css" />
   </head>
 
-  <body>
+  <body data-page="about">
     <header class="hdr hdr-solid" id="hdr">
       <a href="index.html">Armel Kervennal</a>
       <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
@@ -297,6 +297,7 @@
       const cfg = (window.SITE_CONFIG && SITE_CONFIG.content) || {};
       const about = cfg.about || {};
       const contact = cfg.contact || {};
+      const labels = (window.SITE_CONFIG && SITE_CONFIG.site && SITE_CONFIG.site.labels) || {};
       const root = document.getElementById("about");
 
       function el(tag, cls, text) {
@@ -380,17 +381,17 @@
       if (contact.email) {
         const a = el("a", null, contact.email);
         a.href = "mailto:" + contact.email;
-        row("Email", a);
+        row(labels.email || "Email", a);
       }
       if (contact.instagramHandle) {
         const a = el("a", null, contact.instagramHandle);
         a.href = contact.instagramUrl || "#";
         a.target = "_blank";
         a.rel = "noopener";
-        row("Instagram", a);
+        row(labels.instagram || "Instagram", a);
       }
       if (contact.location) {
-        row("Basé à", document.createTextNode(contact.location));
+        row(labels.location || "Basé à", document.createTextNode(contact.location));
       }
       cs.appendChild(dl);
 

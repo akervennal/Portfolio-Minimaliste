@@ -1,4 +1,45 @@
 var SITE_CONFIG = {
+  "site": {
+    "name": "Armel Kervennal",
+    "menu": [
+      {
+        "href": "archive.html",
+        "label": "archive"
+      },
+      {
+        "href": "auto.html",
+        "label": "automobile"
+      },
+      {
+        "href": "about.html",
+        "label": "about"
+      }
+    ],
+    "pages": {
+      "home": {
+        "title": "Armel Kervennal",
+        "description": "Portfolio d'Armel Kervennal, photographe basé à Nantes."
+      },
+      "archive": {
+        "title": "Armel Kervennal — archive",
+        "description": "Archive complète des photographies d'Armel Kervennal, classée par année et par lieu."
+      },
+      "auto": {
+        "title": "Armel Kervennal — automobile",
+        "description": "Photographie automobile par Armel Kervennal."
+      },
+      "about": {
+        "title": "Armel Kervennal — à propos",
+        "description": "À propos d'Armel Kervennal, photographe basé à Nantes."
+      }
+    },
+    "labels": {
+      "close": "fermer · esc",
+      "email": "Email",
+      "instagram": "Instagram",
+      "location": "Basé à"
+    }
+  },
   "sequence": [
     {
       "type": "single",
@@ -12,12 +53,12 @@ var SITE_CONFIG = {
     },
     {
       "type": "group",
-      "bg": "#ffffff",
+      "bg": "#c01909",
       "photos": [
-        "images/R%C3%A9publique%20Czech%202026/28-MEL_6609.jpg",
-        "images/R%C3%A9publique%20Czech%202026/45-MEL_6749.jpg",
-        "images/R%C3%A9publique%20Czech%202026/48-MEL_6757.jpg",
-        "images/R%C3%A9publique%20Czech%202026/4-MEL_6357.jpg"
+        "images/pyrenees-2026/22-MEL_5247.jpg",
+        "images/pyrenees-2026/15-MEL_5197.jpg",
+        "images/pyrenees-2026/21-MEL_5242.jpg",
+        "images/pyrenees-2026/17-MEL_5213.jpg"
       ]
     },
     {
@@ -27,12 +68,12 @@ var SITE_CONFIG = {
     },
     {
       "type": "group",
-      "bg": "#c01909",
+      "bg": "#ffffff",
       "photos": [
-        "images/pyrenees-2026/22-MEL_5247.jpg",
-        "images/pyrenees-2026/15-MEL_5197.jpg",
-        "images/pyrenees-2026/21-MEL_5242.jpg",
-        "images/pyrenees-2026/17-MEL_5213.jpg"
+        "images/R%C3%A9publique%20Czech%202026/28-MEL_6609.jpg",
+        "images/R%C3%A9publique%20Czech%202026/45-MEL_6749.jpg",
+        "images/R%C3%A9publique%20Czech%202026/48-MEL_6757.jpg",
+        "images/R%C3%A9publique%20Czech%202026/4-MEL_6357.jpg"
       ]
     },
     {
@@ -80,21 +121,6 @@ var SITE_CONFIG = {
       ]
     },
     {
-      "type": "single",
-      "src": "images/showcase/MEL_0388.jpg",
-      "bg": "#ffffff"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/1-MEL_3166.jpg",
-      "bg": "#3d4322"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/2-MEL_8725.jpg",
-      "bg": "#ff4000"
-    },
-    {
       "type": "group",
       "bg": "#ffffff",
       "photos": [
@@ -104,23 +130,13 @@ var SITE_CONFIG = {
     },
     {
       "type": "single",
-      "src": "images/showcase/7-MEL_8433.jpg",
-      "bg": "#ffffff"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/4-MEL_8103.jpg",
-      "bg": "#fa9e61"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/9-MEL_3695.jpg",
-      "bg": "#e2e2e2"
+      "src": "images/showcase/1-MEL_3166.jpg",
+      "bg": "#3d4322"
     },
     {
       "type": "single",
       "src": "images/showcase/IMG_4776_TIF.jpg",
-      "bg": "#ffffff"
+      "bg": "#11181d"
     },
     {
       "type": "single",
@@ -129,37 +145,23 @@ var SITE_CONFIG = {
     },
     {
       "type": "single",
+      "src": "images/showcase/7-MEL_8433.jpg",
+      "bg": "#828282"
+    },
+    {
+      "type": "single",
+      "src": "images/showcase/9-MEL_3695.jpg",
+      "bg": "#e2e2e2"
+    },
+    {
+      "type": "single",
       "src": "images/showcase/3-MEL_9879.jpg",
       "bg": "#a4aead"
     },
     {
       "type": "single",
-      "src": "images/showcase/3-MEL_7745.jpg",
-      "bg": "#ffffff"
-    },
-    {
-      "type": "group",
       "bg": "#97371f",
-      "photos": [
-        "images/showcase/3-MEL_8150.jpg",
-        "images/thabor-rennes-2024/1-MEL_8176.jpg",
-        "images/thabor-rennes-2024/2-MEL_8159.jpg"
-      ]
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/8-MEL_8227.jpg",
-      "bg": "#ff5a4b"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/4-MEL_9344.jpg",
-      "bg": "#687282"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/2-MEL_9402.jpg",
-      "bg": "#ffffff"
+      "src": "images/showcase/3-MEL_8150.jpg"
     },
     {
       "type": "single",
@@ -170,16 +172,6 @@ var SITE_CONFIG = {
       "type": "single",
       "src": "images/showcase/MEL_6501.jpg",
       "bg": "#aa000b"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/3-MEL_8724.jpg",
-      "bg": "#ffffff"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/10-MEL_9110.jpg",
-      "bg": "#ffffff"
     }
   ],
   "content": {
@@ -348,7 +340,7 @@ var SITE_CONFIG = {
         "cover": "images/viking-cup-round-3-2026/18.jpg",
         "groups": [
           {
-            "label": "À l'arrêt",
+            "label": "Paddock",
             "photos": [
               {
                 "src": "images/viking-cup-round-3-2026/3.jpg",
@@ -363,21 +355,6 @@ var SITE_CONFIG = {
             ]
           },
           {
-            "label": "Au paddock",
-            "photos": [
-              {
-                "src": "images/viking-cup-round-3-2026/39.jpg",
-                "w": 2048,
-                "h": 1365
-              },
-              {
-                "src": "images/viking-cup-round-3-2026/40.jpg",
-                "w": 2048,
-                "h": 1365
-              }
-            ]
-          },
-          {
             "label": "En piste",
             "photos": [
               {
@@ -386,7 +363,27 @@ var SITE_CONFIG = {
                 "h": 2048
               },
               {
+                "src": "images/viking-cup-round-3-2026/17.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
                 "src": "images/viking-cup-round-3-2026/18.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          },
+          {
+            "label": "Retour de la piste",
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/39.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/40.jpg",
                 "w": 2048,
                 "h": 1365
               }
