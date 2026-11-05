@@ -471,7 +471,7 @@
       });
       kit.appendChild(gear);
       root.appendChild(kit);
-      sections.push({ el: kit, color: about.gearColor });
+      sections.push({ el: kit, color: about.gearColor, phoneColor: about.gearColorPhone });
 
       // --- contact ----------------------------------------------------
       const cs = el("section", "contact");
@@ -499,7 +499,7 @@
       if (contact.location) more.appendChild(el("span", null, contact.location));
       cs.appendChild(more);
       root.appendChild(cs);
-      sections.push({ el: cs, color: about.contactColor });
+      sections.push({ el: cs, color: about.contactColor, phoneColor: about.contactColorPhone });
 
       // The address fills the width, whatever its length.
       function fitMail() {
@@ -642,7 +642,7 @@
         const from = cycles[index];
         const next = cycles[index + 1];
 
-        cycles.forEach((cycle, i) => {
+        cycles.forEach((cycle) => {
           let shown = 0;
           if (cycle === from) shown = next ? 1 - smooth(PHOTO_HOLDS, PHOTO_GONE, t) : 1;
           else if (cycle === next) shown = smooth(NEXT_STARTS, NEXT_ARRIVED, t);
@@ -666,7 +666,7 @@
           const r = s.getBoundingClientRect();
           return r.top <= middle && r.bottom > middle;
         });
-        if (active) setColour(active.color);
+        if (active) setColour((phone.matches && active.phoneColor) || active.color);
       }
 
       let scrollQueued = false;

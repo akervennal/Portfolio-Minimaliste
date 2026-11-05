@@ -1614,7 +1614,8 @@
           h("p", { class: "help" }, "Le nombre de photos et d'albums se calcule tout seul. Deux lignes qui se suivent avec la même catégorie s'affichent ensemble."),
           h("div", { class: "fields", style: "margin-bottom:12px" },
             field("Depuis (année)", about, "since"),
-            labelled("Couleur de fond", colour(about, "gearColor")),
+            labelled("Couleur de fond (PC)", colour(about, "gearColor")),
+            labelled("Couleur de fond (téléphone)", colour(about, "gearColorPhone")),
           ),
           about.gear.map((g, index) => {
             const handle = grip();
@@ -1637,7 +1638,8 @@
             field("Basé à", contact, "location"),
             field("Instagram (nom affiché)", contact, "instagramHandle"),
             field("Instagram (lien)", contact, "instagramUrl"),
-            labelled("Couleur de fond", colour(about, "contactColor")),
+            labelled("Couleur de fond (PC)", colour(about, "contactColor")),
+            labelled("Couleur de fond (téléphone)", colour(about, "contactColorPhone")),
             field("Phrase de contact", contact, "note", { long: true }),
           ),
         ];
