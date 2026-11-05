@@ -44,7 +44,6 @@
       html,
       body {
         background: #fff;
-        transition: background-color 0.6s var(--ease);
       }
 
       body {
@@ -122,8 +121,8 @@
       }
 
       /* ============================================================
-         LIST — one giant name per model; the page takes the colour of
-         whichever car is at the centre of the screen
+         LIST — one giant name per model; the page eases to the colour
+         of whichever car is at the centre of the screen
          ============================================================ */
       .models {
         padding: 14svh var(--gap);
@@ -136,12 +135,6 @@
         min-height: 72svh;
         text-decoration: none;
         opacity: 0.3;
-        transition:
-          opacity 0.5s var(--ease),
-          color 0.6s var(--ease);
-      }
-      .model.is-active {
-        opacity: 1;
       }
       .model-name {
         font-size: clamp(52px, 12vw, 190px);
@@ -233,8 +226,19 @@
         .model-cover {
           width: 100%;
         }
+        /* Phones: the list photo grows to the screen's width and settles
+           at mid-height, with the gallery showing underneath it. 33.33vw
+           is half the height of a 3:2 photo at full width. */
+        .cover {
+          height: auto;
+          padding-top: calc(50svh - 33.33vw);
+        }
+        .cover img {
+          height: auto;
+          aspect-ratio: 3 / 2;
+        }
         .ser {
-          padding-top: 40px;
+          padding-top: 24px;
         }
         .chapter {
           margin-top: 44px;
@@ -268,11 +272,8 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
-        html,
-        body,
         .hdr,
-        .reveal,
-        .model {
+        .reveal {
           transition: none;
         }
         ::view-transition-group(*),
@@ -311,6 +312,7 @@
     <script src="site-config.js"></script>
     <script src="menu.js"></script>
     <script src="gallery.js"></script>
+    <script src="colour.js"></script>
     <script>
       const series = ((window.SITE_CONFIG && SITE_CONFIG.auto) || {}).series || [];
       const hdr = document.getElementById("hdr");
@@ -345,12 +347,6 @@
         return s ? "auto.html?m=" + slug(s.model) : "auto.html";
       }
 
-      function isDark(hex) {
-        const n = parseInt(hex.slice(1), 16);
-        const [r, g, b] = [n >> 16, (n >> 8) & 255, n & 255];
-        return 0.299 * r + 0.587 * g + 0.114 * b < 128;
-      }
-
       function setPage(bg, ink) {
         document.documentElement.style.backgroundColor = bg;
         document.body.style.backgroundColor = bg;
@@ -362,6 +358,8 @@
       let activeRow = null;
       let listY = 0;
 
+      let rows = [];
+
       const centreLine = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
@@ -372,19 +370,85 @@
         { rootMargin: "-50% 0px -50% 0px" },
       );
 
-      function activateRow(row) {
-        if (activeRow) activeRow.classList.remove("is-active");
-        activeRow = row;
-        row.classList.add("is-active");
-        const { color } = series[+row.dataset.i];
-        const dark = isDark(color);
-        setPage(color, dark ? "#fff" : "#111");
+      // Same treatment as the homepage (see the scroll loop in index.html):
+      // the row at the centre sets a target, and the colour and the rows'
+      // opacity ease toward it, in OKLab, at their own pace.
+      const EASE = 0.085; // per-frame lerp factor, ~600ms to settle at 60fps
+      const SETTLED = 0.0015; // below this distance-to-target, snap and stop
+      const ROW_REST = 0.3;
+      let curLab = null;
+      let targetLab = null;
+      let painting = false;
+
+      function paintList() {
+        painting = false;
+        if (current || !targetLab) return;
+        const ease = reduceMotion.matches ? 1 : EASE;
+        let settling = false;
+
+        if (!curLab) {
+          curLab = targetLab;
+        } else {
+          let rest = 0;
+          curLab = curLab.map((v, k) => {
+            const nv = v + (targetLab[k] - v) * ease;
+            rest = Math.max(rest, Math.abs(targetLab[k] - nv));
+            return nv;
+          });
+          if (rest < SETTLED) curLab = targetLab;
+          else settling = true;
+        }
+
+        rows.forEach((row) => {
+          const target = row === activeRow ? 1 : ROW_REST;
+          let op = row.opacity + (target - row.opacity) * ease;
+          if (Math.abs(target - op) < SETTLED) op = target;
+          else settling = true;
+          row.opacity = op;
+          row.el.style.opacity = op;
+        });
+
+        const dark = curLab[0] < 0.62;
+        setPage(oklabToCss(curLab), dark ? "#f2f2f2" : "#111111");
         hdr.classList.toggle("on-colour", !dark);
         hdr.classList.toggle("on-dark", dark);
+
+        if (settling && !painting) {
+          painting = true;
+          requestAnimationFrame(paintList);
+        }
+      }
+
+      function activateRow(rowEl) {
+        activeRow = rows.find((row) => row.el === rowEl);
+        targetLab = hexToOklab(series[+rowEl.dataset.i].color);
+        if (!painting) {
+          painting = true;
+          requestAnimationFrame(paintList);
+        }
+      }
+
+      // Back from a gallery or on first load: no easing in, the page is
+      // simply already on the row at the centre of the screen.
+      function snapToCentre() {
+        const middle = window.innerHeight / 2;
+        const row =
+          rows.find(({ el }) => {
+            const r = el.getBoundingClientRect();
+            return r.top <= middle && r.bottom > middle;
+          }) || rows[0];
+        activeRow = row;
+        targetLab = hexToOklab(series[+row.el.dataset.i].color);
+        curLab = targetLab;
+        rows.forEach((r) => {
+          r.opacity = r === row ? 1 : ROW_REST;
+        });
+        paintList();
       }
 
       function renderList() {
         const nav = el("nav", "models");
+        rows = [];
         series.forEach((s, i) => {
           const a = el("a", "model");
           a.href = urlFor(s);
@@ -399,6 +463,7 @@
             navigate(s);
           });
           nav.appendChild(a);
+          rows.push({ el: a, opacity: ROW_REST });
           centreLine.observe(a);
         });
         view.replaceChildren(nav);
@@ -419,22 +484,17 @@
         grid.replaceChildren(...cols);
       }
 
-      phone.addEventListener("change", () => cascades.forEach(layoutCascade));
+      phone.addEventListener("change", () => {
+        cascades.forEach(layoutCascade);
+        photoTone();
+      });
 
       function buildCover(s) {
         const cover = el("div", "cover");
-        const picture = document.createElement("picture");
-        if (s.coverPhone) {
-          const source = document.createElement("source");
-          source.media = "(max-width: 700px)";
-          source.srcset = s.coverPhone;
-          picture.appendChild(source);
-        }
         const img = document.createElement("img");
         img.src = s.cover;
         img.alt = s.model;
-        picture.appendChild(img);
-        cover.appendChild(picture);
+        cover.appendChild(img);
         return cover;
       }
 
@@ -475,10 +535,15 @@
         hdr.classList.remove("on-colour", "on-dark");
       }
 
-      // White header while the full-screen photo is behind it.
+      // White header while the full-screen photo is behind it; on phones
+      // the photo sits lower, with the page's white behind the header.
       function photoTone() {
         const cover = view.querySelector(".cover");
-        const over = current && cover && window.pageYOffset < cover.offsetHeight - hdr.offsetHeight;
+        const over =
+          current &&
+          cover &&
+          !phone.matches &&
+          window.pageYOffset < cover.offsetHeight - hdr.offsetHeight;
         hdr.classList.toggle("on-photo", !!over);
       }
       window.addEventListener("scroll", photoTone, { passive: true });
@@ -486,7 +551,7 @@
       // --- routing ----------------------------------------------------
       function coverOf(s) {
         if (s) return view.querySelector(".cover img");
-        return activeRow && activeRow.querySelector(".model-cover");
+        return activeRow && activeRow.el.querySelector(".model-cover");
       }
 
       function show(s) {
@@ -495,9 +560,9 @@
           renderGallery(s);
           window.scrollTo(0, 0);
         } else {
-          activeRow = null;
           renderList();
           window.scrollTo(0, listY);
+          snapToCentre();
         }
         photoTone();
       }

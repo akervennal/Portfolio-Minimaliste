@@ -234,8 +234,7 @@ var SITE_CONFIG = {
         "model": "Nissan S14",
         "color": "#e9b9d4",
         "cover": "images/viking-cup-round-3-2026/7.jpg",
-        "coverPhone": "images/viking-cup-round-3-2026/12.jpg",
-        "groups": [
+          "groups": [
           {
             "label": "Vue d'ensemble",
             "photos": [
@@ -347,8 +346,7 @@ var SITE_CONFIG = {
         "model": "Mazda RX-8",
         "color": "#f2b61a",
         "cover": "images/viking-cup-round-3-2026/18.jpg",
-        "coverPhone": "images/viking-cup-round-3-2026/19.jpg",
-        "groups": [
+          "groups": [
           {
             "label": "À l'arrêt",
             "photos": [
@@ -400,8 +398,7 @@ var SITE_CONFIG = {
         "model": "BMW Série 1",
         "color": "#c01909",
         "cover": "images/viking-cup-round-3-2026/28.jpg",
-        "coverPhone": "images/viking-cup-round-3-2026/24.jpg",
-        "groups": [
+          "groups": [
           {
             "photos": [
               {
@@ -422,8 +419,7 @@ var SITE_CONFIG = {
         "model": "Hypercars",
         "color": "#0f1b2d",
         "cover": "images/24h-du-mans-2026/6-MEL_3648.jpg",
-        "coverPhone": "images/24h-du-mans-2026/7-MEL_3353.jpg",
-        "groups": [
+          "groups": [
           {
             "label": "Au crépuscule",
             "photos": [
