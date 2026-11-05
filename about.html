@@ -290,8 +290,10 @@
            that colour, and each scroll stops on the next sentence. The
            contact comes straight after the story.
            ============================================================ */
+        /* Mandatory: with proximity, a short swipe on iOS stops halfway
+           between two scenes. So every block needs a stop of its own. */
         html {
-          scroll-snap-type: y proximity;
+          scroll-snap-type: y mandatory;
         }
         #about {
           display: flex;
@@ -302,27 +304,34 @@
         }
         .contact {
           order: 2;
+          scroll-snap-align: start;
         }
         .kit {
           order: 3;
+          scroll-snap-align: start;
         }
         .quote {
           order: 4;
+          scroll-snap-align: start;
         }
+        /* Below the top edge, like the header in menu.css: iOS Safari
+           paints the status bar solid over anything fixed against it. The
+           photo melts into the colour there too, so no hard line shows
+           under the clock. */
         .stage {
-          top: 0;
-          height: 100svh;
+          top: 20px;
+          height: calc(100svh - 20px);
           overflow: hidden;
         }
         .stage img {
           inset: 0 0 auto;
           margin: 0;
           width: 100%;
-          height: 82svh;
+          height: calc(82svh - 20px);
           max-width: none;
           max-height: none;
           object-fit: cover;
-          mask-image: linear-gradient(#000 58%, transparent);
+          mask-image: linear-gradient(transparent, #000 10%, #000 58%, transparent);
         }
         .scenes {
           padding-top: 0;
@@ -515,12 +524,18 @@
       let targetLab = null;
       let painting = false;
       let lastPaint = 0;
+      let paintedCss = null;
+      let paintedDark = null;
 
       function applyColour() {
         const css = oklabToCss(curLab);
+        if (css === paintedCss) return;
+        paintedCss = css;
         document.documentElement.style.backgroundColor = css;
         document.body.style.backgroundColor = css;
         const dark = curLab[0] < 0.62;
+        if (dark === paintedDark) return;
+        paintedDark = dark;
         document.documentElement.style.setProperty("--fg", dark ? "#f2f2f2" : "#111111");
         document.documentElement.style.setProperty("--halo", dark ? "rgba(0, 0, 0, 0.6)" : "rgba(255, 255, 255, 0.85)");
       }
