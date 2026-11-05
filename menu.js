@@ -81,7 +81,6 @@
 // faded out otherwise.
 (function () {
   const hdr = document.getElementById("hdr");
-  if (hdr.classList.contains("hdr-solid")) return;
 
   const FADE_PX = 140; // scroll distance for a full fade
   const KEEP_FROM = 0.65; // opacity from which a scroll up settles visible

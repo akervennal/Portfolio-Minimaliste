@@ -1566,31 +1566,56 @@
       }
 
       // --- À propos ---------------------------------------------------
+      const ABOUT_FOLDER = "images/a-propos";
+
+      function labelled(label, control) {
+        return h("label", { class: "field" }, h("span", null, label), control);
+      }
+
       function pageAbout() {
         const about = cfg.content.about;
         const contact = cfg.content.contact;
+        const story = about.story;
+        const choosePhoto = async (obj, key) => {
+          const [src] = await pickPhotos({ folder: ABOUT_FOLDER });
+          if (src) commit(() => (obj[key] = src));
+        };
         return [
           h("h2", null, "À propos"),
-          h("h3", null, "Citation"),
-          h("div", { class: "fields" },
-            field("Citation", about, "quote", { long: true }),
-            field("Auteur", about, "quoteAuthor"),
-          ),
-          h("h3", null, "Texte"),
-          about.approche.map((text, index) => {
+          h("h3", null, "Récit"),
+          h("p", { class: "help" }, "Chaque bloc a son texte, sa photo et sa couleur de fond. La photo reste affichée tant que le bloc suivant garde la même : en en changeant, elle se fond dans la nouvelle. Un texte court s'affiche plus grand."),
+          story.map((scene, index) => {
             const handle = grip();
             return sortable(
               h("div", { class: "row" },
                 handle,
-                bindEdit(h("textarea", { class: "inline grow", rows: 3 }), () => about.approche[index], (v) => (about.approche[index] = v)),
-                h("button", { class: "link", title: "Supprimer", onclick: () => commit(() => about.approche.splice(index, 1)) }, "×"),
+                colour(scene, "color"),
+                bindEdit(h("textarea", { class: "inline grow", rows: 4 }), () => scene.text, (v) => (scene.text = v)),
+                h("div", { class: "tile" },
+                  scene.photo && photo(scene.photo),
+                  h("button", { class: "x", title: "Changer la photo", onclick: () => choosePhoto(scene, "photo") }, "✎"),
+                ),
+                h("button", { class: "link", title: "Supprimer", onclick: () => commit(() => story.splice(index, 1)) }, "×"),
               ),
-              { kind: "para", owner: about, get: () => [...about.approche], set: (l) => (about.approche = l), index, handle },
+              { kind: "scene", owner: about, get: () => [...story], set: (l) => (about.story = l), index, handle },
             );
           }),
-          h("button", { class: "btn", onclick: () => commit(() => about.approche.push("")) }, "+ Paragraphe"),
-          h("h3", null, "Équipement"),
-          h("p", { class: "help" }, "Deux lignes qui se suivent avec la même catégorie s'affichent ensemble."),
+          h("button", {
+            class: "btn",
+            onclick: () => commit(() => story.push({ text: "", photo: story.at(-1)?.photo || "", color: "#ffffff" })),
+          }, "+ Bloc de texte"),
+          h("h3", null, "Citation"),
+          h("div", { class: "fields" },
+            field("Citation", about, "quote", { long: true }),
+            field("Auteur", about, "quoteAuthor"),
+            labelled("Couleur de fond", colour(about, "quoteColor")),
+          ),
+          h("h3", null, "Chiffres et équipement"),
+          h("p", { class: "help" }, "Le nombre de photos et d'albums se calcule tout seul. Deux lignes qui se suivent avec la même catégorie s'affichent ensemble."),
+          h("div", { class: "fields", style: "margin-bottom:12px" },
+            field("Depuis (année)", about, "since"),
+            labelled("Couleur de fond", colour(about, "gearColor")),
+          ),
           about.gear.map((g, index) => {
             const handle = grip();
             return sortable(
@@ -1612,6 +1637,7 @@
             field("Basé à", contact, "location"),
             field("Instagram (nom affiché)", contact, "instagramHandle"),
             field("Instagram (lien)", contact, "instagramUrl"),
+            labelled("Couleur de fond", colour(about, "contactColor")),
             field("Phrase de contact", contact, "note", { long: true }),
           ),
         ];
@@ -1666,9 +1692,11 @@
           h("h3", null, "Petits textes"),
           h("div", { class: "fields" },
             field("Bouton de fermeture d'une photo", site.labels, "close"),
-            field("Libellé Email", site.labels, "email"),
-            field("Libellé Instagram", site.labels, "instagram"),
-            field("Libellé du lieu", site.labels, "location"),
+            field("À propos : mot sous l'année", site.labels, "since"),
+            field("À propos : mot sous le nombre de photos", site.labels, "photos"),
+            field("À propos : mot sous le nombre d'albums", site.labels, "albums"),
+            field("À propos : bouton pour copier l'email", site.labels, "copy"),
+            field("À propos : message une fois copié", site.labels, "copied"),
           ),
           h("h3", null, "Icône de l'onglet"),
           h("div", { class: "foot" },

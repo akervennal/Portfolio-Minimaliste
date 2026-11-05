@@ -141,10 +141,10 @@
 
 /* The header stays put and menu.js fades it with the scroll, so the
    pages' own slide-away class is switched off. */
-.hdr:not(.hdr-solid) {
+.hdr {
   transition: color 0.25s linear;
 }
-.hdr:not(.hdr-solid).is-hidden {
+.hdr.is-hidden {
   transform: none;
 }
 
@@ -153,12 +153,12 @@
    same spot on screen, but the offset comes from `top`, not padding.
    Crossing that edge brings the strip back too, hence the fade above. */
 @media (max-width: 700px), (hover: none) {
-  .hdr:not(.hdr-solid) {
+  .hdr {
     top: 20px;
     padding-top: 0;
     padding-bottom: 0;
   }
-  .hdr:not(.hdr-solid) .menu {
+  .hdr .menu {
     top: calc(100% + 12px);
   }
 }

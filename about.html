@@ -25,10 +25,10 @@
     <style>
       :root {
         --sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
-        --ink: #111;
-        --muted: rgba(17, 17, 17, 0.55);
-        --line: rgba(17, 17, 17, 0.12);
+        --fg: #111;
+        --halo: rgba(255, 255, 255, 0.85);
         --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        --pad: 32px;
       }
 
       *,
@@ -48,10 +48,11 @@
         font-family: var(--sans);
         font-weight: 400;
         font-size: 15px;
-        line-height: 1.7;
-        color: var(--ink);
+        line-height: 1.6;
+        color: var(--fg);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
       }
 
       a {
@@ -67,15 +68,16 @@
         display: flex;
         justify-content: space-between;
         align-items: baseline;
-        padding: 26px 32px;
+        padding: 26px var(--pad);
         font-size: 17px;
         font-weight: 500;
         letter-spacing: 0.01em;
-        background: #fff;
-        transition: transform 0.5s var(--ease);
+        color: var(--fg);
       }
-      .hdr.is-hidden {
-        transform: translateY(-140%);
+      /* keeps the header readable when a photo scrolls underneath it */
+      .hdr > a,
+      .hdr > button {
+        filter: drop-shadow(0 0 5px var(--halo));
       }
       .hdr a {
         text-decoration: none;
@@ -84,174 +86,246 @@
         opacity: 0.55;
       }
 
-      .page {
-        max-width: 62ch;
-        margin: 0 auto;
-        padding: 18vh 32px 14vh;
+      .label {
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        opacity: 0.6;
       }
 
-      /* Text blocks fade + rise in on load, staggered via an inline
-         transition-delay set per element in JS. Without JS (no .js class
-         on <html>) content just renders visible — no FOUC. */
-      .reveal {
-        transition:
-          opacity 0.7s var(--ease),
-          transform 0.7s var(--ease);
+      /* ============================================================
+         STORY — the text scrolls on the left while the photo holds on
+         the right. Each scene names its photo: as long as it doesn't
+         change the photo stays. A phone stacks the two: the photo holds
+         at the top and the text scrolls up beneath it, then under it.
+         ============================================================ */
+      .story {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
       }
-      .js .reveal {
+      .stage {
+        grid-column: 2;
+        grid-row: 1;
+        position: sticky;
+        top: 0;
+        height: 100svh;
+        padding: 84px var(--pad) 32px;
+      }
+      .stage img {
+        position: absolute;
+        inset: 84px var(--pad) 32px;
+        width: calc(100% - var(--pad) * 2);
+        height: calc(100% - 116px);
+        object-fit: contain;
         opacity: 0;
-        transform: translateY(14px);
+        transition: opacity 1.4s var(--ease);
       }
-      .reveal.in {
+      .stage img.on {
         opacity: 1;
-        transform: none;
+      }
+      .scenes {
+        grid-column: 1;
+        grid-row: 1;
+      }
+      .scene {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 120svh;
+        padding: 0 var(--pad);
+      }
+      .scene:first-child {
+        min-height: 100svh;
+      }
+      .scene img {
+        display: none;
+      }
+      .scene p {
+        max-width: 19em;
+        font-size: clamp(26px, 2.9vw, 46px);
+        font-weight: 500;
+        line-height: 1.16;
+        letter-spacing: -0.02em;
+      }
+      .scene p.short {
+        font-size: clamp(38px, 4.8vw, 76px);
+        line-height: 1.04;
+        letter-spacing: -0.03em;
+      }
+      .w {
+        opacity: 0.16;
       }
 
+      /* ============================================================
+         QUOTE, EQUIPMENT, CONTACT
+         ============================================================ */
       .quote {
-        margin: 0 0 4em;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 28px;
+        min-height: 110svh;
+        padding: 0 var(--pad);
       }
       .quote p {
-        font-size: 19px;
-        line-height: 1.5;
-        margin-bottom: 0.9em;
+        max-width: 15em;
+        font-size: clamp(38px, 6.6vw, 112px);
+        font-weight: 500;
+        line-height: 1.02;
+        letter-spacing: -0.03em;
       }
-      .quote cite {
-        font-style: normal;
-        font-size: 12px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--muted);
+      .kit {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 9vh;
+        min-height: 100svh;
+        padding: 14vh var(--pad);
       }
-
-      .prose p {
-        margin-bottom: 1.5em;
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
       }
-      .prose p:last-child {
-        margin-bottom: 0;
+      .stat b {
+        display: block;
+        font-size: clamp(46px, 9vw, 150px);
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.04em;
       }
-
-      .gear {
-        margin-top: 6em;
+      .gear-row {
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        align-items: baseline;
+        gap: 16px;
+        padding: 14px 0;
+        border-top: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
       }
-      .gear-item {
-        margin-bottom: 2.2em;
-      }
-      .gear-item:last-child {
-        margin-bottom: 0;
-      }
-      .gear-label {
-        font-size: 10px;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--muted);
-        margin-bottom: 0.5em;
+      .gear-row:last-child {
+        border-bottom: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
       }
       .gear-title {
-        font-size: 17px;
-        font-weight: 400;
+        font-size: clamp(20px, 2.4vw, 34px);
+        font-weight: 500;
+        letter-spacing: -0.01em;
       }
       .gear-title + .gear-title {
-        margin-top: 0.35em;
+        margin-top: 4px;
       }
-
-      .rule {
-        border: 0;
-        border-top: 1px solid var(--line);
-        margin: 5em 0 3.5em;
-      }
-
-      .contact dl {
-        display: grid;
-        grid-template-columns: 110px 1fr;
-        gap: 14px 24px;
-        margin-bottom: 3em;
-      }
-      .contact dt {
-        font-size: 10px;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--muted);
-        padding-top: 5px;
-      }
-      .contact dd a {
-        text-decoration: none;
-        border-bottom: 1px solid var(--line);
-        padding-bottom: 2px;
-        transition: border-color 0.3s;
-      }
-      .contact dd a:hover {
-        border-color: var(--ink);
+      .contact {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 34px;
+        min-height: 100svh;
+        padding: 12vh var(--pad);
       }
       .contact-note {
-        color: var(--muted);
-        max-width: 46ch;
+        max-width: 26em;
+        font-size: clamp(20px, 2.4vw, 34px);
+        font-weight: 500;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+      }
+      .mail {
+        display: block;
+        width: max-content;
+        font-size: 80px;
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .mail:hover {
+        opacity: 0.6;
+      }
+      .contact-more {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 10px 32px;
+        font-size: 17px;
+        font-weight: 500;
+      }
+      .contact-more a {
+        text-underline-offset: 4px;
+      }
+      .copy {
+        border: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        cursor: pointer;
       }
 
-      /* Desktop gets the whole thing on one screen, no scroll: a
-         two-column layout (words on the left, equipment + contact on
-         the right), vertically centred in the viewport. Mobile keeps
-         the single, more spacious scrolling column above. */
-      @media (min-width: 900px) {
-        .page {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          column-gap: 64px;
-          align-content: center;
-          min-height: 100svh;
-          max-width: 1040px;
-          padding: 84px 48px 36px;
-          line-height: 1.55;
+      @media (max-width: 900px) {
+        .story {
+          display: block;
+          padding-top: 64px;
         }
-        .quote {
-          margin: 0 0 1.6em;
+        /* Starts below the top edge on purpose: see the note on .hdr in
+           menu.css about iOS Safari and bars pinned there. */
+        .stage {
+          top: 64px;
+          z-index: 1;
+          height: 66svh;
+          padding: 0;
         }
-        .quote p {
-          font-size: 20px;
+        .stage img {
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 65%;
+          transition-duration: 0.8s;
         }
-        .prose p {
-          margin-bottom: 1.05em;
+        .scene,
+        .scene:first-child {
+          display: block;
+          min-height: 20svh;
+          padding: 24px var(--pad) 0;
         }
-        .gear {
-          margin-top: 0;
+        .scene:last-child {
+          min-height: 30svh;
         }
-        .gear-item {
-          margin-bottom: 1.1em;
+        .scene p,
+        .scene p.short {
+          font-size: 30px;
+          line-height: 1.1;
+          letter-spacing: -0.02em;
         }
-        .rule {
-          margin: 1.8em 0 1.4em;
+        .w {
+          opacity: 1 !important;
         }
-        .contact dl {
-          margin-bottom: 1.2em;
+        .quote,
+        .kit {
+          display: none;
+        }
+        .contact {
+          min-height: 62svh;
+          gap: 16px;
+          padding: 40px var(--pad);
+        }
+        .contact-note {
+          font-size: 17px;
         }
       }
 
       @media (max-width: 700px) {
+        :root {
+          --pad: 20px;
+        }
         .hdr {
-          padding: 20px 20px;
           font-size: 15px;
-        }
-        .page {
-          padding: 22vh 20px 16vh;
-        }
-        .quote p {
-          font-size: 17px;
-        }
-        .contact dl {
-          grid-template-columns: 1fr;
-          gap: 4px 0;
-        }
-        .contact dt {
-          padding-top: 14px;
         }
       }
 
       /* ============================================================
-         PAGE TRANSITIONS (index <-> about)
-
-         A cross-document view transition — the browser crossfades the
-         old and new page in place instead of hard-cutting between them.
-         Pure progressive enhancement: unsupported browsers just navigate
-         as before, nothing to feature-detect or fall back manually.
+         PAGE TRANSITIONS
          ============================================================ */
       @view-transition {
         navigation: auto;
@@ -263,9 +337,11 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .hdr,
-        .reveal {
+        .stage img {
           transition: none;
+        }
+        .w {
+          opacity: 1;
         }
         ::view-transition-group(*),
         ::view-transition-old(*),
@@ -278,7 +354,7 @@
   </head>
 
   <body data-page="about">
-    <header class="hdr hdr-solid" id="hdr">
+    <header class="hdr" id="hdr">
       <a href="index.html">Armel Kervennal</a>
       <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
       <nav class="menu" id="menu" hidden>
@@ -289,16 +365,19 @@
     </header>
     <div class="menu-scrim" id="menuScrim" hidden></div>
 
-    <main class="page" id="about"></main>
+    <main id="about"></main>
 
     <script src="site-config.js"></script>
     <script src="menu.js"></script>
+    <script src="colour.js"></script>
     <script>
-      const cfg = (window.SITE_CONFIG && SITE_CONFIG.content) || {};
-      const about = cfg.about || {};
-      const contact = cfg.contact || {};
-      const labels = (window.SITE_CONFIG && SITE_CONFIG.site && SITE_CONFIG.site.labels) || {};
+      const site = window.SITE_CONFIG || {};
+      const about = (site.content || {}).about || {};
+      const contact = (site.content || {}).contact || {};
+      const labels = (site.site || {}).labels || {};
+      const story = about.story || [];
       const root = document.getElementById("about");
+      const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
       function el(tag, cls, text) {
         const n = document.createElement(tag);
@@ -307,130 +386,248 @@
         return n;
       }
 
-      // Stagger each top-level text block's entrance by its order on
-      // the page, so they read as one cascade rather than popping in
-      // together.
-      let revealIndex = 0;
-      function reveal(node) {
-        node.classList.add("reveal");
-        node.style.transitionDelay = revealIndex++ * 90 + "ms";
-        return node;
-      }
+      // --- story ------------------------------------------------------
+      const SHORT_TEXT = 110; // up to this length, a scene is set larger
+      const stage = el("div", "stage");
+      const scenes = el("div", "scenes");
+      const stageImgs = new Map();
+      const sections = []; // every block that sets the page's colour
+      const texts = []; // { box, words } lit up by the scroll
 
-      // Two columns on desktop (words on the left, equipment + contact on
-      // the right) so everything fits on one screen; on mobile these are
-      // plain divs with no layout of their own, so content just stacks
-      // in this same order.
-      const colWords = el("div", "col-words");
-      const colInfo = el("div", "col-info");
+      story.forEach((scene) => {
+        const sec = el("section", "scene");
+        sec.dataset.photo = scene.photo || "";
+
+        if (scene.photo) {
+          const img = el("img");
+          img.src = scene.photo;
+          img.alt = "";
+          sec.appendChild(img);
+          if (!stageImgs.has(scene.photo)) {
+            const big = el("img");
+            big.src = scene.photo;
+            big.alt = "";
+            stageImgs.set(scene.photo, big);
+            stage.appendChild(big);
+          }
+        }
+
+        const p = el("p", scene.text.length <= SHORT_TEXT ? "short" : null);
+        const words = scene.text.split(/\s+/).filter(Boolean).map((word) => {
+          const w = el("span", "w", word);
+          p.append(w, " ");
+          return w;
+        });
+        sec.appendChild(p);
+        scenes.appendChild(sec);
+        texts.push({ box: p, words });
+        sections.push({ el: sec, color: scene.color });
+      });
+
+      const storyEl = el("div", "story");
+      storyEl.append(stage, scenes);
+      root.appendChild(storyEl);
 
       // --- quote ------------------------------------------------------
       if (about.quote) {
-        const fig = el("figure", "quote");
-        const bq = document.createElement("blockquote");
-        bq.appendChild(el("p", null, "« " + about.quote + " »"));
-        fig.appendChild(bq);
-        if (about.quoteAuthor) {
-          const cap = document.createElement("figcaption");
-          cap.appendChild(el("cite", null, about.quoteAuthor));
-          fig.appendChild(cap);
+        const q = el("figure", "quote");
+        q.appendChild(el("p", null, "« " + about.quote + " »"));
+        if (about.quoteAuthor) q.appendChild(el("figcaption", "label", about.quoteAuthor));
+        root.appendChild(q);
+        sections.push({ el: q, color: about.quoteColor });
+      }
+
+      // --- figures and equipment --------------------------------------
+      const kit = el("section", "kit");
+      const stats = el("div", "stats");
+      function stat(value, label) {
+        const s = el("div", "stat");
+        s.append(el("b", null, value), el("span", "label", label));
+        stats.appendChild(s);
+      }
+      // Counted from the albums, so these stay true by themselves.
+      const albums = Object.values(site.projects || {});
+      const photos = new Set(albums.flatMap((a) => a.photos || []));
+      if (about.since) stat(about.since, labels.since || "depuis");
+      stat(String(photos.size), labels.photos || "photos");
+      stat(String(albums.length), labels.albums || "albums");
+      kit.appendChild(stats);
+
+      const gear = el("div");
+      let lastLabel = null;
+      let item = null;
+      (about.gear || []).forEach((g) => {
+        if (!item || g.label !== lastLabel) {
+          item = el("div");
+          const row = el("div", "gear-row");
+          row.append(el("span", "label", g.label), item);
+          gear.appendChild(row);
+          lastLabel = g.label;
         }
-        colWords.appendChild(reveal(fig));
-      }
-
-      // --- approche ---------------------------------------------------
-      if ((about.approche || []).length) {
-        const sec = el("section", "prose");
-        about.approche.forEach((p) => sec.appendChild(el("p", null, p)));
-        colWords.appendChild(reveal(sec));
-      }
-
-      // --- équipement — label and model only, no commentary -----------
-      // Consecutive entries sharing a label (eg. the two lenses, both
-      // "Objectifs") render as one block: the label once, then each
-      // model underneath it.
-      if ((about.gear || []).length) {
-        const sec = el("section", "gear");
-        let item = null;
-        let lastLabel = null;
-        about.gear.forEach((g) => {
-          if (!item || g.label !== lastLabel) {
-            item = el("div", "gear-item");
-            if (g.label) item.appendChild(el("div", "gear-label", g.label));
-            sec.appendChild(item);
-            lastLabel = g.label;
-          }
-          if (g.title) item.appendChild(el("h2", "gear-title", g.title));
-        });
-        colInfo.appendChild(reveal(sec));
-      }
+        item.appendChild(el("div", "gear-title", g.title));
+      });
+      kit.appendChild(gear);
+      root.appendChild(kit);
+      sections.push({ el: kit, color: about.gearColor });
 
       // --- contact ----------------------------------------------------
-      colInfo.appendChild(el("hr", "rule"));
-
       const cs = el("section", "contact");
-      const dl = document.createElement("dl");
+      if (contact.note) cs.appendChild(el("p", "contact-note", contact.note));
+      const mail = el("a", "mail", contact.email);
+      mail.href = "mailto:" + contact.email;
+      cs.appendChild(mail);
 
-      function row(label, node) {
-        dl.appendChild(el("dt", null, label));
-        const dd = document.createElement("dd");
-        dd.appendChild(node);
-        dl.appendChild(dd);
-      }
-
-      if (contact.email) {
-        const a = el("a", null, contact.email);
-        a.href = "mailto:" + contact.email;
-        row(labels.email || "Email", a);
-      }
+      const more = el("div", "contact-more");
+      const copy = el("button", "copy", labels.copy || "copier");
+      copy.type = "button";
+      copy.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(contact.email);
+        copy.textContent = labels.copied || "copié";
+        setTimeout(() => (copy.textContent = labels.copy || "copier"), 1800);
+      });
+      more.appendChild(copy);
       if (contact.instagramHandle) {
         const a = el("a", null, contact.instagramHandle);
         a.href = contact.instagramUrl || "#";
         a.target = "_blank";
         a.rel = "noopener";
-        row(labels.instagram || "Instagram", a);
+        more.appendChild(a);
       }
-      if (contact.location) {
-        row(labels.location || "Basé à", document.createTextNode(contact.location));
+      if (contact.location) more.appendChild(el("span", null, contact.location));
+      cs.appendChild(more);
+      root.appendChild(cs);
+      sections.push({ el: cs, color: about.contactColor });
+
+      // The address fills the width, whatever its length.
+      function fitMail() {
+        const room = cs.clientWidth - 2 * parseFloat(getComputedStyle(cs).paddingLeft);
+        mail.style.fontSize = "100px";
+        const size = (100 * room) / mail.offsetWidth;
+        mail.style.fontSize = Math.min(size, 190) + "px";
       }
-      cs.appendChild(dl);
+      fitMail();
+      document.fonts.ready.then(fitMail);
+      window.addEventListener("resize", fitMail);
 
-      if (contact.note) cs.appendChild(el("p", "contact-note", contact.note));
-      colInfo.appendChild(reveal(cs));
+      // --- colour: same treatment as the homepage ---------------------
+      // The block at the centre of the screen sets a target, and the
+      // colour eases toward it in OKLab at its own pace.
+      const EASE = 0.085; // lerp factor per 60fps frame
+      const FRAME_MS = 1000 / 60;
+      const SETTLED = 0.0015;
+      let curLab = null;
+      let targetLab = null;
+      let painting = false;
+      let lastPaint = 0;
 
-      root.appendChild(colWords);
-      root.appendChild(colInfo);
+      function paint() {
+        painting = false;
+        const now = performance.now();
+        const frames = Math.min(now - lastPaint, 100) / FRAME_MS;
+        lastPaint = now;
+        const ease = reduceMotion.matches ? 1 : 1 - Math.pow(1 - EASE, frames);
 
-      // Two frames: one for layout/paint to settle, one for the browser
-      // to register the pre-transition styles before we flip them —
-      // otherwise the transition can get skipped and the text just snaps in.
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          root.querySelectorAll(".reveal").forEach((n) => n.classList.add("in"));
+        let rest = 0;
+        curLab = curLab.map((v, k) => {
+          const nv = v + (targetLab[k] - v) * ease;
+          rest = Math.max(rest, Math.abs(targetLab[k] - nv));
+          return nv;
         });
-      });
+        if (rest < SETTLED) curLab = targetLab;
 
-      // --- header hide on scroll down ---------------------------------
-      const hdr = document.getElementById("hdr");
-      let lastY = window.pageYOffset;
-      let hidden = false;
-      window.addEventListener(
-        "scroll",
-        () => {
-          const y = window.pageYOffset;
-          const dy = y - lastY;
-          if (Math.abs(dy) <= 6) return;
-          if (dy > 0 && y > 80 && !hidden) {
-            hidden = true;
-            hdr.classList.add("is-hidden");
-          } else if (dy < 0 && hidden) {
-            hidden = false;
-            hdr.classList.remove("is-hidden");
+        const css = oklabToCss(curLab);
+        document.documentElement.style.backgroundColor = css;
+        document.body.style.backgroundColor = css;
+        const dark = curLab[0] < 0.62;
+        document.documentElement.style.setProperty("--fg", dark ? "#f2f2f2" : "#111111");
+        document.documentElement.style.setProperty("--halo", dark ? "rgba(0, 0, 0, 0.6)" : "rgba(255, 255, 255, 0.85)");
+
+        if (curLab !== targetLab) {
+          painting = true;
+          requestAnimationFrame(paint);
+        }
+      }
+
+      function setColour(hex) {
+        const lab = hexToOklab(hex || "#ffffff");
+        if (targetLab && lab.every((v, k) => v === targetLab[k])) return;
+        targetLab = lab;
+        if (!curLab) curLab = lab;
+        if (!painting) {
+          painting = true;
+          lastPaint = performance.now();
+          requestAnimationFrame(paint);
+        }
+      }
+
+      // --- scroll -----------------------------------------------------
+      const phoneLayout = matchMedia("(max-width: 900px)");
+      let shownPhoto = null;
+
+      function showPhoto(src) {
+        if (!src || src === shownPhoto) return;
+        shownPhoto = src;
+        stageImgs.forEach((img, key) => img.classList.toggle("on", key === src));
+      }
+
+      // Past the photo, a text would reappear in the gap above it.
+      function hideUnderPhoto() {
+        const edge = stage.getBoundingClientRect().bottom;
+        texts.forEach(({ box }) => {
+          const under = phoneLayout.matches && box.getBoundingClientRect().bottom < edge;
+          box.style.visibility = under ? "hidden" : "";
+        });
+      }
+
+      function lightWords() {
+        const vh = window.innerHeight;
+        // The opening sentence is on screen before any scroll: always lit.
+        texts.forEach(({ box, words }, index) => {
+          if (index === 0) {
+            words.forEach((w) => (w.style.opacity = 1));
+            return;
           }
-          lastY = y;
-        },
-        { passive: true },
-      );
+          const r = box.getBoundingClientRect();
+          // From the moment a text enters to when it sits centred.
+          const progress = (vh * 0.9 - r.top) / (vh * 0.4 + r.height / 2);
+          const lit = progress * words.length;
+          words.forEach((w, i) => {
+            const on = Math.max(0, Math.min(1, lit - i));
+            w.style.opacity = reduceMotion.matches ? 1 : 0.16 + on * 0.84;
+          });
+        });
+      }
+
+      function onScroll() {
+        scrollQueued = false;
+        // What is being read: on a phone, the text just below the photo.
+        const reading = phoneLayout.matches
+          ? stage.getBoundingClientRect().bottom + window.innerHeight * 0.1
+          : window.innerHeight / 2;
+        const active = sections.find(({ el: s }) => {
+          const r = s.getBoundingClientRect();
+          return r.top <= reading && r.bottom > reading;
+        });
+        if (active) {
+          setColour(active.color);
+          showPhoto(active.el.dataset.photo);
+        }
+        lightWords();
+        hideUnderPhoto();
+      }
+
+      let scrollQueued = false;
+      function queueScroll() {
+        if (scrollQueued) return;
+        scrollQueued = true;
+        requestAnimationFrame(onScroll);
+      }
+      window.addEventListener("scroll", queueScroll, { passive: true });
+      window.addEventListener("resize", queueScroll);
+      // Each photo that loads pushes the page down: "load" doesn't bubble,
+      // hence the capture.
+      root.addEventListener("load", queueScroll, true);
+      onScroll();
     </script>
   </body>
 </html>

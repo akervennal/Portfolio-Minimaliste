@@ -37,7 +37,12 @@ var SITE_CONFIG = {
       "close": "fermer · esc",
       "email": "Email",
       "instagram": "Instagram",
-      "location": "Basé à"
+      "location": "Basé à",
+      "since": "depuis",
+      "photos": "photos",
+      "albums": "albums",
+      "copy": "copier l'adresse",
+      "copied": "adresse copiée"
     }
   },
   "sequence": [
@@ -179,11 +184,6 @@ var SITE_CONFIG = {
       "portrait": "images/auto-portrait/IMG_0321(2).JPG",
       "quote": "The camera is an instrument that teaches people how to see without a camera.",
       "quoteAuthor": "Dorothea Lange",
-      "approche": [
-        "Ma mère m'a mis un appareil entre les mains en 2018. Je ne l'ai plus reposé depuis.",
-        "Mon approche a profondément évolué avec le temps. Si mes débuts ont été marqués par une quête de perfection technique pour « impressionner l'œil », j'ai vite compris qu'une image trop stylisée racontait le photographe plutôt que le sujet.",
-        "Aujourd'hui, mon ambition est de m'effacer pour laisser parler l'instant. J'ai fait le choix d'un traitement sobre et naturel, pensé pour restituer fidèlement l'émotion du moment."
-      ],
       "gear": [
         {
           "label": "Boîtier",
@@ -210,14 +210,35 @@ var SITE_CONFIG = {
             "Conçu pour le plein format, il n'utilise sur mon boîtier APS-C que la partie centrale de son image, généralement la plus nette de tout objectif. Sur un capteur DX, ça donne l'équivalent d'un 75mm : bien pour le portrait, un peu long pour le paysage ou la photo documentaire en intérieur, ce qui explique qu'il reste le moins utilisé des trois."
           ]
         }
-      ]
+      ],
+      "story": [
+        {
+          "text": "Étudiant ingénieur, passionné de photo.",
+          "photo": "images/a-propos/portrait-voile.jpg",
+          "color": "#dbe4ea"
+        },
+        {
+          "text": "Voitures et portraits, gratuitement.",
+          "photo": "images/R%C3%A9publique%20Czech%202026/30-MEL_6638.jpg",
+          "color": "#a8553a"
+        },
+        {
+          "text": "Basé à Nantes. Rennes, Angers, Laval et Le Mans en train.",
+          "photo": "images/a-propos/11-MEL_2236.jpg",
+          "color": "#b7d2e4"
+        }
+      ],
+      "quoteColor": "#111111",
+      "gearColor": "#ebe9e4",
+      "contactColor": "#e8dc5c",
+      "since": "2018"
     },
     "contact": {
       "email": "akervennal@gmail.com",
       "instagramHandle": "@armel_kervennal",
       "instagramUrl": "https://instagram.com/armel_kervennal",
       "location": "Nantes, France",
-      "note": "Toujours partant pour de nouveaux shootings ou projets photo — n'hésite pas à m'écrire."
+      "note": "Un shooting en tête ?"
     }
   },
   "auto": {
