@@ -212,35 +212,6 @@
         animation-timing-function: var(--ease);
       }
 
-      /* Prolongs Safari's own blur under the clock a little further down
-         the screen. Stays 12px clear of the top edge and leaves the blur
-         to an absolute child, or iOS paints a solid bar there instead
-         (see the note on .hdr in menu.css). */
-      .top-blur {
-        display: none;
-      }
-      @media (max-width: 700px), (hover: none) {
-        .top-blur {
-          display: block;
-          position: fixed;
-          top: 12px;
-          left: 0;
-          right: 0;
-          height: 84px;
-          z-index: 49;
-          pointer-events: none;
-        }
-        .top-blur::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
-          -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10px, #000 25%, transparent);
-          mask-image: linear-gradient(to bottom, transparent, #000 10px, #000 25%, transparent);
-        }
-      }
-
       @media (prefers-reduced-motion: reduce) {
         .g-item,
         .hdr {
@@ -267,8 +238,6 @@
       </nav>
     </header>
     <div class="menu-scrim" id="menuScrim" hidden></div>
-
-    <div class="top-blur"></div>
 
     <main id="seq"></main>
 
