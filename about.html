@@ -324,7 +324,7 @@
         .story {
           grid-template-columns: 1fr;
           --photo-top: 52px; /* below the header, from the stage's top */
-          --photo-h: 56svh;
+          --photo-h: 62svh;
         }
         .contact,
         .kit,
@@ -345,9 +345,9 @@
           inset: var(--photo-top) var(--pad) auto;
           width: calc(100% - 2 * var(--pad));
           height: var(--photo-h);
-          /* whole, uncropped: sitting on the sentence, along the margin */
+          /* whole, uncropped: centred, sitting on the sentence */
           object-fit: contain;
-          object-position: left bottom;
+          object-position: center bottom;
           transition: none;
           will-change: opacity, filter;
         }
