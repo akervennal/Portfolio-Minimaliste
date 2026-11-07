@@ -345,7 +345,9 @@
           inset: var(--photo-top) var(--pad) auto;
           width: calc(100% - 2 * var(--pad));
           height: var(--photo-h);
-          object-fit: cover;
+          /* whole, uncropped: sitting on the sentence, along the margin */
+          object-fit: contain;
+          object-position: left bottom;
           transition: none;
           will-change: opacity, filter;
         }
