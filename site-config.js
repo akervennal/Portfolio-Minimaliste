@@ -214,7 +214,7 @@ var SITE_CONFIG = {
       "story": [
         {
           "text": "Étudiant ingénieur, passionné de photo.",
-          "photo": "images/a-propos/portrait-voile.jpg",
+          "photo": "images/a-propos/MEL_2152.jpg",
           "color": "#dbe4ea"
         },
         {
