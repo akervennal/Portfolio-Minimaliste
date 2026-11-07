@@ -331,8 +331,9 @@
           scroll-snap-align: start;
         }
         /* Below the top edge, like the header in menu.css: iOS Safari
-           paints the status bar solid over anything fixed against it. The
-           photos reach past that edge, to carry on behind the clock. */
+           paints the status bar solid over anything fixed against it. So
+           the photos stay clear of the clock and melt into the colour at
+           the top as well as at the bottom. */
         .stage {
           grid-column: 1;
           top: 20px;
@@ -340,11 +341,11 @@
           padding: 0;
         }
         .stage img {
-          inset: -100px 0 auto;
+          inset: 0 0 auto;
           width: 100%;
-          height: calc(82svh + 80px);
+          height: calc(82svh - 20px);
           object-fit: cover;
-          mask-image: linear-gradient(#000 calc(100% - 34svh), transparent);
+          mask-image: linear-gradient(transparent, #000 90px, #000 calc(100% - 34svh), transparent);
           transition: none;
           will-change: opacity, filter;
         }
