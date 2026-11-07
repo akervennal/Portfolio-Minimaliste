@@ -312,9 +312,9 @@
         }
 
         /* ============================================================
-           PHONE — the same cycle, one screen per scene: the photo runs
-           edge to edge and melts into the colour, the sentence sits on
-           that colour, and each scroll stops on the next block.
+           PHONE — the same cycle, one screen per scene: the photo within
+           the margins, the sentence just under it on the colour, and each
+           scroll stops on the next block.
            ============================================================ */
         /* Mandatory: with proximity, a short swipe on iOS stops halfway
            between two scenes. So every block needs a stop of its own. */
@@ -323,6 +323,8 @@
         }
         .story {
           grid-template-columns: 1fr;
+          --photo-top: 52px; /* below the header, from the stage's top */
+          --photo-h: 56svh;
         }
         .contact,
         .kit,
@@ -331,9 +333,8 @@
           scroll-snap-align: start;
         }
         /* Below the top edge, like the header in menu.css: iOS Safari
-           paints the status bar solid over anything fixed against it. So
-           the photos stay clear of the clock and melt into the colour at
-           the top as well as at the bottom. */
+           paints the status bar solid over anything fixed against it. The
+           photo sits within the margins, under the header, on the colour. */
         .stage {
           grid-column: 1;
           top: 20px;
@@ -341,11 +342,10 @@
           padding: 0;
         }
         .stage img {
-          inset: 0 0 auto;
-          width: 100%;
-          height: calc(82svh - 20px);
+          inset: var(--photo-top) var(--pad) auto;
+          width: calc(100% - 2 * var(--pad));
+          height: var(--photo-h);
           object-fit: cover;
-          mask-image: linear-gradient(transparent, #000 90px, #000 calc(100% - 34svh), transparent);
           transition: none;
           will-change: opacity, filter;
         }
@@ -364,7 +364,8 @@
           position: absolute;
           left: var(--pad);
           right: var(--pad);
-          bottom: 44px;
+          /* just under the photo: the stage starts 20px down */
+          top: calc(20px + var(--photo-top) + var(--photo-h) + 28px);
           max-width: none;
           font-size: 34px;
           line-height: 1.06;
@@ -449,8 +450,20 @@
         const sec = el("section", "scene");
         sec.dataset.photo = scene.photo || "";
         const text = el("p", scene.text.length <= SHORT_TEXT ? "short" : null);
-        const words = scene.text.split(/\s+/).filter(Boolean).map((word) => {
-          const w = el("span", "w", word);
+        // The words set in the admin as highlight take their own colour.
+        const mark = (scene.highlight || "").trim();
+        const at = mark ? scene.text.toLowerCase().indexOf(mark.toLowerCase()) : -1;
+        const words = [...scene.text.matchAll(/\S+/g)].map((m) => {
+          const w = el("span", "w");
+          const from = Math.max(at - m.index, 0);
+          const to = Math.min(at + mark.length - m.index, m[0].length);
+          if (at >= 0 && from < to) {
+            const hit = el("span", null, m[0].slice(from, to));
+            hit.style.color = scene.highlightColor || "";
+            w.append(m[0].slice(0, from), hit, m[0].slice(to));
+          } else {
+            w.textContent = m[0];
+          }
           text.append(w, " ");
           return w;
         });

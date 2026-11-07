@@ -216,12 +216,16 @@ var SITE_CONFIG = {
         {
           "text": "Voitures et portraits, gratuitement.",
           "photo": "images/a-propos/MEL_6644.jpg",
-          "color": "#909ba1"
+          "color": "#909ba1",
+          "highlight": "gratuitement",
+          "highlightColor": "#56332b"
         },
         {
           "text": "Basé à Nantes. Rennes, Angers, Laval et Le Mans en train.",
           "photo": "images/a-propos/11-MEL_2236.jpg",
-          "color": "#8bb3d6"
+          "color": "#8bb3d6",
+          "highlight": "Nantes",
+          "highlightColor": "#fff23a"
         }
       ],
       "quoteColor": "#111111",
