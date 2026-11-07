@@ -310,8 +310,16 @@
           inset: -70px -20px -24px -90px;
           -webkit-backdrop-filter: blur(10px);
           backdrop-filter: blur(10px);
-          -webkit-mask-image: radial-gradient(ellipse at 100% 100%, #000 45%, transparent 75%);
-          mask-image: radial-gradient(ellipse at 100% 100%, #000 45%, transparent 75%);
+          /* Fades out toward the bottom too: on iOS Safari the page goes
+             on, unblurred, under the toolbar below this edge. */
+          -webkit-mask-image:
+            radial-gradient(ellipse at 100% 100%, #000 45%, transparent 75%),
+            linear-gradient(#000 calc(100% - 40px), transparent);
+          -webkit-mask-composite: source-in;
+          mask-image:
+            radial-gradient(ellipse at 100% 100%, #000 45%, transparent 75%),
+            linear-gradient(#000 calc(100% - 40px), transparent);
+          mask-composite: intersect;
           pointer-events: none;
         }
         .hdr {
