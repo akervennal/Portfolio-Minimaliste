@@ -211,7 +211,9 @@ var SITE_CONFIG = {
         {
           "text": "Étudiant ingénieur, passionné de photo.",
           "photo": "images/a-propos/MEL_2152.jpg",
-          "color": "#d4d7de"
+          "color": "#d4d7de",
+          "highlight": "passionné",
+          "highlightColor": "#4f5ca5"
         },
         {
           "text": "Voitures et portraits, gratuitement.",
