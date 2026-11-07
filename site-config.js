@@ -215,17 +215,17 @@ var SITE_CONFIG = {
         {
           "text": "Étudiant ingénieur, passionné de photo.",
           "photo": "images/a-propos/MEL_2152.jpg",
-          "color": "#dbe4ea"
+          "color": "#d4d7de"
         },
         {
           "text": "Voitures et portraits, gratuitement.",
-          "photo": "images/R%C3%A9publique%20Czech%202026/30-MEL_6638.jpg",
-          "color": "#a8553a"
+          "photo": "images/a-propos/MEL_6644.jpg",
+          "color": "#909ba1"
         },
         {
           "text": "Basé à Nantes. Rennes, Angers, Laval et Le Mans en train.",
           "photo": "images/a-propos/11-MEL_2236.jpg",
-          "color": "#b7d2e4"
+          "color": "#8bb3d6"
         }
       ],
       "quoteColor": "#111111",

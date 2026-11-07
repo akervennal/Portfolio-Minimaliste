@@ -81,6 +81,8 @@
 // faded out otherwise.
 (function () {
   const hdr = document.getElementById("hdr");
+  // A page can keep its header on screen the whole time.
+  if (document.body.dataset.header === "stay") return;
 
   const FADE_PX = 140; // scroll distance for a full fade
   const KEEP_FROM = 0.65; // opacity from which a scroll up settles visible
