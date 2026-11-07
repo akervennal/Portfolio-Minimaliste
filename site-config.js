@@ -77,9 +77,13 @@ var SITE_CONFIG = {
       "photos": [
         "images/R%C3%A9publique%20Czech%202026/28-MEL_6609.jpg",
         "images/R%C3%A9publique%20Czech%202026/45-MEL_6749.jpg",
-        "images/R%C3%A9publique%20Czech%202026/48-MEL_6757.jpg",
-        "images/R%C3%A9publique%20Czech%202026/4-MEL_6357.jpg"
+        "images/R%C3%A9publique%20Czech%202026/48-MEL_6757.jpg"
       ]
+    },
+    {
+      "type": "single",
+      "src": "images/showcase/IMG_4776_TIF.jpg",
+      "bg": "#11181d"
     },
     {
       "type": "single",
@@ -104,7 +108,7 @@ var SITE_CONFIG = {
     },
     {
       "type": "group",
-      "bg": "#000000",
+      "bg": "#8a9295",
       "photos": [
         "images/R%C3%A9publique%20Czech%202026/30-MEL_6638.jpg",
         "images/R%C3%A9publique%20Czech%202026/31-MEL_6642.jpg",
@@ -114,7 +118,7 @@ var SITE_CONFIG = {
     {
       "type": "single",
       "src": "images/showcase/MEL_9003.jpg",
-      "bg": "#ffffff"
+      "bg": "#00559d"
     },
     {
       "type": "group",
@@ -126,22 +130,14 @@ var SITE_CONFIG = {
       ]
     },
     {
-      "type": "group",
+      "type": "single",
       "bg": "#ffffff",
-      "photos": [
-        "images/showcase/MEL_9768.jpg",
-        "images/showcase/hero/MEL_9528.jpg"
-      ]
+      "src": "images/showcase/MEL_9768.jpg"
     },
     {
       "type": "single",
       "src": "images/showcase/1-MEL_3166.jpg",
       "bg": "#3d4322"
-    },
-    {
-      "type": "single",
-      "src": "images/showcase/IMG_4776_TIF.jpg",
-      "bg": "#11181d"
     },
     {
       "type": "single",
