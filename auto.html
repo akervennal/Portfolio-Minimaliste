@@ -137,7 +137,8 @@
         right: var(--gap);
         bottom: 28px;
         z-index: 10;
-        font-size: 15px;
+        --index-line: 28px;
+        font-size: 20px;
         font-weight: 500;
       }
       /* Five brands at most on screen: past that the list scrolls, by
@@ -149,26 +150,36 @@
         flex-direction: column;
         align-items: flex-end;
         gap: 2px;
-        max-height: calc(5 * 24px + 4 * 2px);
+        max-height: calc(5 * var(--index-line) + 4 * 2px);
         overflow-y: auto;
         overscroll-behavior: contain;
         scrollbar-width: none;
-        line-height: 24px;
+        line-height: var(--index-line);
       }
       .index-list::-webkit-scrollbar {
         display: none;
       }
       .index-list.more-above {
-        -webkit-mask-image: linear-gradient(transparent, #000 24px);
-        mask-image: linear-gradient(transparent, #000 24px);
+        -webkit-mask-image: linear-gradient(transparent, #000 var(--index-line));
+        mask-image: linear-gradient(transparent, #000 var(--index-line));
       }
       .index-list.more-below {
-        -webkit-mask-image: linear-gradient(#000 calc(100% - 24px), transparent);
-        mask-image: linear-gradient(#000 calc(100% - 24px), transparent);
+        -webkit-mask-image: linear-gradient(#000 calc(100% - var(--index-line)), transparent);
+        mask-image: linear-gradient(#000 calc(100% - var(--index-line)), transparent);
       }
       .index-list.more-above.more-below {
-        -webkit-mask-image: linear-gradient(transparent, #000 24px, #000 calc(100% - 24px), transparent);
-        mask-image: linear-gradient(transparent, #000 24px, #000 calc(100% - 24px), transparent);
+        -webkit-mask-image: linear-gradient(
+          transparent,
+          #000 var(--index-line),
+          #000 calc(100% - var(--index-line)),
+          transparent
+        );
+        mask-image: linear-gradient(
+          transparent,
+          #000 var(--index-line),
+          #000 calc(100% - var(--index-line)),
+          transparent
+        );
       }
       .index a {
         text-decoration: none;
@@ -302,6 +313,8 @@
         .index {
           right: 20px;
           bottom: 24px;
+          --index-line: 24px;
+          font-size: 15px;
         }
         .index::before {
           content: "";
