@@ -129,6 +129,57 @@
         text-decoration: none;
         opacity: 0.3;
       }
+      /* The index: every brand, small, to jump to its first model.
+         Fixed in the bottom right corner, clear of the photos on the left
+         of a big screen. */
+      .index {
+        position: fixed;
+        right: var(--gap);
+        bottom: 28px;
+        z-index: 10;
+        font-size: 15px;
+        font-weight: 500;
+      }
+      /* Five brands at most on screen: past that the list scrolls, by
+         hand or by itself to keep the brand on screen in view (see
+         followIndex), and fades out at the edge that has more. */
+      .index-list {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+        max-height: calc(5 * 24px + 4 * 2px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: none;
+        line-height: 24px;
+      }
+      .index-list::-webkit-scrollbar {
+        display: none;
+      }
+      .index-list.more-above {
+        -webkit-mask-image: linear-gradient(transparent, #000 24px);
+        mask-image: linear-gradient(transparent, #000 24px);
+      }
+      .index-list.more-below {
+        -webkit-mask-image: linear-gradient(#000 calc(100% - 24px), transparent);
+        mask-image: linear-gradient(#000 calc(100% - 24px), transparent);
+      }
+      .index-list.more-above.more-below {
+        -webkit-mask-image: linear-gradient(transparent, #000 24px, #000 calc(100% - 24px), transparent);
+        mask-image: linear-gradient(transparent, #000 24px, #000 calc(100% - 24px), transparent);
+      }
+      .index a {
+        text-decoration: none;
+        opacity: 0.45;
+        transition: opacity 0.3s;
+      }
+      .index a:hover,
+      .index a.is-active {
+        opacity: 1;
+      }
+
       /* Only the car whose colour is the page's opens. */
       .model:not(.is-active) {
         cursor: default;
@@ -139,6 +190,8 @@
         font-weight: 500;
         letter-spacing: -0.03em;
         line-height: 0.95;
+        /* one line always: fitNames() shrinks the ones that would wrap */
+        white-space: nowrap;
       }
       .model-cover {
         display: block;
@@ -243,6 +296,23 @@
       @media (max-width: 700px) {
         :root {
           --hdr-h: 58px;
+        }
+        /* The photos run the phone's width, so the corner behind the
+           index blurs, fading out with no edge. */
+        .index {
+          right: 20px;
+          bottom: 24px;
+        }
+        .index::before {
+          content: "";
+          position: absolute;
+          z-index: -1;
+          inset: -70px -20px -24px -90px;
+          -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+          -webkit-mask-image: radial-gradient(ellipse at 100% 100%, #000 45%, transparent 75%);
+          mask-image: radial-gradient(ellipse at 100% 100%, #000 45%, transparent 75%);
+          pointer-events: none;
         }
         .hdr {
           padding: 20px 20px;
@@ -382,7 +452,11 @@
     <script src="gallery.js"></script>
     <script src="colour.js"></script>
     <script>
-      const series = ((window.SITE_CONFIG && SITE_CONFIG.auto) || {}).series || [];
+      // A car shows up once it has photos; without a chosen cover, its
+      // first photo stands in.
+      const series = (((window.SITE_CONFIG && SITE_CONFIG.auto) || {}).series || [])
+        .map((s) => ({ ...s, cover: s.cover || s.groups.flatMap((g) => g.photos)[0]?.src }))
+        .filter((s) => s.cover);
       const hdr = document.getElementById("hdr");
       const view = document.getElementById("view");
       const phone = matchMedia("(max-width: 700px)");
@@ -396,6 +470,11 @@
         if (cls) n.className = cls;
         if (text != null) n.textContent = text;
         return n;
+      }
+
+      // Set in the admin, or else the model's first word.
+      function brandOf(s) {
+        return (s.brand || "").trim() || s.model.trim().split(/\s+/)[0];
       }
 
       function slug(model) {
@@ -508,9 +587,46 @@
         }
       }
 
-      function setActive(row) {
+      function setActive(row, instant) {
         activeRow = row;
-        rows.forEach((r) => r.el.classList.toggle("is-active", r === row));
+        rows.forEach((r) => {
+          r.el.classList.toggle("is-active", r === row);
+          r.link.classList.toggle("is-active", r.link === row.link);
+        });
+        followIndex(row.link, instant);
+      }
+
+      // Keeps the active brand in the middle of the index when the index
+      // is too long to show whole. Eased by hand: a smooth scrollTo() here
+      // would cut short the page's own smooth scroll after an index click.
+      const FOLLOW_MS = 400;
+      let indexList = null;
+      let followFrame = null;
+
+      function followIndex(link, instant) {
+        if (!indexList || indexList.scrollHeight <= indexList.clientHeight) return;
+        const list = indexList;
+        const max = list.scrollHeight - list.clientHeight;
+        const to = Math.max(0, Math.min(max, link.offsetTop - (list.clientHeight - link.offsetHeight) / 2));
+        cancelAnimationFrame(followFrame);
+        if (instant || reduceMotion.matches) {
+          list.scrollTop = to;
+          return;
+        }
+        const from = list.scrollTop;
+        const start = performance.now();
+        const step = (now) => {
+          const t = Math.min((now - start) / FOLLOW_MS, 1);
+          list.scrollTop = from + (to - from) * (1 - Math.pow(1 - t, 3));
+          if (t < 1) followFrame = requestAnimationFrame(step);
+        };
+        followFrame = requestAnimationFrame(step);
+      }
+
+      function indexEdges() {
+        const l = indexList;
+        l.classList.toggle("more-above", l.scrollTop > 1);
+        l.classList.toggle("more-below", l.scrollTop + l.clientHeight < l.scrollHeight - 1);
       }
 
       function activateRow(rowEl) {
@@ -527,7 +643,7 @@
             const r = el.getBoundingClientRect();
             return r.top <= middle && r.bottom > middle;
           }) || rows[0];
-        setActive(row);
+        setActive(row, true);
         targetLab = hexToOklab(series[+row.el.dataset.i].color);
         curLab = targetLab;
         rows.forEach((r) => {
@@ -538,6 +654,13 @@
 
       function renderList() {
         const nav = el("nav", "models");
+        const index = el("nav", "index");
+        index.setAttribute("aria-label", "Index");
+        indexList = el("div", "index-list");
+        indexList.addEventListener("scroll", indexEdges, { passive: true });
+        index.appendChild(indexList);
+        const brands = new Map(); // brand -> its link, which goes to its first model
+        const covers = [];
         rows = [];
         series.forEach((s, i) => {
           const a = el("a", "model");
@@ -545,7 +668,10 @@
           a.dataset.i = i;
           a.appendChild(el("span", "model-name", s.model));
           const img = el("img", "model-cover");
-          img.src = s.cover;
+          // Only the photos about to come on screen load. Browsers defer
+          // an image only once it is in the page, hence the src set below.
+          if (i > 1) img.loading = "lazy";
+          covers.push([img, s.cover]);
           img.alt = s.model;
           a.appendChild(img);
           a.addEventListener("click", (e) => {
@@ -553,11 +679,46 @@
             if (activeRow && activeRow.el === a) navigate(s);
           });
           nav.appendChild(a);
-          rows.push({ el: a, opacity: ROW_REST });
+
+          // Brings the brand's first model to the centre, where it takes
+          // over the page.
+          const brand = brandOf(s);
+          let link = brands.get(brand);
+          if (!link) {
+            link = el("a", null, brand);
+            link.href = urlFor(s);
+            link.addEventListener("click", (e) => {
+              e.preventDefault();
+              a.scrollIntoView({ block: "center", behavior: reduceMotion.matches ? "auto" : "smooth" });
+            });
+            brands.set(brand, link);
+            indexList.appendChild(link);
+          }
+
+          rows.push({ el: a, link, opacity: ROW_REST });
           centreLine.observe(a);
         });
-        view.replaceChildren(nav);
+        view.replaceChildren(index, nav);
+        covers.forEach(([img, src]) => (img.src = src));
+        indexEdges();
+        fitNames();
       }
+
+      // A name too long for the width is set just small enough to fit.
+      function fitNames() {
+        const nav = view.querySelector(".models");
+        if (!nav) return;
+        const pad = getComputedStyle(nav);
+        const room = nav.clientWidth - parseFloat(pad.paddingLeft) - parseFloat(pad.paddingRight);
+        nav.querySelectorAll(".model-name").forEach((name) => {
+          name.style.fontSize = "";
+          if (name.scrollWidth > room) {
+            name.style.fontSize = (parseFloat(getComputedStyle(name).fontSize) * room) / name.scrollWidth + "px";
+          }
+        });
+      }
+      document.fonts.ready.then(fitNames);
+      window.addEventListener("resize", fitNames);
 
       // --- gallery ----------------------------------------------------
       let cascades = [];
@@ -657,6 +818,11 @@
       function go(s) {
         if (s === current || flying) return;
         if (!current) listY = window.pageYOffset;
+        // Gallery to gallery (back and forward buttons): no photo to fly.
+        if (current && s) {
+          show(s);
+          return;
+        }
 
         if (!document.startViewTransition || reduceMotion.matches) {
           show(s);
@@ -905,11 +1071,12 @@
       const first = fromURL();
       lastModel = first;
       show(first);
-      view.firstElementChild.classList.add("reveal");
+      const firstPage = view.querySelector(".models, .gallery");
+      firstPage.classList.add("reveal");
       // Two frames: one for layout/paint to settle, one for the browser
       // to register the pre-transition styles before we flip them.
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => view.firstElementChild.classList.add("in"));
+        requestAnimationFrame(() => firstPage.classList.add("in"));
       });
     </script>
   </body>

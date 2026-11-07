@@ -1521,6 +1521,10 @@
           ),
           h("div", { class: "fields", style: "margin:14px 0" },
             field("Modèle", s, "model"),
+            field("Marque", s, "brand", {
+              placeholder: (s.model || "").trim().split(/\s+/)[0],
+              hint: "Pour l'index de la page. Vide : le premier mot du modèle.",
+            }),
             h("label", { class: "field" },
               h("span", null, "Couleur de fond"),
               colour(s, "color"),

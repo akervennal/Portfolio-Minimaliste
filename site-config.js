@@ -246,6 +246,230 @@ var SITE_CONFIG = {
   "auto": {
     "series": [
       {
+        "model": "Alpine A424",
+        "color": "#1f62c4",
+        "cover": "images/24h-du-mans-2026/3-MEL_3934.jpg",
+        "groups": [
+          {
+            "label": "À pleine vitesse",
+            "photos": [
+              {
+                "src": "images/24h-du-mans-2026/3-MEL_3934.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/24h-du-mans-2026/7-MEL_3353.jpg",
+                "w": 1600,
+                "h": 2400
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "model": "Aston Martin Valkyrie",
+        "brand": "Aston Martin",
+        "color": "#1d5c4a",
+        "groups": [
+          {
+            "photos": [
+              {
+                "src": "images/automobile/MEL_3995.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          }
+        ],
+        "cover": "images/automobile/MEL_3995.jpg"
+      },
+      {
+        "model": "BMW M Hybrid V8",
+        "color": "#f1c232",
+        "cover": "images/24h-du-mans-2026/5-MEL_3751.jpg",
+        "groups": [
+          {
+            "label": "Au crépuscule",
+            "photos": [
+              {
+                "src": "images/24h-du-mans-2026/5-MEL_3751.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/automobile/MEL_3756.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/24h-du-mans-2026/2-MEL_3956.jpg",
+                "w": 2400,
+                "h": 1600
+              }
+            ]
+          },
+          {
+            "label": "À pleine vitesse",
+            "photos": [
+              {
+                "src": "images/24h-du-mans-2026/9-MEL_3318.jpg",
+                "w": 2400,
+                "h": 1600
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "model": "BMW Série 1",
+        "color": "#c01909",
+        "cover": "images/viking-cup-round-3-2026/28.jpg",
+        "groups": [
+          {
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/24.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/28.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "model": "Cadillac V-Series.R",
+        "color": "#063574",
+        "cover": "images/automobile/MEL_3667.jpg",
+        "groups": [
+          {
+            "label": "Au crépuscule",
+            "photos": [
+              {
+                "src": "images/automobile/MEL_3667.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/24h-du-mans-2026/4-MEL_3817.jpg",
+                "w": 1600,
+                "h": 2400
+              },
+              {
+                "src": "images/24h-du-mans-2025/3-MEL_1451.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "model": "Ferrari 499P",
+        "color": "#c3161c",
+        "cover": "images/24h-du-mans-2026/10-MEL_3236.jpg",
+        "groups": [
+          {
+            "label": "Sur la grille",
+            "photos": [
+              {
+                "src": "images/24h-du-mans-2026/10-MEL_3236.jpg",
+                "w": 2400,
+                "h": 1600
+              },
+              {
+                "src": "images/automobile/MEL_3682.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "model": "Genesis GMR-001",
+        "color": "#f36c12",
+        "groups": [
+          {
+            "photos": [
+              {
+                "src": "images/24h-du-mans-2026/7-MEL_3370.jpg",
+                "w": 1600,
+                "h": 2400
+              },
+              {
+                "src": "images/24h-du-mans-2026/3-MEL_3734.jpg",
+                "w": 2400,
+                "h": 1600
+              }
+            ]
+          }
+        ],
+        "cover": "images/24h-du-mans-2026/3-MEL_3734.jpg"
+      },
+      {
+        "model": "Mazda RX-8",
+        "color": "#f2b61a",
+        "cover": "images/viking-cup-round-3-2026/18.jpg",
+        "groups": [
+          {
+            "label": "Paddock",
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/3.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/2.jpg",
+                "w": 1365,
+                "h": 2048
+              }
+            ]
+          },
+          {
+            "label": "En piste",
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/19.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/17.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/18.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          },
+          {
+            "label": "Retour de la piste",
+            "photos": [
+              {
+                "src": "images/viking-cup-round-3-2026/39.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/viking-cup-round-3-2026/40.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          }
+        ]
+      },
+      {
         "model": "Nissan S14",
         "color": "#e9b9d4",
         "cover": "images/viking-cup-round-3-2026/7.jpg",
@@ -358,82 +582,57 @@ var SITE_CONFIG = {
         ]
       },
       {
-        "model": "Mazda RX-8",
-        "color": "#f2b61a",
-        "cover": "images/viking-cup-round-3-2026/18.jpg",
+        "model": "Peugeot 9X8",
+        "color": "#34373c",
+        "cover": "images/24h-du-mans-2026/8-MEL_3330.jpg",
         "groups": [
           {
-            "label": "Paddock",
+            "label": "Au crépuscule",
             "photos": [
               {
-                "src": "images/viking-cup-round-3-2026/3.jpg",
-                "w": 2048,
-                "h": 1365
+                "src": "images/24h-du-mans-2026/4-MEL_3693.jpg",
+                "w": 2400,
+                "h": 1600
               },
               {
-                "src": "images/viking-cup-round-3-2026/2.jpg",
-                "w": 1365,
-                "h": 2048
-              }
-            ]
-          },
-          {
-            "label": "En piste",
-            "photos": [
-              {
-                "src": "images/viking-cup-round-3-2026/19.jpg",
-                "w": 1365,
-                "h": 2048
+                "src": "images/24h-du-mans-2026/6-MEL_3648.jpg",
+                "w": 2400,
+                "h": 1600
               },
               {
-                "src": "images/viking-cup-round-3-2026/17.jpg",
-                "w": 2048,
-                "h": 1365
-              },
-              {
-                "src": "images/viking-cup-round-3-2026/18.jpg",
+                "src": "images/automobile/MEL_3641.jpg",
                 "w": 2048,
                 "h": 1365
               }
             ]
           },
           {
-            "label": "Retour de la piste",
+            "label": "À pleine vitesse",
             "photos": [
               {
-                "src": "images/viking-cup-round-3-2026/39.jpg",
-                "w": 2048,
-                "h": 1365
-              },
-              {
-                "src": "images/viking-cup-round-3-2026/40.jpg",
-                "w": 2048,
-                "h": 1365
+                "src": "images/24h-du-mans-2026/8-MEL_3330.jpg",
+                "w": 2400,
+                "h": 1600
               }
             ]
           }
         ]
       },
       {
-        "model": "BMW Série 1",
-        "color": "#c01909",
-        "cover": "images/viking-cup-round-3-2026/28.jpg",
+        "model": "Porsche 911 GT3 R",
+        "color": "#f0cdb4",
         "groups": [
           {
             "photos": [
               {
-                "src": "images/viking-cup-round-3-2026/24.jpg",
-                "w": 1365,
-                "h": 2048
-              },
-              {
-                "src": "images/viking-cup-round-3-2026/28.jpg",
-                "w": 2048,
-                "h": 1365
+                "src": "images/24h-du-mans-2026/5-MEL_3624.jpg",
+                "w": 2400,
+                "h": 1600
               }
             ]
           }
-        ]
+        ],
+        "cover": "images/24h-du-mans-2026/5-MEL_3624.jpg"
       },
       {
         "model": "Porsche 911 Targa",
@@ -462,6 +661,54 @@ var SITE_CONFIG = {
         ]
       },
       {
+        "model": "Porsche 963",
+        "color": "#ebe7e1",
+        "cover": "images/24h-du-mans-2025/7-MEL_1095.jpg",
+        "groups": [
+          {
+            "label": "Sur la grille",
+            "photos": [
+              {
+                "src": "images/24h-du-mans-2025/5-MEL_1111.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/24h-du-mans-2025/6-MEL_1101.jpg",
+                "w": 1365,
+                "h": 2048
+              },
+              {
+                "src": "images/24h-du-mans-2025/7-MEL_1095.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "model": "Toyota GR010 Hybrid",
+        "color": "#a42b4d",
+        "groups": [
+          {
+            "photos": [
+              {
+                "src": "images/24h-du-mans-2026/8-MEL_3292.jpg",
+                "w": 1600,
+                "h": 2400
+              },
+              {
+                "src": "images/automobile/MEL_3767.jpg",
+                "w": 2048,
+                "h": 1365
+              }
+            ]
+          }
+        ],
+        "cover": "images/automobile/MEL_3767.jpg"
+      },
+      {
         "model": "Hypercars",
         "color": "#0f1b2d",
         "cover": "images/24h-du-mans-2026/6-MEL_3648.jpg",
@@ -480,22 +727,47 @@ var SITE_CONFIG = {
                 "h": 1600
               },
               {
-                "src": "images/24h-du-mans-2026/4-MEL_3693.jpg",
-                "w": 2400,
-                "h": 1600
-              },
-              {
                 "src": "images/24h-du-mans-2026/4-MEL_3817.jpg",
                 "w": 1600,
                 "h": 2400
               },
               {
-                "src": "images/24h-du-mans-2026/5-MEL_3751.jpg",
-                "w": 2400,
-                "h": 1600
+                "src": "images/automobile/MEL_3995.jpg",
+                "w": 2048,
+                "h": 1365
               },
               {
-                "src": "images/24h-du-mans-2025/3-MEL_1451.jpg",
+                "src": "images/automobile/MEL_3682.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/automobile/MEL_3767.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/automobile/MEL_3756.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/automobile/MEL_3641.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/automobile/MEL_3667.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/automobile/MEL_3927.jpg",
+                "w": 2048,
+                "h": 1365
+              },
+              {
+                "src": "images/automobile/MEL_3995-2.jpg",
                 "w": 2048,
                 "h": 1365
               }
@@ -525,54 +797,9 @@ var SITE_CONFIG = {
             "label": "À pleine vitesse",
             "photos": [
               {
-                "src": "images/24h-du-mans-2026/8-MEL_3330.jpg",
-                "w": 2400,
-                "h": 1600
-              },
-              {
-                "src": "images/24h-du-mans-2026/9-MEL_3318.jpg",
-                "w": 2400,
-                "h": 1600
-              },
-              {
-                "src": "images/24h-du-mans-2026/2-MEL_3956.jpg",
-                "w": 2400,
-                "h": 1600
-              },
-              {
                 "src": "images/24h-du-mans-2026/3-MEL_3734.jpg",
                 "w": 2400,
                 "h": 1600
-              },
-              {
-                "src": "images/24h-du-mans-2026/3-MEL_3934.jpg",
-                "w": 2400,
-                "h": 1600
-              }
-            ]
-          },
-          {
-            "label": "Sur la grille",
-            "photos": [
-              {
-                "src": "images/24h-du-mans-2026/10-MEL_3236.jpg",
-                "w": 2400,
-                "h": 1600
-              },
-              {
-                "src": "images/24h-du-mans-2025/5-MEL_1111.jpg",
-                "w": 1365,
-                "h": 2048
-              },
-              {
-                "src": "images/24h-du-mans-2025/6-MEL_1101.jpg",
-                "w": 1365,
-                "h": 2048
-              },
-              {
-                "src": "images/24h-du-mans-2025/7-MEL_1095.jpg",
-                "w": 2048,
-                "h": 1365
               }
             ]
           }
