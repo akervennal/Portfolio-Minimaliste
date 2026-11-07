@@ -98,13 +98,6 @@
         color: #fff;
         --hdr-halo: none;
       }
-      /* White over a full-screen photo, except with the menu open: it
-         then sits on the pale blur, where black reads better. */
-      .hdr.on-photo:not(:has(.menu.is-open)) {
-        color: #fff;
-        --hdr-halo: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6))
-          drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
-      }
 
       .reveal {
         transition:
@@ -136,6 +129,10 @@
         text-decoration: none;
         opacity: 0.3;
       }
+      /* Only the car whose colour is the page's opens. */
+      .model:not(.is-active) {
+        cursor: default;
+      }
       .model-name {
         align-self: flex-start;
         font-size: clamp(52px, 12vw, 190px);
@@ -151,54 +148,54 @@
       }
 
       /* ============================================================
-         GALLERY — the car's photo full-screen, then its chapters, built
-         like a shoot: the whole car, the details, the action
+         GALLERY — on the car's colour: its name, its photo settled a
+         little below mid-height with the gallery showing underneath, then
+         its chapters, built like a shoot: the whole car, the details, the
+         action. coverBox() in the script mirrors --cover-h and --cover-top.
          ============================================================ */
-      .cover {
-        display: block;
-        height: 100svh;
-        overflow: hidden;
-      }
-      .cover img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
       .gallery {
         --locs-gap: var(--gap);
+        --cover-h: min(60svh, calc((100vw - 2 * var(--gap)) / 1.5));
+        --cover-top: calc(55svh - var(--cover-h) / 2);
         position: relative;
         display: flex;
         flex-direction: column;
       }
-      .gallery > .cover {
+      .cover {
         order: -1;
+        padding: var(--cover-top) var(--gap) 0;
+      }
+      .cover img {
+        display: block;
+        width: auto;
+        height: var(--cover-h);
+        aspect-ratio: 3 / 2;
+        object-fit: cover;
+      }
+      /* the title sits on top of that photo, in the space above it */
+      .gallery > .yr-head {
+        position: absolute;
+        top: var(--cover-top);
+        left: 0;
+        right: 0;
+        width: 100%;
+        margin: 0;
+        transform: translateY(calc(-100% - 12px));
+      }
+      /* The photo count slides in from the right once the gallery is in.
+         Backwards only: a held end state would block the hover fade. */
+      .gallery .yr-meta {
+        animation: meta-in 0.6s var(--ease) backwards;
+      }
+      @keyframes meta-in {
+        from {
+          opacity: 0;
+          transform: translateX(64px);
+        }
       }
       .ser {
+        padding-top: 24px;
         padding-bottom: 14vh;
-      }
-      /* The photo drifts up slowly (coverDrift) and the rest of the page
-         scrolls over it. */
-      @media (min-width: 701px) {
-        .gallery > .cover {
-          position: sticky;
-          top: 0;
-        }
-        .gallery > .cover img {
-          will-change: transform;
-        }
-        .gallery > .yr-head {
-          z-index: 1;
-          margin-bottom: 0;
-          padding-top: 56px;
-          padding-bottom: 24px;
-          background: #fff;
-        }
-        .ser {
-          position: relative;
-          z-index: 1;
-          background: #fff;
-        }
       }
       .chapter {
         margin-top: 64px;
@@ -258,29 +255,19 @@
         .model-cover {
           width: 100%;
         }
-        /* Phones: the list photo grows to the screen's width and settles
-           at mid-height, with the gallery showing underneath it. 33.33vw
-           is half the height of a 3:2 photo at full width. */
+        /* Phones: the photo runs the screen's width and settles at
+           mid-height. 33.33vw is half the height of a 3:2 photo at full
+           width. */
+        .gallery {
+          --cover-h: 66.67vw;
+          --cover-top: calc(50svh - 33.33vw);
+        }
         .cover {
-          height: auto;
-          padding-top: calc(50svh - 33.33vw);
+          padding: var(--cover-top) 0 0;
         }
         .cover img {
-          height: auto;
-          aspect-ratio: 3 / 2;
-        }
-        /* the title sits on top of that photo, in the space above it */
-        .gallery > .yr-head {
-          position: absolute;
-          top: calc(50svh - 33.33vw);
-          left: 0;
-          right: 0;
           width: 100%;
-          margin: 0;
-          transform: translateY(calc(-100% - 12px));
-        }
-        .ser {
-          padding-top: 24px;
+          height: auto;
         }
         .chapter {
           margin-top: 44px;
@@ -301,9 +288,9 @@
         animation-duration: 0.5s;
         animation-timing-function: var(--ease);
       }
-      /* The list photo growing into the gallery's full-screen one. On a
-         big screen this view transition stutters and flyCover() below
-         takes over with .car-fly and .car-veil; phones keep it. */
+      /* The list photo growing into the gallery's one. On a big screen
+         this view transition stutters and flyCover() below takes over
+         with .car-fly and .car-veil; phones keep it. */
       ::view-transition-group(car-cover) {
         animation-duration: 0.8s;
         animation-timing-function: var(--ease);
@@ -338,11 +325,24 @@
         transform-origin: 0 0;
         will-change: transform;
       }
+      .car-fly-name {
+        position: fixed;
+        z-index: 41;
+        margin: 0;
+        font-weight: 500;
+        white-space: nowrap;
+        pointer-events: none;
+        transform-origin: 0 0;
+        will-change: transform;
+      }
 
       @media (prefers-reduced-motion: reduce) {
         .hdr,
         .reveal {
           transition: none;
+        }
+        .gallery .yr-meta {
+          animation: none;
         }
         ::view-transition-group(*),
         ::view-transition-old(*),
@@ -447,7 +447,7 @@
       const SETTLED = 0.0015; // below this distance-to-target, snap and stop
       const ROW_REST = 0.3;
       const WHITE_LAB = hexToOklab("#ffffff");
-      const KEEP_COLOUR_PX = 40; // phone gallery: scroll that turns the page white
+      const KEEP_COLOUR_PX = 40; // gallery: scroll that turns the page white
       let curLab = null;
       let targetLab = null;
       let painting = false;
@@ -457,7 +457,7 @@
       // would run twice as fast on a 120Hz phone screen.
       function paintList() {
         painting = false;
-        if ((current && !phone.matches) || !targetLab) return;
+        if (!targetLab) return;
         const now = performance.now();
         const frames = Math.min(now - lastPaint, 100) / FRAME_MS;
         lastPaint = now;
@@ -508,8 +508,13 @@
         }
       }
 
+      function setActive(row) {
+        activeRow = row;
+        rows.forEach((r) => r.el.classList.toggle("is-active", r === row));
+      }
+
       function activateRow(rowEl) {
-        activeRow = rows.find((row) => row.el === rowEl);
+        setActive(rows.find((row) => row.el === rowEl));
         easeTo(hexToOklab(series[+rowEl.dataset.i].color));
       }
 
@@ -522,7 +527,7 @@
             const r = el.getBoundingClientRect();
             return r.top <= middle && r.bottom > middle;
           }) || rows[0];
-        activeRow = row;
+        setActive(row);
         targetLab = hexToOklab(series[+row.el.dataset.i].color);
         curLab = targetLab;
         rows.forEach((r) => {
@@ -545,14 +550,13 @@
           a.appendChild(img);
           a.addEventListener("click", (e) => {
             e.preventDefault();
-            navigate(s);
+            if (activeRow && activeRow.el === a) navigate(s);
           });
           nav.appendChild(a);
           rows.push({ el: a, opacity: ROW_REST });
           centreLine.observe(a);
         });
         view.replaceChildren(nav);
-        hdr.classList.remove("on-photo");
       }
 
       // --- gallery ----------------------------------------------------
@@ -569,11 +573,7 @@
         grid.replaceChildren(...cols);
       }
 
-      phone.addEventListener("change", () => {
-        cascades.forEach(layoutCascade);
-        photoTone();
-        coverDrift();
-      });
+      phone.addEventListener("change", () => cascades.forEach(layoutCascade));
 
       function buildCover(s) {
         const cover = el("div", "cover");
@@ -591,7 +591,7 @@
 
         const head = el("a", "yr-head");
         head.href = urlFor(null);
-        head.append(el("span", "yr-y", s.model), el("span", "yr-meta", String(all.length)));
+        head.append(el("span", "yr-y", s.model), el("span", "yr-meta", photoCount(s)));
         head.addEventListener("click", (e) => {
           e.preventDefault();
           navigate(null);
@@ -618,65 +618,21 @@
         wrap.appendChild(sec);
         view.replaceChildren(wrap);
 
-        // Phones arrive on the car's colour, which fades out on scroll
-        // (galleryColour); on a big screen the photo fills the page.
+        // Arrives on the car's colour, which fades out on scroll
+        // (galleryColour).
         rows = [];
-        if (phone.matches) {
-          targetLab = galleryLab = hexToOklab(s.color);
-          paintList();
-        } else {
-          curLab = null;
-          setPage("#fff", "#111", "rgba(17, 17, 17, 0.55)");
-          hdr.classList.remove("on-colour", "on-dark");
-        }
+        targetLab = galleryLab = hexToOklab(s.color);
+        paintList();
       }
 
       let galleryLab = null;
 
       function galleryColour() {
-        if (!current || !phone.matches) return;
+        if (!current) return;
         const lab = window.pageYOffset > KEEP_COLOUR_PX ? WHITE_LAB : galleryLab;
         if (lab !== targetLab) easeTo(lab);
       }
       window.addEventListener("scroll", galleryColour, { passive: true });
-
-      // White header while the full-screen photo is behind it; on phones
-      // the photo sits lower, with the page's white behind the header.
-      function photoTone() {
-        const cover = view.querySelector(".cover");
-        const over =
-          current &&
-          cover &&
-          !phone.matches &&
-          window.pageYOffset < cover.offsetHeight - hdr.offsetHeight;
-        hdr.classList.toggle("on-photo", !!over);
-      }
-      window.addEventListener("scroll", photoTone, { passive: true });
-
-      // Mouse only: on touch screens the page scrolls ahead of the script
-      // and the photo jitters.
-      const DRIFT = 0.3; // share of the scroll the photo follows
-      const finePointer = matchMedia("(pointer: fine)");
-      let driftQueued = false;
-
-      function coverDrift() {
-        driftQueued = false;
-        const img = view.querySelector(".cover img");
-        if (!current || !img) return;
-        const drift = phone.matches || !finePointer.matches || reduceMotion.matches;
-        const y = Math.min(window.pageYOffset, window.innerHeight);
-        img.style.transform = drift ? "" : "translate3d(0, " + -y * DRIFT + "px, 0)";
-      }
-
-      window.addEventListener(
-        "scroll",
-        () => {
-          if (driftQueued) return;
-          driftQueued = true;
-          requestAnimationFrame(coverDrift);
-        },
-        { passive: true },
-      );
 
       // --- routing ----------------------------------------------------
       function coverOf(s) {
@@ -694,7 +650,6 @@
           window.scrollTo(0, listY);
           snapToCentre();
         }
-        photoTone();
       }
 
       // The photo of the car being opened (or left) grows into the other
@@ -755,17 +710,78 @@
       const FLY_MS = 800;
       const FLY_EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 
-      // The photo flies at its full-screen size, uncropped: a transform
+      // Where the gallery's photo will sit, before the gallery exists:
+      // the same sums as --cover-h and --cover-top in the CSS.
+      function coverBox() {
+        const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--gap"));
+        const vh = window.innerHeight;
+        const height = Math.min(vh * 0.6, (window.innerWidth - 2 * gap) / 1.5);
+        return { left: gap, top: vh * 0.55 - height / 2, width: height * 1.5, height };
+      }
+
+      function photoCount(s) {
+        return String(s.groups.reduce((n, g) => n + g.photos.length, 0));
+      }
+
+      // Where the gallery's title and count will sit: a hidden copy of its
+      // header, laid out by the same CSS.
+      function headBox(s) {
+        const probe = el("div", "gallery");
+        probe.style.cssText = "position: fixed; top: 0; left: 0; width: 100%; visibility: hidden";
+        const head = el("div", "yr-head");
+        const title = el("span", "yr-y", s.model);
+        const meta = el("span", "yr-meta", photoCount(s));
+        meta.style.animation = "none";
+        head.append(title, meta);
+        probe.appendChild(head);
+        document.body.appendChild(probe);
+        const style = getComputedStyle(meta);
+        const box = {
+          title: title.getBoundingClientRect(),
+          meta: meta.getBoundingClientRect(),
+          metaStyle: {
+            fontSize: style.fontSize,
+            lineHeight: style.lineHeight,
+            letterSpacing: style.letterSpacing,
+            color: style.color,
+          },
+        };
+        probe.remove();
+        return box;
+      }
+
+      // The model's name flies with the photo, resized into the other
+      // view's: centre on centre, left edge on left edge.
+      function nameFlight(name, to) {
+        const from = name.getBoundingClientRect();
+        const style = getComputedStyle(name);
+        const size = parseFloat(style.fontSize);
+        const fly = el("span", "car-fly-name", name.textContent);
+        Object.assign(fly.style, {
+          left: from.left + "px",
+          top: from.top + "px",
+          fontSize: size + "px",
+          lineHeight: style.lineHeight,
+          letterSpacing: style.letterSpacing,
+          color: style.color,
+        });
+        document.body.appendChild(fly);
+        // By width: the two names don't share the same letter spacing.
+        const k = to.width / from.width;
+        const dx = to.left - from.left;
+        const dy = to.top + to.height / 2 - from.top - (from.height * k) / 2;
+        return { fly, keyframes: [{ transform: "none" }, { transform: "translate(" + dx + "px, " + dy + "px) scale(" + k + ")" }] };
+      }
+
+      // The photo flies at the gallery's size, uncropped: a transform
       // shrinks it onto the list photo, which has the same 3:2 shape, and
-      // a clip crops it to the screen at the other end. The compositor
-      // moves one decoded image, and nothing is laid out again.
+      // a clip crops it to that shape. The compositor moves one decoded
+      // image, and nothing is laid out again.
       async function flyCover(s, before) {
         flying = true;
         const fromList = !!s;
         const start = before.getBoundingClientRect();
-        const box = fromList
-          ? { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight }
-          : start;
+        const box = fromList ? coverBox() : start;
 
         const fly = el("img", "car-fly");
         fly.src = before.currentSrc || before.src;
@@ -773,6 +789,8 @@
         fly.style.visibility = "hidden";
         const veil = el("div", "car-veil");
         veil.style.opacity = fromList ? 0 : 1;
+        // The colour of the page being uncovered, or of the one leaving.
+        veil.style.background = fromList ? s.color : getComputedStyle(document.body).backgroundColor;
         document.body.append(veil, fly);
         await fly.decode().catch(() => {});
 
@@ -795,36 +813,79 @@
         });
 
         // Leaving a gallery, the list goes in now, under the veil, so the
-        // photo has a place to land.
+        // photo and the name have a place to land.
         let target = before;
         let keyframes;
+        let name;
+        let targetName = null;
+        let count = null;
         if (fromList) {
           keyframes = [onThumb(start), { transform: "none", ...cropped }];
-          hdr.classList.remove("on-colour", "on-dark");
-          hdr.classList.add("on-photo");
+          const listName = before.closest(".model").querySelector(".model-name");
+          const head = headBox(s);
+          name = nameFlight(listName, head.title);
+          listName.style.visibility = "hidden";
+          // The count slides in from the right while the photo lands.
+          count = el("span", "car-fly-name", photoCount(s));
+          Object.assign(count.style, head.metaStyle, { left: head.meta.left + "px", top: head.meta.top + "px" });
+          document.body.appendChild(count);
         } else {
+          // A stand-in for the title, which show() is about to remove.
+          const title = view.querySelector(".yr-y");
+          const titleRect = title.getBoundingClientRect();
+          const titleStyle = getComputedStyle(title);
+          const stand = el("span", null, title.textContent);
+          Object.assign(stand.style, {
+            position: "fixed",
+            left: titleRect.left + "px",
+            top: titleRect.top + "px",
+            fontSize: titleStyle.fontSize,
+            lineHeight: titleStyle.lineHeight,
+            letterSpacing: titleStyle.letterSpacing,
+            fontWeight: 500,
+            color: titleStyle.color,
+            visibility: "hidden",
+          });
+          document.body.appendChild(stand);
           show(null);
           target = view.querySelector('.model[data-i="' + series.indexOf(lastModel) + '"] img');
           keyframes = [{ transform: "none", ...cropped }, onThumb(target.getBoundingClientRect())];
+          targetName = target.closest(".model").querySelector(".model-name");
+          name = nameFlight(stand, targetName.getBoundingClientRect());
+          stand.remove();
+          targetName.style.visibility = "hidden";
         }
 
         const options = { duration: FLY_MS, easing: FLY_EASE, fill: "forwards" };
         const flight = fly.animate(keyframes, options);
+        const nameMove = name.fly.animate(name.keyframes, options);
+        if (count) {
+          count.animate([{ opacity: 0, transform: "translateX(64px)" }, { opacity: 1, transform: "none" }], {
+            ...options,
+            duration: FLY_MS * 0.7,
+            delay: FLY_MS * 0.3,
+            fill: "both",
+          });
+        }
         const fade = veil.animate(
           [{ opacity: fromList ? 0 : 1 }, { opacity: fromList ? 1 : 0 }],
           { ...options, duration: FLY_MS * 0.6 },
         );
         fly.style.visibility = "";
         target.style.visibility = "hidden";
-        await Promise.all([flight.finished, fade.finished]).catch(() => {});
+        await Promise.all([flight.finished, nameMove.finished, fade.finished]).catch(() => {});
 
         if (fromList) {
           show(s);
+          view.querySelector(".yr-meta").style.animation = "none";
           await view.querySelector(".cover img").decode().catch(() => {});
+          count.remove();
         } else {
           target.style.visibility = "";
+          targetName.style.visibility = "";
         }
         fly.remove();
+        name.fly.remove();
         veil.remove();
         flying = false;
 
