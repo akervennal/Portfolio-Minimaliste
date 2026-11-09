@@ -11,6 +11,10 @@ var SITE_CONFIG = {
         "label": "automobile"
       },
       {
+        "href": "shooting.html",
+        "label": "session photo"
+      },
+      {
         "href": "about.html",
         "label": "about"
       }
@@ -31,6 +35,10 @@ var SITE_CONFIG = {
       "about": {
         "title": "Armel Kervennal — à propos",
         "description": "À propos d'Armel Kervennal, photographe basé à Nantes."
+      },
+      "shooting": {
+        "title": "Armel Kervennal — session photo",
+        "description": "Session photo automobile à Nantes, Rennes, Angers, Laval et Le Mans : formules, tarifs et réservation."
       }
     },
     "labels": {
@@ -216,10 +224,10 @@ var SITE_CONFIG = {
           "highlightColor": "#4f5ca5"
         },
         {
-          "text": "Voitures et portraits, gratuitement.",
+          "text": "Vos voitures en photos",
           "photo": "images/a-propos/MEL_6644.jpg",
           "color": "#909ba1",
-          "highlight": "gratuitement",
+          "highlight": "Voitures",
           "highlightColor": "#56332b"
         },
         {
@@ -243,6 +251,100 @@ var SITE_CONFIG = {
       "instagramUrl": "https://instagram.com/armel_kervennal",
       "location": "Nantes, France",
       "note": "Un shooting en tête ?"
+    },
+    "shooting": {
+      "hero": {
+        "label": "Session photo · Nantes",
+        "title": "Session photo automobile.",
+        "highlight": "automobile",
+        "highlightColor": "#a8553a",
+        "text": "Photos retouchées en haute définition, livrées sous 7 jours.",
+        "button": "Réserver",
+        "from": "à partir de 120 €",
+        "photo": "images/R%C3%A9publique%20Czech%202026/31-MEL_6642.jpg",
+        "color": "#efe4d8"
+      },
+      "offersLabel": "",
+      "offersTitle": "Formules",
+      "offerButton": "Choisir",
+      "offers": [
+        {
+          "name": "Essentiel",
+          "price": "120 €",
+          "details": [
+            "1 lieu",
+            "15 photos retouchées",
+            "Vues d'ensemble et détails",
+            "Livraison sous 7 jours"
+          ]
+        },
+        {
+          "name": "Complet",
+          "price": "200 €",
+          "details": [
+            "2 lieux",
+            "30 photos retouchées",
+            "Vues d'ensemble, détails et intérieur",
+            "Livraison sous 7 jours"
+          ]
+        },
+        {
+          "name": "Événement",
+          "price": "Sur devis",
+          "details": [
+            "Rassemblement, club, journée circuit",
+            "Demi-journée ou journée",
+            "Livraison sous 10 jours"
+          ]
+        }
+      ],
+      "offersNote": "Propriétaire sur les photos sur demande, sans supplément. Déplacement inclus à Nantes, Rennes, Angers, Laval, Le Mans.",
+      "offersColor": "#ffffff",
+      "photosLabel": "",
+      "photosTitle": "Exemples",
+      "photos": [
+        "images/R%C3%A9publique%20Czech%202026/30-MEL_6638.jpg",
+        "images/viking-cup-round-3-2026/7.jpg",
+        "images/viking-cup-round-3-2026/12.jpg",
+        "images/viking-cup-round-3-2026/11.jpg",
+        "images/viking-cup-round-3-2026/5.jpg",
+        "images/viking-cup-round-3-2026/18.jpg"
+      ],
+      "photosColor": "#161616",
+      "stepsLabel": "",
+      "stepsTitle": "Déroulement",
+      "steps": [],
+      "stepsColor": "#d4d7de",
+      "faqLabel": "",
+      "faqTitle": "Questions",
+      "faq": [],
+      "faqColor": "#ffffff",
+      "form": {
+        "label": "",
+        "title": "Réserver",
+        "offerLabel": "Formule",
+        "nameLabel": "Prénom",
+        "namePlaceholder": "",
+        "carLabel": "Voiture",
+        "carPlaceholder": "Modèle et année",
+        "placeLabel": "Ville",
+        "placePlaceholder": "Ville",
+        "dateLabel": "Quand",
+        "datePlaceholder": "Date ou période",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Lieu, idée, usage des photos",
+        "button": "Envoyer la demande →",
+        "sent": "Votre messagerie s'ouvre avec la demande pré-remplie. Si rien ne s'ouvre, écrivez à l'adresse ci-dessous.",
+        "direct": "Contact direct",
+        "subject": "Session photo",
+        "greeting": "Bonjour Armel,",
+        "show": false
+      },
+      "bookColor": "#e8dc5c",
+      "autoLink": "Session photo automobile",
+      "autoLinkSub": "Formules et tarifs →",
+      "aboutLink": "formules et tarifs →",
+      "photosLink": "Toutes les voitures →"
     }
   },
   "auto": {

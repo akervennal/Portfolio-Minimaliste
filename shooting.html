@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Armel Kervennal — session photo</title>
+    <meta
+      name="description"
+      content="Session photo automobile à Nantes : formules, tarifs et réservation."
+    />
+    <link rel="icon" type="image/png" href="Favicon/favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- set synchronously so the pre-paint state matches what JS will draw -->
+    <script>
+      document.documentElement.className = "js";
+    </script>
+
+    <style>
+      :root {
+        --sans: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+        --fg: #111;
+        --bg: #fff;
+        --halo: rgba(255, 255, 255, 0.85);
+        --line: color-mix(in srgb, var(--fg) 18%, transparent);
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        --pad: 32px;
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        background: #fff;
+      }
+
+      body {
+        font-family: var(--sans);
+        font-weight: 400;
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .hdr {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 26px var(--pad);
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        color: var(--fg);
+      }
+      .hdr > a,
+      .hdr > button {
+        filter: drop-shadow(0 0 5px var(--halo));
+      }
+      .hdr a {
+        text-decoration: none;
+      }
+      .hdr a:hover {
+        opacity: 0.55;
+      }
+
+      .label {
+        display: block;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        opacity: 0.6;
+      }
+
+      /* Each block fades up the first time it comes on screen. */
+      .reveal {
+        transition:
+          opacity 0.8s var(--ease),
+          transform 0.8s var(--ease);
+      }
+      .js .reveal {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      .js .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* Same underlined link everywhere a click leads to the booking. */
+      .cta {
+        font-weight: 500;
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 6px;
+        cursor: pointer;
+      }
+      .cta:hover {
+        opacity: 0.6;
+      }
+
+      /* A big title over each section, the size of the about page's. */
+      .sec {
+        padding: 16vh var(--pad);
+      }
+      .sec-title {
+        margin: 8px 0 7vh;
+        max-width: 14em;
+        font-size: clamp(38px, 5.4vw, 92px);
+        font-weight: 500;
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+      }
+
+      /* ============================================================
+         HERO — the sentence on the left, a photo whole on the right
+         ============================================================ */
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 100svh;
+      }
+      .hero-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 30px;
+        padding: 110px var(--pad) 64px;
+      }
+      .hero h1 {
+        max-width: 11em;
+        font-size: clamp(38px, 4.8vw, 80px);
+        font-weight: 500;
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+      }
+      .hero-sub {
+        max-width: 28em;
+        font-size: clamp(17px, 1.4vw, 21px);
+        line-height: 1.45;
+      }
+      .hero-cta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 8px 28px;
+      }
+      .hero-cta .cta {
+        font-size: clamp(24px, 2.4vw, 36px);
+        letter-spacing: -0.01em;
+      }
+      .hero-from {
+        font-size: 17px;
+        font-weight: 500;
+        opacity: 0.6;
+      }
+      .hero-photo {
+        position: relative;
+        height: 100svh;
+      }
+      .hero-photo img {
+        position: absolute;
+        inset: 84px var(--pad) 32px;
+        width: calc(100% - 2 * var(--pad));
+        height: calc(100% - 116px);
+        object-fit: contain;
+      }
+
+      /* ============================================================
+         OFFERS — one ruled row each: name, what's in it, price
+         ============================================================ */
+      .offer {
+        display: grid;
+        grid-template-columns: 1.1fr 1.6fr 1fr;
+        gap: 16px 24px;
+        align-items: baseline;
+        padding: 30px 0;
+        border-top: 1px solid var(--line);
+      }
+      .offer:last-of-type {
+        border-bottom: 1px solid var(--line);
+      }
+      .offer-name,
+      .offer-price {
+        font-size: clamp(30px, 3.6vw, 60px);
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.03em;
+      }
+      .offer ul {
+        list-style: none;
+        font-size: 17px;
+        line-height: 1.45;
+      }
+      .offer li + li {
+        margin-top: 6px;
+      }
+      .offer-side {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 14px;
+        text-align: right;
+      }
+      .offer-side .cta {
+        font-size: 17px;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 4px;
+      }
+      .offers-note {
+        max-width: 34em;
+        margin-top: 28px;
+        font-size: 17px;
+        opacity: 0.7;
+      }
+
+      /* ============================================================
+         WORK — a few photos, cascading in columns
+         ============================================================ */
+      .work-grid {
+        columns: 3;
+        column-gap: 13px;
+      }
+      .work-grid img {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin-bottom: 13px;
+        break-inside: avoid;
+      }
+      .work-more {
+        display: inline-block;
+        margin-top: 28px;
+        font-size: clamp(20px, 2.2vw, 32px);
+        letter-spacing: -0.01em;
+      }
+
+      /* ============================================================
+         STEPS — three big numbers, like the about page's figures
+         ============================================================ */
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px 24px;
+      }
+      .step-n {
+        display: block;
+        font-size: clamp(64px, 9vw, 150px);
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+      .step-title {
+        margin: 18px 0 8px;
+        font-size: clamp(20px, 2.2vw, 32px);
+        font-weight: 500;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+      }
+      .step p {
+        max-width: 22em;
+        font-size: 17px;
+        line-height: 1.45;
+      }
+
+      /* ============================================================
+         QUESTIONS — ruled rows, like the equipment list
+         ============================================================ */
+      .qa {
+        display: grid;
+        grid-template-columns: 1fr 1.4fr;
+        gap: 10px 24px;
+        align-items: baseline;
+        padding: 24px 0;
+        border-top: 1px solid var(--line);
+      }
+      .qa:last-child {
+        border-bottom: 1px solid var(--line);
+      }
+      .qa h3 {
+        font-size: clamp(20px, 2.2vw, 32px);
+        font-weight: 500;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+      }
+      .qa p {
+        max-width: 34em;
+        font-size: 17px;
+        line-height: 1.45;
+      }
+
+      /* ============================================================
+         BOOKING — a form that writes the email, sent by the visitor's
+         own mail app: the site has no server to send it.
+         ============================================================ */
+      .book {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100svh;
+      }
+      .book .sec-title {
+        margin-bottom: 5vh;
+      }
+      .book-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 34px 32px;
+        max-width: 1100px;
+      }
+      .book-form .wide {
+        grid-column: 1 / -1;
+      }
+      .book-form fieldset {
+        min-width: 0;
+        border: 0;
+      }
+      .book-form legend {
+        padding: 0;
+      }
+      .choices {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .choices input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .choices span {
+        display: block;
+        padding: 8px 20px;
+        border: 1.5px solid currentColor;
+        border-radius: 999px;
+        font-size: 17px;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          background-color 0.2s,
+          color 0.2s;
+      }
+      .choices span:hover {
+        opacity: 0.6;
+      }
+      .choices input:checked + span {
+        background: var(--fg);
+        color: var(--bg);
+        border-color: var(--fg);
+        opacity: 1;
+      }
+      .choices input:focus-visible + span {
+        outline: 1px solid var(--fg);
+        outline-offset: 4px;
+      }
+      .book-field {
+        display: block;
+      }
+      .book-field input,
+      .book-field textarea {
+        display: block;
+        width: 100%;
+        margin-top: 6px;
+        padding: 6px 0 10px;
+        border: 0;
+        border-bottom: 1.5px solid color-mix(in srgb, var(--fg) 35%, transparent);
+        border-radius: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        font-size: clamp(20px, 1.9vw, 28px);
+        font-weight: 500;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .book-field textarea {
+        min-height: 3.2em;
+        resize: vertical;
+      }
+      .book-field input:focus,
+      .book-field textarea:focus {
+        border-bottom-color: var(--fg);
+      }
+      .book-field ::placeholder {
+        color: color-mix(in srgb, var(--fg) 38%, transparent);
+        opacity: 1;
+      }
+      .send {
+        justify-self: start;
+        margin-top: 8px;
+        border: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        font-size: clamp(38px, 5.6vw, 96px);
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        text-align: left;
+        cursor: pointer;
+      }
+      .send:hover {
+        opacity: 0.6;
+      }
+      .send:focus-visible {
+        outline: 1px solid var(--fg);
+        outline-offset: 8px;
+      }
+      .book-status {
+        max-width: 34em;
+        font-size: 17px;
+        font-weight: 500;
+      }
+      .book-status[hidden] {
+        display: none;
+      }
+      .book-more {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 10px 32px;
+        margin-top: 7vh;
+        font-size: 17px;
+        font-weight: 500;
+      }
+      .book-more a,
+      .copy {
+        text-underline-offset: 4px;
+      }
+      .book-more .label {
+        display: inline;
+      }
+      /* Without the form, the email and Instagram take its place, large. */
+      .book-more.solo {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 0;
+      }
+      .book-more.solo a {
+        font-size: clamp(32px, 5.6vw, 96px);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        text-decoration: none;
+        overflow-wrap: anywhere;
+      }
+      .book-more.solo a:hover {
+        opacity: 0.6;
+      }
+      .book-more.solo .copy {
+        margin-top: 14px;
+      }
+      .copy {
+        border: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      @media (max-width: 900px) {
+        .offer {
+          grid-template-columns: 1fr 1fr;
+        }
+        .offer ul {
+          grid-column: 1 / -1;
+          grid-row: 2;
+        }
+        .steps {
+          grid-template-columns: 1fr;
+        }
+        .qa {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 700px) {
+        :root {
+          --pad: 20px;
+        }
+        .hdr {
+          font-size: 15px;
+        }
+        .sec {
+          padding: 96px var(--pad);
+        }
+        .sec-title {
+          margin-bottom: 40px;
+          font-size: 38px;
+        }
+        /* Phone: the photo first, under the header, then the sentence. */
+        .hero {
+          grid-template-columns: 1fr;
+          min-height: 0;
+        }
+        .hero-photo {
+          order: -1;
+          height: auto;
+          padding: 78px var(--pad) 0;
+        }
+        .hero-photo img {
+          position: static;
+          width: 100%;
+          height: auto;
+          max-height: 58svh;
+        }
+        .hero-text {
+          gap: 22px;
+          padding: 28px var(--pad) 72px;
+        }
+        .hero h1 {
+          font-size: 36px;
+          line-height: 1.04;
+        }
+        .offer {
+          padding: 24px 0;
+        }
+        .offer-name,
+        .offer-price {
+          font-size: 30px;
+        }
+        .work-grid {
+          columns: 2;
+          column-gap: 10px;
+        }
+        .work-grid img {
+          margin-bottom: 10px;
+        }
+        .step-n {
+          font-size: 64px;
+        }
+        .book-form {
+          grid-template-columns: 1fr;
+          gap: 28px;
+        }
+        .book-field input,
+        .book-field textarea {
+          font-size: 20px;
+        }
+        .send {
+          font-size: 40px;
+        }
+      }
+
+      /* ============================================================
+         PAGE TRANSITIONS
+         ============================================================ */
+      @view-transition {
+        navigation: auto;
+      }
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 0.5s;
+        animation-timing-function: var(--ease);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .reveal,
+        .choices span {
+          transition: none;
+        }
+        .js .reveal {
+          opacity: 1;
+          transform: none;
+        }
+        ::view-transition-group(*),
+        ::view-transition-old(*),
+        ::view-transition-new(*) {
+          animation: none !important;
+        }
+      }
+    </style>
+    <link rel="stylesheet" href="menu.css" />
+  </head>
+
+  <body data-page="shooting">
+    <header class="hdr" id="hdr">
+      <a href="index.html">Armel Kervennal</a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button>
+      <nav class="menu" id="menu" hidden>
+        <a href="archive.html">archive</a>
+        <a href="auto.html">automobile</a>
+        <a href="shooting.html" class="is-current">session photo</a>
+        <a href="about.html">about</a>
+      </nav>
+    </header>
+    <div class="menu-scrim" id="menuScrim" hidden></div>
+
+    <main id="shooting"></main>
+
+    <script src="site-config.js"></script>
+    <script src="menu.js"></script>
+    <script src="colour.js"></script>
+    <script>
+      const site = window.SITE_CONFIG || {};
+      const content = site.content || {};
+      const shoot = content.shooting || {};
+      const contact = content.contact || {};
+      const labels = (site.site || {}).labels || {};
+      const form = shoot.form || {};
+      const offers = (shoot.offers || []).filter((o) => (o.name || "").trim());
+      const root = document.getElementById("shooting");
+      const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+      const sections = []; // every block that sets the page's colour
+
+      function el(tag, cls, text) {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text != null) n.textContent = text;
+        return n;
+      }
+
+      function lines(list) {
+        return (list || []).map((l) => String(l).trim()).filter(Boolean);
+      }
+
+      // The words set in the admin as highlight take their own colour.
+      function withHighlight(node, text, mark, color) {
+        mark = (mark || "").trim();
+        const at = mark ? text.toLowerCase().indexOf(mark.toLowerCase()) : -1;
+        if (at < 0) {
+          node.textContent = text;
+          return node;
+        }
+        const hit = el("span", null, text.slice(at, at + mark.length));
+        hit.style.color = color || "";
+        node.append(text.slice(0, at), hit, text.slice(at + mark.length));
+        return node;
+      }
+
+      function section(cls, color) {
+        const s = el("section", cls);
+        root.appendChild(s);
+        sections.push({ el: s, color });
+        return s;
+      }
+
+      function head(sec, label, title) {
+        const wrap = el("div", "reveal");
+        if (label) wrap.appendChild(el("span", "label", label));
+        if (title) wrap.appendChild(el("h2", "sec-title", title));
+        sec.appendChild(wrap);
+      }
+
+      // A link to the form that also picks the offer it comes from.
+      function bookLink(text, offerName) {
+        const a = el("a", "cta", text);
+        a.href = "#reserver";
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (offerName) pick(offerName);
+          document.getElementById("reserver").scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth" });
+          setTimeout(() => nameInput && nameInput.focus({ preventScroll: true }), reduceMotion.matches ? 0 : 700);
+        });
+        return a;
+      }
+
+      // --- hero -------------------------------------------------------
+      const hero = shoot.hero || {};
+      const heroSec = section("hero", hero.color);
+      const heroText = el("div", "hero-text reveal");
+      if (hero.label) heroText.appendChild(el("span", "label", hero.label));
+      heroText.appendChild(withHighlight(el("h1"), hero.title || "", hero.highlight, hero.highlightColor));
+      if (hero.text) heroText.appendChild(el("p", "hero-sub", hero.text));
+      const heroCta = el("div", "hero-cta");
+      heroCta.appendChild(bookLink(hero.button || "Réserver une session photo"));
+      if (hero.from) heroCta.appendChild(el("span", "hero-from", hero.from));
+      heroText.appendChild(heroCta);
+      const heroPhoto = el("div", "hero-photo");
+      if (hero.photo) {
+        const img = el("img");
+        img.src = hero.photo;
+        img.alt = "";
+        img.setAttribute("fetchpriority", "high");
+        heroPhoto.appendChild(img);
+      }
+      heroSec.append(heroText, heroPhoto);
+
+      // --- offers -----------------------------------------------------
+      if (offers.length) {
+        const s = section("sec offers", shoot.offersColor);
+        head(s, shoot.offersLabel, shoot.offersTitle);
+        offers.forEach((o) => {
+          const row = el("article", "offer reveal");
+          row.appendChild(el("h3", "offer-name", o.name));
+          const list = el("ul");
+          lines(o.details).forEach((d) => list.appendChild(el("li", null, d)));
+          row.appendChild(list);
+          const side = el("div", "offer-side");
+          if (o.price) side.appendChild(el("span", "offer-price", o.price));
+          side.appendChild(bookLink(shoot.offerButton || "Choisir", o.name));
+          row.appendChild(side);
+          s.appendChild(row);
+        });
+        if (shoot.offersNote) s.appendChild(el("p", "offers-note reveal", shoot.offersNote));
+      }
+
+      // --- work -------------------------------------------------------
+      const photos = lines(shoot.photos);
+      if (photos.length) {
+        const s = section("sec work", shoot.photosColor);
+        head(s, shoot.photosLabel, shoot.photosTitle);
+        const grid = el("div", "work-grid");
+        photos.forEach((src) => {
+          const img = el("img", "reveal");
+          img.src = src;
+          img.alt = "";
+          img.loading = "lazy";
+          img.decoding = "async";
+          grid.appendChild(img);
+        });
+        s.appendChild(grid);
+        if (shoot.photosLink) {
+          const more = el("a", "cta work-more reveal", shoot.photosLink);
+          more.href = "auto.html";
+          s.appendChild(more);
+        }
+      }
+
+      // --- steps ------------------------------------------------------
+      const steps = (shoot.steps || []).filter((st) => (st.title || "").trim());
+      if (steps.length) {
+        const s = section("sec", shoot.stepsColor);
+        head(s, shoot.stepsLabel, shoot.stepsTitle);
+        const grid = el("div", "steps");
+        steps.forEach((st, i) => {
+          const step = el("div", "step reveal");
+          step.style.transitionDelay = i * 90 + "ms";
+          step.append(el("span", "step-n", String(i + 1)), el("h3", "step-title", st.title));
+          if (st.text) step.appendChild(el("p", null, st.text));
+          grid.appendChild(step);
+        });
+        s.appendChild(grid);
+      }
+
+      // --- questions --------------------------------------------------
+      const faq = (shoot.faq || []).filter((f) => (f.q || "").trim());
+      if (faq.length) {
+        const s = section("sec", shoot.faqColor);
+        head(s, shoot.faqLabel, shoot.faqTitle);
+        const list = el("div");
+        faq.forEach((f) => {
+          const row = el("div", "qa reveal");
+          row.append(el("h3", null, f.q), el("p", null, f.a || ""));
+          list.appendChild(row);
+        });
+        s.appendChild(list);
+      }
+
+      // --- booking ----------------------------------------------------
+      const book = section("sec book", shoot.bookColor);
+      book.id = "reserver";
+      head(book, form.label, form.title);
+
+      const f = el("form", "book-form reveal");
+      f.noValidate = false;
+      const radios = [];
+      if (offers.length) {
+        const set = el("fieldset", "wide");
+        set.appendChild(el("legend", "label", form.offerLabel || "Formule"));
+        const choices = el("div", "choices");
+        offers.forEach((o, i) => {
+          const lab = el("label");
+          const input = el("input");
+          input.type = "radio";
+          input.name = "offer";
+          input.value = o.name;
+          if (i === 0) input.checked = true;
+          radios.push(input);
+          lab.append(input, el("span", null, o.name));
+          choices.appendChild(lab);
+        });
+        set.appendChild(choices);
+        f.appendChild(set);
+      }
+
+      function pick(name) {
+        radios.forEach((r) => (r.checked = r.value === name));
+      }
+
+      function bookField(key, label, placeholder, { long, wide, required, type } = {}) {
+        const lab = el("label", "book-field" + (wide ? " wide" : ""));
+        lab.appendChild(el("span", "label", label));
+        const input = el(long ? "textarea" : "input");
+        input.name = key;
+        if (!long) input.type = type || "text";
+        if (long) input.rows = 3;
+        if (placeholder) input.placeholder = placeholder;
+        if (required) input.required = true;
+        lab.appendChild(input);
+        f.appendChild(lab);
+        return input;
+      }
+
+      const nameInput = bookField("name", form.nameLabel || "Prénom", form.namePlaceholder, { required: true });
+      bookField("car", form.carLabel || "Voiture", form.carPlaceholder);
+      bookField("place", form.placeLabel || "Ville", form.placePlaceholder);
+      bookField("date", form.dateLabel || "Quand", form.datePlaceholder);
+      bookField("message", form.messageLabel || "Message", form.messagePlaceholder, { long: true, wide: true });
+
+      const send = el("button", "send wide", form.button || "Envoyer la demande →");
+      send.type = "submit";
+      f.appendChild(send);
+      const status = el("p", "book-status wide");
+      status.hidden = true;
+      status.setAttribute("role", "status");
+      f.appendChild(status);
+      // Switched off in the admin: only the email and Instagram remain.
+      const showForm = form.show !== false;
+      if (showForm) book.appendChild(f);
+
+      // The visitor's mail app opens with the request already written.
+      f.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!f.reportValidity()) return;
+        const data = new FormData(f);
+        const val = (k) => String(data.get(k) || "").trim();
+        const subject = [form.subject, val("offer"), val("car")].filter(Boolean).join(" · ");
+        const body = [
+          form.greeting || "",
+          "",
+          val("message"),
+          "",
+          [
+            [form.offerLabel || "Formule", val("offer")],
+            [form.carLabel || "Voiture", val("car")],
+            [form.placeLabel || "Ville", val("place")],
+            [form.dateLabel || "Quand", val("date")],
+          ]
+            .filter(([, v]) => v)
+            .map(([k, v]) => k + " : " + v)
+            .join("\n"),
+          "",
+          val("name"),
+        ]
+          .join("\n")
+          .replace(/\n{3,}/g, "\n\n");
+        location.href =
+          "mailto:" + contact.email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+        status.textContent = form.sent || "";
+        status.hidden = !form.sent;
+      });
+
+      // Straight to the email or Instagram, for those who'd rather.
+      if (contact.email) {
+        const more = el("div", "book-more reveal" + (showForm ? "" : " solo"));
+        if (form.direct && showForm) more.appendChild(el("span", "label", form.direct));
+        const mail = el("a", null, contact.email);
+        mail.href = "mailto:" + contact.email;
+        more.appendChild(mail);
+        if (contact.instagramHandle) {
+          const insta = el("a", null, contact.instagramHandle);
+          insta.href = contact.instagramUrl || "#";
+          insta.target = "_blank";
+          insta.rel = "noopener";
+          more.appendChild(insta);
+        }
+        const copy = el("button", "copy", labels.copy || "copier l'adresse mail");
+        copy.type = "button";
+        copy.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(contact.email);
+            copy.textContent = labels.copied || "copié";
+          } catch {
+            copy.textContent = contact.email;
+          }
+          setTimeout(() => (copy.textContent = labels.copy || "copier l'adresse mail"), 1800);
+        });
+        more.appendChild(copy);
+        book.appendChild(more);
+      }
+
+      // --- reveal -----------------------------------------------------
+      const seen = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("in");
+            seen.unobserve(entry.target);
+          });
+        },
+        { rootMargin: "0px 0px -8% 0px" },
+      );
+      document.querySelectorAll(".reveal").forEach((n) => seen.observe(n));
+
+      // --- colour: same treatment as the other pages ------------------
+      // The block at the centre of the screen sets a target, and the
+      // colour eases toward it in OKLab at its own pace.
+      const EASE = 0.085; // lerp factor per 60fps frame
+      const FRAME_MS = 1000 / 60;
+      const SETTLED = 0.0015;
+      let curLab = null;
+      let targetLab = null;
+      let painting = false;
+      let lastPaint = 0;
+      let paintedCss = null;
+      let paintedDark = null;
+
+      function applyColour() {
+        const css = oklabToCss(curLab);
+        if (css === paintedCss) return;
+        paintedCss = css;
+        document.documentElement.style.backgroundColor = css;
+        document.body.style.backgroundColor = css;
+        document.documentElement.style.setProperty("--bg", css);
+        const dark = curLab[0] < 0.62;
+        if (dark === paintedDark) return;
+        paintedDark = dark;
+        document.documentElement.style.setProperty("--fg", dark ? "#f2f2f2" : "#111111");
+        document.documentElement.style.setProperty("--halo", dark ? "rgba(0, 0, 0, 0.6)" : "rgba(255, 255, 255, 0.85)");
+      }
+
+      function paint() {
+        painting = false;
+        const now = performance.now();
+        const frames = Math.min(now - lastPaint, 100) / FRAME_MS;
+        lastPaint = now;
+        const ease = reduceMotion.matches ? 1 : 1 - Math.pow(1 - EASE, frames);
+        let rest = 0;
+        curLab = curLab.map((v, k) => {
+          const nv = v + (targetLab[k] - v) * ease;
+          rest = Math.max(rest, Math.abs(targetLab[k] - nv));
+          return nv;
+        });
+        if (rest < SETTLED) curLab = targetLab;
+        applyColour();
+        if (curLab !== targetLab) {
+          painting = true;
+          requestAnimationFrame(paint);
+        }
+      }
+
+      function setColour(hex) {
+        const lab = hexToOklab(hex || "#ffffff");
+        if (targetLab && lab.every((v, k) => v === targetLab[k])) return;
+        targetLab = lab;
+        if (!curLab) {
+          curLab = lab;
+          applyColour();
+          return;
+        }
+        if (!painting) {
+          painting = true;
+          lastPaint = performance.now();
+          requestAnimationFrame(paint);
+        }
+      }
+
+      function onScroll() {
+        scrollQueued = false;
+        const middle = window.innerHeight / 2;
+        const active = sections.find(({ el: s }) => {
+          const r = s.getBoundingClientRect();
+          return r.top <= middle && r.bottom > middle;
+        });
+        if (active) setColour(active.color);
+      }
+
+      let scrollQueued = false;
+      function queueScroll() {
+        if (scrollQueued) return;
+        scrollQueued = true;
+        requestAnimationFrame(onScroll);
+      }
+      window.addEventListener("scroll", queueScroll, { passive: true });
+      window.addEventListener("resize", queueScroll);
+      onScroll();
+
+      // Arriving from another page's link straight to the form.
+      if (location.hash === "#reserver") book.scrollIntoView();
+    </script>
+  </body>
+</html>

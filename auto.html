@@ -210,6 +210,25 @@
         aspect-ratio: 3 / 2;
         object-fit: cover;
       }
+      /* After the last car: the reader's own, with a way to book. */
+      .shoot-cta {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 20px;
+        min-height: 72svh;
+        text-decoration: none;
+      }
+      .shoot-cta-sub {
+        font-size: clamp(20px, 2.4vw, 34px);
+        font-weight: 500;
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 6px;
+      }
+      .shoot-cta:hover {
+        opacity: 0.6;
+      }
 
       /* ============================================================
          GALLERY — on the car's colour: its name, its photo settled a
@@ -453,6 +472,7 @@
       <nav class="menu" id="menu" hidden>
         <a href="archive.html">archive</a>
         <a href="auto.html" class="is-current">automobile</a>
+        <a href="shooting.html">session photo</a>
         <a href="about.html">about</a>
       </nav>
     </header>
@@ -719,6 +739,14 @@
           rows.push({ el: a, link, opacity: ROW_REST });
           centreLine.observe(a);
         });
+        const shooting = ((window.SITE_CONFIG && SITE_CONFIG.content) || {}).shooting || {};
+        if (shooting.autoLink) {
+          const cta = el("a", "shoot-cta");
+          cta.href = "shooting.html";
+          cta.append(el("span", "model-name", shooting.autoLink));
+          if (shooting.autoLinkSub) cta.appendChild(el("span", "shoot-cta-sub", shooting.autoLinkSub));
+          nav.appendChild(cta);
+        }
         view.replaceChildren(index, nav);
         covers.forEach(([img, src]) => (img.src = src));
         indexEdges();

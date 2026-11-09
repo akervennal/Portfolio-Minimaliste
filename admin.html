@@ -880,7 +880,7 @@
         $("viewBtn").href =
           view.page === "album" ? "archive.html?y=" + encodeURIComponent(cfg.projects[view.id].year) + "&p=" + encodeURIComponent(view.id)
           : model ? "auto.html?m=" + slugify(model.model)
-          : { archive: "archive.html", auto: "auto.html", about: "about.html" }[view.page] || "index.html";
+          : { archive: "archive.html", auto: "auto.html", shooting: "shooting.html", about: "about.html" }[view.page] || "index.html";
         document.title = (dirty ? "• " : "") + "Administration";
       }
 
@@ -1659,6 +1659,171 @@
         ];
       }
 
+      // --- Shooting ---------------------------------------------------
+      // A list whose rows can be dragged, removed and added to.
+      function editList({ kind, owner, key, row, blank, addLabel }) {
+        const list = owner[key];
+        return [
+          list.map((item, index) => {
+            const handle = grip();
+            return sortable(
+              h("div", { class: "row" },
+                handle,
+                h("div", { class: "grow fields" }, row(item)),
+                h("button", { class: "link", title: "Supprimer", onclick: () => commit(() => list.splice(index, 1)) }, "×"),
+              ),
+              { kind, owner, get: () => [...owner[key]], set: (l) => (owner[key] = l), index, handle },
+            );
+          }),
+          h("button", { class: "btn", onclick: () => commit(() => list.push(blank())) }, addLabel),
+        ];
+      }
+
+      function pageShooting() {
+        if (!cfg.content.shooting) cfg.content.shooting = {};
+        const sh = cfg.content.shooting;
+        sh.hero ||= {};
+        sh.form ||= {};
+        sh.offers ||= [];
+        sh.photos ||= [];
+        sh.steps ||= [];
+        sh.faq ||= [];
+        const hero = sh.hero;
+        const form = sh.form;
+        const sectionHead = (labelKey, titleKey, colourKey) =>
+          h("div", { class: "fields", style: "margin-bottom:12px" },
+            field("Petit titre", sh, labelKey),
+            field("Grand titre", sh, titleKey, { wide: true }),
+            labelled("Couleur de fond", colour(sh, colourKey)),
+          );
+        return [
+          h("h2", null, "Session photo"),
+          h("p", { class: "help" }, "La page pour réserver une séance. Une section sans contenu (aucune formule, aucune photo…) ne s'affiche pas."),
+
+          h("h3", null, "En haut de la page"),
+          h("div", { class: "row" },
+            h("div", { class: "grow fields" },
+              field("Petit titre", hero, "label"),
+              field("Grande phrase", hero, "title", { long: true }),
+              field("Mot en couleur (facultatif)", hero, "highlight"),
+              labelled("Couleur du mot", colour(hero, "highlightColor")),
+              field("Texte", hero, "text", { long: true }),
+              field("Bouton", hero, "button"),
+              field("À côté du bouton", hero, "from", { hint: "Le prix d'appel, par exemple « à partir de 120 € »." }),
+              labelled("Couleur de fond", colour(hero, "color")),
+            ),
+            h("div", { class: "tile" },
+              hero.photo && photo(hero.photo),
+              h("button", {
+                class: "x",
+                title: "Changer la photo",
+                onclick: async () => {
+                  const [src] = await pickPhotos({ folder: AUTO_FOLDER });
+                  if (src) commit(() => (hero.photo = src));
+                },
+              }, "✎"),
+            ),
+          ),
+
+          h("h3", null, "Formules"),
+          h("p", { class: "help" }, "Dans le détail, une ligne par point. Le prix est un texte libre : « 120 € », « Sur devis »…"),
+          sectionHead("offersLabel", "offersTitle", "offersColor"),
+          editList({
+            kind: "offer",
+            owner: sh,
+            key: "offers",
+            addLabel: "+ Formule",
+            blank: () => ({ name: "", price: "", details: [] }),
+            row: (o) => [
+              field("Nom", o, "name"),
+              field("Prix", o, "price"),
+              h("label", { class: "field wide" },
+                h("span", null, "Détail"),
+                bindEdit(h("textarea", { rows: 6 }), () => (o.details || []).join("\n"), (v) => (o.details = v.split("\n"))),
+              ),
+            ],
+          }),
+          h("div", { class: "fields", style: "margin-top:12px" },
+            field("Lien sous chaque prix", sh, "offerButton"),
+            field("Phrase sous les formules", sh, "offersNote", { long: true }),
+          ),
+
+          h("h3", null, "Photos"),
+          sectionHead("photosLabel", "photosTitle", "photosColor"),
+          photoGrid({
+            kind: "shooting",
+            owner: sh,
+            folder: AUTO_FOLDER,
+            get: () => [...sh.photos],
+            set: (list) => (sh.photos = list),
+          }),
+          h("div", { class: "fields", style: "margin-top:12px" },
+            field("Lien vers la page automobile", sh, "photosLink", { hint: "Sous les photos. Vide : pas de lien." }),
+          ),
+
+          h("h3", null, "Étapes"),
+          sectionHead("stepsLabel", "stepsTitle", "stepsColor"),
+          editList({
+            kind: "step",
+            owner: sh,
+            key: "steps",
+            addLabel: "+ Étape",
+            blank: () => ({ title: "", text: "" }),
+            row: (st) => [field("Titre", st, "title"), field("Texte", st, "text", { long: true })],
+          }),
+
+          h("h3", null, "Questions"),
+          sectionHead("faqLabel", "faqTitle", "faqColor"),
+          editList({
+            kind: "faq",
+            owner: sh,
+            key: "faq",
+            addLabel: "+ Question",
+            blank: () => ({ q: "", a: "" }),
+            row: (f) => [field("Question", f, "q"), field("Réponse", f, "a", { long: true })],
+          }),
+
+          h("h3", null, "Réserver"),
+          h("p", { class: "help" }, "Le bouton du formulaire ouvre la messagerie du visiteur avec la demande déjà écrite, adressée à l'email de la page À propos. Formulaire masqué : seuls l'email et Instagram s'affichent, en grand."),
+          h("label", { style: "display:flex;gap:8px;align-items:center;margin-bottom:12px;cursor:pointer" },
+            h("input", {
+              type: "checkbox",
+              checked: form.show !== false,
+              onchange: (e) => commit(() => (form.show = e.target.checked)),
+            }),
+            "Afficher le formulaire",
+          ),
+          h("div", { class: "fields" },
+            field("Petit titre", form, "label"),
+            field("Grand titre", form, "title"),
+            labelled("Couleur de fond", colour(sh, "bookColor")),
+            field("Formule : titre", form, "offerLabel"),
+            field("Prénom : titre", form, "nameLabel"),
+            field("Prénom : exemple", form, "namePlaceholder"),
+            field("Voiture : titre", form, "carLabel"),
+            field("Voiture : exemple", form, "carPlaceholder"),
+            field("Ville : titre", form, "placeLabel"),
+            field("Ville : exemple", form, "placePlaceholder"),
+            field("Date : titre", form, "dateLabel"),
+            field("Date : exemple", form, "datePlaceholder"),
+            field("Message : titre", form, "messageLabel"),
+            field("Message : exemple", form, "messagePlaceholder"),
+            field("Bouton d'envoi", form, "button"),
+            field("Email : objet", form, "subject", { hint: "Suivi de la formule et de la voiture choisies." }),
+            field("Email : première ligne", form, "greeting"),
+            field("Au-dessus de l'email", form, "direct"),
+            field("Message après l'envoi", form, "sent", { long: true }),
+          ),
+
+          h("h3", null, "Liens vers cette page"),
+          h("div", { class: "fields" },
+            field("Automobile : sous la dernière voiture", sh, "autoLink", { hint: "Vide : pas de lien." }),
+            field("Automobile : lien en dessous", sh, "autoLinkSub"),
+            field("À propos : lien à côté du contact", sh, "aboutLink", { hint: "Vide : pas de lien." }),
+          ),
+        ];
+      }
+
       // --- Réglages ---------------------------------------------------
       async function replaceFavicon() {
         const [file] = await chooseFiles();
@@ -1679,7 +1844,8 @@
 
       function pageSettings() {
         const site = cfg.site;
-        const pageNames = { home: "Accueil", archive: "Archive", auto: "Automobile", about: "À propos" };
+        const pageNames = { home: "Accueil", archive: "Archive", auto: "Automobile", shooting: "Session photo", about: "À propos" };
+        site.pages.shooting ||= {};
         return [
           h("h2", null, "Réglages du site"),
           h("h3", null, "Nom"),
@@ -1713,8 +1879,8 @@
             field("À propos : mot sous le nombre d'albums", site.labels, "albums"),
             field("À propos : titre au-dessus de l'email", site.labels, "email"),
             field("À propos : titre au-dessus d'Instagram", site.labels, "instagram"),
-            field("À propos : bouton pour copier l'email", site.labels, "copy"),
-            field("À propos : message une fois copié", site.labels, "copied"),
+            field("À propos et Session photo : bouton pour copier l'email", site.labels, "copy"),
+            field("À propos et Session photo : message une fois copié", site.labels, "copied"),
           ),
           h("h3", null, "Icône de l'onglet"),
           h("div", { class: "foot" },
@@ -1730,6 +1896,7 @@
         album: pageAlbum,
         auto: pageAuto,
         model: pageModel,
+        shooting: pageShooting,
         about: pageAbout,
         settings: pageSettings,
       };
@@ -1737,6 +1904,7 @@
         ["home", "Accueil", () => cfg.sequence.length],
         ["archive", "Archive", () => Object.keys(cfg.projects).length],
         ["auto", "Automobile", () => cfg.auto.series.length],
+        ["shooting", "Session photo"],
         ["about", "À propos"],
         ["settings", "Réglages"],
       ];

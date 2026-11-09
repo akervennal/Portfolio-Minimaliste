@@ -415,6 +415,7 @@
       <nav class="menu" id="menu" hidden>
         <a href="archive.html">archive</a>
         <a href="auto.html">automobile</a>
+        <a href="shooting.html">session photo</a>
         <a href="about.html" class="is-current">about</a>
       </nav>
     </header>
@@ -555,6 +556,12 @@
       });
       more.appendChild(copy);
       if (contact.location) more.appendChild(el("span", null, contact.location));
+      const shooting = (site.content || {}).shooting || {};
+      if (shooting.aboutLink) {
+        const offers = el("a", null, shooting.aboutLink);
+        offers.href = "shooting.html";
+        more.appendChild(offers);
+      }
       cs.appendChild(more);
       root.appendChild(cs);
       sections.push({ el: cs, color: about.contactColor, phoneColor: about.contactColorPhone });
